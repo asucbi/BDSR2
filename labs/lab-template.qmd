@@ -1,0 +1,105 @@
+---
+title: "BDSR2 lab template"
+author: "Derek Powell"
+format: 
+  html:
+    embed-resources: true
+editor: visual
+theme: cosmo
+---
+
+:::{.callout-caution icon=false}
+## Learning Objectives
+
+Our learning objectives for this module are:
+
+- Learn to use a template to make lab documents for BDSR2
+- Have something we can copy and paste to get started
+:::
+
+Here is where we would have an introduction to the lab. 
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at neque vel auctor. Mauris in imperdiet tellus. Vestibulum tincidunt maximus pretium. Nullam molestie viverra purus, ut viverra mauris. Aliquam pulvinar nec ante eu elementum. Donec at faucibus urna. Cras semper egestas lectus, et vulputate sapien gravida pulvinar. Proin sit amet laoreet est. Sed auctor, mauris in ultricies tristique, justo ipsum pulvinar risus, non tincidunt sem massa id libero. Etiam eget volutpat nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean rhoncus urna efficitur nunc tincidunt tristique. Sed rhoncus erat nec suscipit lobortis. Duis efficitur pellentesque enim ac feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
+
+::: {.column-margin}
+Here is where we might bore students with some minutia or a formula like $\hat{y} = \alpha + \beta x$.
+:::
+
+
+# Exercises
+
+:::{.callout-note icon=false}
+## Exercise 1
+
+Copy and paste this template and delete all the boilerplate below.
+
+:::
+
+:::{.callout-note icon=false}
+## Exercise 2
+
+Get to work and make an actual lab!
+
+:::
+
+:::{.callout-important}
+Note that this will render into the `../docs/labs/` folder, so as to appear on our github pages site (once that is set up in the future). Looks like this may cause issues with the built-in viewer in `Rstudio`, so may have some more tweaking to do.
+:::
+
+---
+
+### Additional formatting
+
+Quarto includes "callouts," including: `note`, `tip`, `warning`, `caution`, and `important`. I think it will be useful to use a few of these in formulaic ways. We can use these however by defining a custom title and suppressing the icons where relevant
+
+Let's use the "note" callout for the lab exercises. We can provide our own more informative titles as needed with `##` level headings inside the note as desired. If we like, we can also emd another "hint" callout and collapse them with `collapse=true`.
+
+:::{.callout-note icon=false}
+## Exercise 1
+
+Do something involving making a machine learning model, probably!
+
+:::{.callout-note icon=false collapse=true}
+## Hint
+
+This would be helpful though.
+:::
+
+:::
+
+Let's override the icon of the caution callout with `icon=false` for "learning objectives" to start the document.
+
+:::{.callout-caution icon=false}
+## Learning Objectives
+
+Our learning objectives for this module are:
+
+-   Introduce foundational frameworks and processes of machine learning
+-   Introduce "splitting" data into training and test splits
+-   Demonstrate use of linear regression in `tidymodels`
+:::
+
+:::{.callout-tip}
+And one for tips and tricks etc.
+:::
+
+:::{.callout-important}
+And this important one for things we really want to flag. Probably use this mostly for instructions regarding saving, formatting. and submitting assignments.
+:::
+
+
+::: {.column-margin}
+We can also use the `.column-margin` div to include any kinds of marginal comments, brief tips/tricks, etc.
+:::
+
+### Other Quarto Resources
+
+Some things that look really useful for us:
+
+- [Diagrams guide](https://quarto.org/docs/authoring/diagrams.html)
+- [Code annotation syntax guide](https://quarto.org/docs/authoring/code-annotation.html)
+- [Embedding Videos](https://quarto.org/docs/authoring/videos.html)
+
+
+
+

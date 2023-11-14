@@ -25,10 +25,12 @@ out <- d %>%
   drop_na(
     candidate
   ) %>% 
+  filter(candidate != "Scattered", state != "American Samoa") %>% 
   mutate(
     winner = ifelse(is.na(winner), 0, 1)
   ) %>% 
   mutate_at(vars(district, year, votes), as.integer)
+  
 
 
 write_csv(out, "../../data/congress.csv")

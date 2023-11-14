@@ -1,44 +1,167 @@
 ---
-title: "BDSR2 lab template"
+title: "Module 1 Lab: Election Forcasting"
 author: "Derek Powell"
-format: html
+format: 
+  html:
+    embed-resources: true
 editor: visual
 theme: cosmo
-output-dir: docs/labs
 ---
 
-:::{.callout-caution icon=false}
+::: {.callout-caution icon="false"}
 ## Learning Objectives
 
 Our learning objectives for this module are:
 
-- Learn to use a template to make lab documents for BDSR2
-- Have something we can copy and paste to get started
+-   Introduce foundational frameworks and processes of machine learning
+-   Introduce "splitting" data into training and test splits
+-   Demonstrate use of linear regression in `tidymodels`
 :::
 
-Here is where we would have an introduction to the lab. 
+Elections are important! More about this blah blah.
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at neque vel auctor. Mauris in imperdiet tellus. Vestibulum tincidunt maximus pretium. Nullam molestie viverra purus, ut viverra mauris. Aliquam pulvinar nec ante eu elementum. Donec at faucibus urna. Cras semper egestas lectus, et vulputate sapien gravida pulvinar. Proin sit amet laoreet est. Sed auctor, mauris in ultricies tristique, justo ipsum pulvinar risus, non tincidunt sem massa id libero. Etiam eget volutpat nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean rhoncus urna efficitur nunc tincidunt tristique. Sed rhoncus erat nec suscipit lobortis. Duis efficitur pellentesque enim ac feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
+## Data
 
-::: {.column-margin}
-Bore students with some minutia or a formula like $\hat{y} = \alpha + \beta x$.
-:::
+We will use data on U.S. House of Representatives Congressional Elections in 2014, 2016, 2018, and 2020. 
+
+```{r}
+#| message = FALSE
+library(tidyverse)
+library(tidymodels)
+
+congress <- read_csv("../data/congress.csv")
+```
 
 
 # Exercises
 
-:::{.callout-note icon=false}
+We're going to start by predicting election results in 2018 from the results the prior election in 2016. 
+
+Before we can really begin that though, we need to do some ... drum roll please ... you guessed it! Data Munging!
+
+Our first step will be to set up our data so we can build our models. For each district, we will try to predict the share of votes won by the democratic House candidate. The first and most important predictor will be the democratic vote share from the prior election. Another helpful predictor could be whether or not the candidate is an incumbent. 
+
+In American politics, there is a well-known incumbeny advantage---incumbents tend to be favored in elections. There are lots of reasons for this, but at very least they have automatic name recognition and the station of the office with which to represent themselves. And, if things are generally going reasonably well, they have the baseline credibility of having the keys to the Capitol without burning it down.
+
+::: {.callout-note icon="false"}
 ## Exercise 1
 
-Copy and paste this template and delete all the boilerplate below.
+Take the `df` data, add a variable called `incumbent` that indicate whether the candidate is an incumbent or not.
+
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+
+There is more than one way to do this, but you will likely want to make use of `group_by()` and a function that might be new called `lag()`. The help can help!
+:::
 
 :::
 
-:::{.callout-important}
-This isn't done yet as I need to figure out how to get it to render into the right location.
+```{r}
+df <- congress %>% 
+  arrange(year) %>% 
+  group_by(candidate) %>% 
+  mutate(
+    incumbent = if_else(lag(winner)==1, 1, 0, missing=0),
+    incumbent = if_else(year==2014, NA, incumbent)
+    )
+```
+
+
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Now, do some further  data munging of the sort we learned last semester.
+
+1. Filter `df` to include only the years 2016 and 2018.
+2. Pivot the data to a wide format, so that for each Congressional district we have variables  representing the proportion of democratic votes in 2016 and 2018, and whether or not there was a democrat incumbent going into the 2018 election.
+3. Only include data for elections that were *contested* in both 2016 and 2018---i.e. elections with at least one D and one R candidate (sorry, third party candidates, but you don't count).
 :::
 
----
+```{r}
+df <- df %>% 
+  ungroup() %>% 
+  filter(year %in% c(2016, 2018), party %in% c("D","R")) %>%
+  group_by(year, district) %>% 
+  select(year, state, district, party, prop, incumbent) %>%
+  pivot_wider(
+    id_cols = c(state, district), 
+    names_from = c(party, year), 
+    values_from = c(prop, incumbent), 
+    values_fn = max
+    ) %>% 
+  drop_na(contains("prop_"))
+  
+```
+
+
+With our data ready in our `df` tibble, we can start building a model! Before we do that though, we need to split our data into training and testing splits. We can use the classic 80% for training and 20% for testing.
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+Using `tidymodels`, split the data into training and testing splits called `train` and `test`.
+
+:::
+
+```{r}
+set.seed(123)
+df_split <- initial_split(df)
+df_split
+```
+
+```{r}
+train <- training(df_split)
+test <- testing(df_split)
+```
+
+
+Now we'll build our model specification and modeling workflow.
+
+::: {.callout-note icon="false"}
+## Exercise 4
+
+Create a model specification for linear regression and call it `linear_spec`.
+
+:::
+
+```{r}
+linear_spec <- linear_reg()
+```
+
+
+::: {.callout-note icon="false"}
+## Exercise 4
+
+Create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it `lin_wflow`
+
+:::
+
+```{r}
+lin_wflow <- workflow(prop_D_2018 ~ prop_D_2016) %>% 
+  add_model(linear_spec)
+  
+```
+
+::: {.callout-note icon="false"}
+## Exercise 5
+
+Now fit the model to the `train` data (finally!). Call this `lin_fit1`.
+
+:::
+
+
+```{r}
+lin_fit1 <- lin_wflow %>% 
+  fit(data = train)
+```
+
+
+
+Now, we'll use this model to "forecast" the results in 2020 (should see lower performance.) Can try using 2016 data to predict 2020 and compare.
+
+
+
+------------------------------------------------------------------------
 
 ## Quarto information
 
@@ -67,22 +190,21 @@ Quarto includes "callouts," including: `note`, `tip`, `warning`, `caution`, and 
 
 Let's use the "note" callout for the lab exercises. We can provide our own more informative titles as needed with `##` level headings inside the note as desired. If we like, we can also emd another "hint" callout and collapse them with `collapse=true`.
 
-:::{.callout-note icon=false}
+::: {.callout-note icon="false"}
 ## Exercise 1
 
 Do something involving making a machine learning model, probably!
 
-:::{.callout-note icon=false collapse=true}
+::: {.callout-note icon="false" collapse="true"}
 ## Hint
 
 This would be helpful though.
 :::
-
 :::
 
 Let's override the icon of the caution callout with `icon=false` for "learning objectives" to start the document.
 
-:::{.callout-caution icon=false}
+::: {.callout-caution icon="false"}
 ## Learning Objectives
 
 Our learning objectives for this module are:
@@ -92,16 +214,15 @@ Our learning objectives for this module are:
 -   Demonstrate use of linear regression in `tidymodels`
 :::
 
-:::{.callout-tip}
+::: callout-tip
 And one for tips and tricks etc.
 :::
 
-:::{.callout-important}
+::: callout-important
 And this important one for things we really want to flag. Probably use this mostly for instructions regarding saving, formatting. and submitting assignments.
 :::
 
-
-::: {.column-margin}
+::: column-margin
 We can also use the `.column-margin` div to include any kinds of marginal comments, brief tips/tricks, etc.
 :::
 
@@ -109,10 +230,6 @@ We can also use the `.column-margin` div to include any kinds of marginal commen
 
 Some things that look really useful for us:
 
-- [Diagrams guide](https://quarto.org/docs/authoring/diagrams.html)
-- [Code annotation syntax guide](https://quarto.org/docs/authoring/code-annotation.html)
-- [Embedding Videos](https://quarto.org/docs/authoring/videos.html)
-
-
-
-
+-   [Diagrams guide](https://quarto.org/docs/authoring/diagrams.html)
+-   [Code annotation syntax guide](https://quarto.org/docs/authoring/code-annotation.html)
+-   [Embedding Videos](https://quarto.org/docs/authoring/videos.html)

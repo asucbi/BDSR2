@@ -58,3 +58,5 @@ rsconnect/
 # local-only files
 
 local/
+**/local/
+proc/**/data

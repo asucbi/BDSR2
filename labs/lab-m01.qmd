@@ -28,6 +28,7 @@ We will use data on U.S. House of Representatives Congressional Elections in 201
 #| message = FALSE
 library(tidyverse)
 library(tidymodels)
+library(broom)
 
 congress <- read_csv("../data/congress.csv")
 ```
@@ -72,15 +73,15 @@ df <- congress %>%
 
 Now, do some further  data munging of the sort we learned last semester.
 
-1. Filter `df` to include only the years 2016 and 2018.
-2. Pivot the data to a wide format, so that for each Congressional district we have variables  representing the proportion of democratic votes in 2016 and 2018, and whether or not there was a democrat incumbent going into the 2018 election.
-3. Only include data for elections that were *contested* in both 2016 and 2018---i.e. elections with at least one D and one R candidate (sorry, third party candidates, but you don't count).
+1. Filter `df` to include only the rows for Democrat and Republican candidates
+2. Pivot the data to a wide format, so that for each Congressional district we have variables  representing the proportion of democratic votes in 2016 and 2018, and whether or not there was a democrat incumbent going into the 2018 election. If there is more than one D or R candidate, use the proportion value for the candidate with the most votes.
+3. Replace `NA` values for vote proportion and incumbency with zero---if there's not value it's because no one ran and therefore they got zero votes.
 :::
 
 ```{r}
 df <- df %>% 
   ungroup() %>% 
-  filter(year %in% c(2016, 2018), party %in% c("D","R")) %>%
+  # filter(year %in% c(2014, 2016, 2018), party %in% c("D","R")) %>%
   group_by(year, district) %>% 
   select(year, state, district, party, prop, incumbent) %>%
   pivot_wider(
@@ -89,7 +90,7 @@ df <- df %>%
     values_from = c(prop, incumbent), 
     values_fn = max
     ) %>% 
-  drop_na(contains("prop_"))
+  replace(is.na(.), 0)
   
 ```
 
@@ -104,7 +105,7 @@ Using `tidymodels`, split the data into training and testing splits called `trai
 :::
 
 ```{r}
-set.seed(123)
+set.seed(42)
 df_split <- initial_split(df)
 df_split
 ```
@@ -132,12 +133,12 @@ linear_spec <- linear_reg()
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
-Create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it `lin_wflow`
+Create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it `lin_wflow1`.
 
 :::
 
 ```{r}
-lin_wflow <- workflow(prop_D_2018 ~ prop_D_2016) %>% 
+lin_wflow1 <- workflow(prop_D_2018 ~ prop_D_2016) %>% 
   add_model(linear_spec)
   
 ```
@@ -151,14 +152,122 @@ Now fit the model to the `train` data (finally!). Call this `lin_fit1`.
 
 
 ```{r}
-lin_fit1 <- lin_wflow %>% 
+lin_fit1 <- lin_wflow1 %>% 
+  fit(data = train)
+```
+
+Now check the fit on the training data
+
+::: {.callout-note icon="false"}
+## Exercise 5
+
+Let's look at this two ways, by some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE) and by plotting the predicted values against the actual observed values.
+
+:::
+
+```{r}
+lin_fit1 %>% 
+  augment(train) %>% 
+  metrics(prop_D_2018, .pred)
+
+lin_fit1 %>% 
+  augment(train) %>% 
+  ggplot(aes(x = .pred, y = prop_D_2018)) +
+  geom_point() +
+  theme(aspect.ratio = 1)
+```
+
+By looking at the predictions against the actual election results, we can see our model's performane is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the "cloud" of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?
+
+::: {.callout-note icon="false"}
+## Exercise 6
+
+Let's inspect the model's coefficients and see if they offer any clues. Use the `tidy()` function from the `broom` package. What does the intercept represent? Can you see that reflected on the plot above anywhere? Think about this a bit before moving on to the next exercise to see if you can come up with a theory for what is happening. When you've thought it through, you can expand the explanation below.
+
+::: {.callout-warning icon="false" collapse = "true"}
+## Explanation
+
+Of course the intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot---so that's a clue there are actually data points in our data with a proportion of zero. These are *uncontested* elections where there was no Democratic party candidate. 
+
+But whenever a candidate actually runs, they do so because they expect to get at least some share of the vote---more than 21\% at least.
+
+:::
+
+:::
+
+```{r}
+tidy(lin_fit1)
+```
+
+We'd like to add a predictor to our dataset to account for this in our model. But, if we are going to add a predictor we will need to add it to our train and test splits. A better way to manage this kind of "feature engineering" is to use a **recipe**.
+
+::: {.callout-note icon="false"}
+## Exercise 7
+
+Create a new workflow `lin_wflow2` that adds a `step_mutate()` to add a recipe step creating a new variable called `uncontested_2016` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. Make sure the workflow applies a new formula that uses this variable in the linear regression model.
+
+Then, fit this new model and call it `lin_fit2`
+
+:::
+
+```{r}
+## not sure how recipes work :(
+rec <- recipe(prop_D_2018 ~ prop_D_2016 + uncontested_2016, data = train) %>% 
+  step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0))
+
+lin_wflow2 <- workflow() %>% 
+  add_formula(prop_D_2018 ~ prop_D_2016 + uncontested_2016) %>% 
+  add_recipe(rec) %>% 
+  # step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0)) %>% 
+  add_model(linear_spec)
+
+lin_fit2 <- lin_wflow2 %>% 
   fit(data = train)
 ```
 
 
+Now let's try creating some new model specifications that use more predictors.
 
-Now, we'll use this model to "forecast" the results in 2020 (should see lower performance.) Can try using 2016 data to predict 2020 and compare.
+::: {.callout-note icon="false"}
+## Exercise 6
 
+Create a new workflow specification adding the vote share from 2014 to the formula (`lin_wflow2`) and another further adding whether or not the candidate was an incumbent in 2018 (`lin_wflow3`). Fit both of these to the training data.
+
+:::
+
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 7
+
+Compute prediction metrics for each of the model workflows on the training data. Which would you pick based on these?
+
+:::
+
+```{r}
+
+```
+
+
+Now we can look at the test data and see which did better.
+
+< exercise >
+
+
+But wait, how would we actually use data like this? Let's take ourselves back to 2019---the federal government was shutting down, Felicity Huffman was in prison, "Old Town Road" was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting from the 2018 data.
+
+
+< exercise >
+
+
+Can use our model to predict the total number of house seats too.
+
+< exercise >
+
+This would be more useful with a measure of uncertainty---perhaps we'll get to something like that later.
 
 
 ------------------------------------------------------------------------

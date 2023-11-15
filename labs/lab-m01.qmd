@@ -3,11 +3,14 @@ title: "Module 1 Lab: Election Forcasting"
 author: "Derek Powell"
 format: 
   html:
+    toc: true
+    toc-expand: 2
     embed-resources: true
 editor: visual
 theme: cosmo
 ---
 
+# Introduction
 ::: {.callout-caution icon="false"}
 ## Learning Objectives
 
@@ -20,7 +23,7 @@ Our learning objectives for this module are:
 
 Elections are important! More about this blah blah.
 
-## Data
+# Data
 
 We will use data on U.S. House of Representatives Congressional Elections in 2014, 2016, 2018, and 2020. 
 
@@ -39,6 +42,8 @@ congress <- read_csv("../data/congress.csv")
 We're going to start by predicting election results in 2018 from the results the prior election in 2016. 
 
 Before we can really begin that though, we need to do some ... drum roll please ... you guessed it! Data Munging!
+
+## Exercise 1
 
 Our first step will be to set up our data so we can build our models. For each district, we will try to predict the share of votes won by the democratic House candidate. The first and most important predictor will be the democratic vote share from the prior election. Another helpful predictor could be whether or not the candidate is an incumbent. 
 
@@ -67,6 +72,7 @@ df <- congress %>%
     )
 ```
 
+## Exercise 2
 
 ::: {.callout-note icon="false"}
 ## Exercise 2
@@ -81,7 +87,7 @@ Now, do some further  data munging of the sort we learned last semester.
 ```{r}
 df <- df %>% 
   ungroup() %>% 
-  # filter(year %in% c(2014, 2016, 2018), party %in% c("D","R")) %>%
+  filter(year %in% c(2014, 2016, 2018), party %in% c("D","R")) %>%
   group_by(year, district) %>% 
   select(year, state, district, party, prop, incumbent) %>%
   pivot_wider(
@@ -90,12 +96,17 @@ df <- df %>%
     values_from = c(prop, incumbent), 
     values_fn = max
     ) %>% 
-  replace(is.na(.), 0)
+  replace(is.na(.), 0) %>% 
+  ungroup()
   
 ```
-
+::: {.callout-warning}
+Make sure your `df` is not grouped to avoid unexpected behavior later as you split and add recipes.
+:::
 
 With our data ready in our `df` tibble, we can start building a model! Before we do that though, we need to split our data into training and testing splits. We can use the classic 80% for training and 20% for testing.
+
+## Exercise 3
 
 ::: {.callout-note icon="false"}
 ## Exercise 3
@@ -118,6 +129,8 @@ test <- testing(df_split)
 
 Now we'll build our model specification and modeling workflow.
 
+## Exercise 4
+
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
@@ -130,8 +143,10 @@ linear_spec <- linear_reg()
 ```
 
 
+## Exercise 5
+
 ::: {.callout-note icon="false"}
-## Exercise 4
+## Exercise 5
 
 Create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it `lin_wflow1`.
 
@@ -143,8 +158,10 @@ lin_wflow1 <- workflow(prop_D_2018 ~ prop_D_2016) %>%
   
 ```
 
+
+## Exercise 6
 ::: {.callout-note icon="false"}
-## Exercise 5
+## Exercise 6
 
 Now fit the model to the `train` data (finally!). Call this `lin_fit1`.
 
@@ -156,12 +173,15 @@ lin_fit1 <- lin_wflow1 %>%
   fit(data = train)
 ```
 
-Now check the fit on the training data
+
+## Exercise 7
+
+Now check the fit on the training data. We will focus on two ways of examining model fit. First, we'll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). SEcond, we'll plot plotting the predicted values against the actual observed values.
 
 ::: {.callout-note icon="false"}
-## Exercise 5
+## Exercise 7
 
-Let's look at this two ways, by some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE) and by plotting the predicted values against the actual observed values.
+Compute predictive metrics for the model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
 
 :::
 
@@ -177,10 +197,12 @@ lin_fit1 %>%
   theme(aspect.ratio = 1)
 ```
 
+## Exercise 8
+
 By looking at the predictions against the actual election results, we can see our model's performane is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the "cloud" of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?
 
 ::: {.callout-note icon="false"}
-## Exercise 6
+## Exercise 8
 
 Let's inspect the model's coefficients and see if they offer any clues. Use the `tidy()` function from the `broom` package. What does the intercept represent? Can you see that reflected on the plot above anywhere? Think about this a bit before moving on to the next exercise to see if you can come up with a theory for what is happening. When you've thought it through, you can expand the explanation below.
 
@@ -199,26 +221,31 @@ But whenever a candidate actually runs, they do so because they expect to get at
 tidy(lin_fit1)
 ```
 
+
+## Exercise 9
+
 We'd like to add a predictor to our dataset to account for this in our model. But, if we are going to add a predictor we will need to add it to our train and test splits. A better way to manage this kind of "feature engineering" is to use a **recipe**.
 
 ::: {.callout-note icon="false"}
-## Exercise 7
+## Exercise 9
 
-Create a new workflow `lin_wflow2` that adds a `step_mutate()` to add a recipe step creating a new variable called `uncontested_2016` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. Make sure the workflow applies a new formula that uses this variable in the linear regression model.
+Create a new workflow `lin_wflow2` that adds a `step_mutate()` to add a recipe step creating a new variable called `uncontested_2016` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. The tip below may help.
 
-Then, fit this new model and call it `lin_fit2`
+Then, fit this new model and call it `lin_fit2`.
+:::
 
+::: {.callout-tip}
+We can use a `.` in our formula to refer to all other variables. So if we set our formula to `y ~ .` we will tell the model to predict using all other variables. This is useful when we have a LOT of predictors in our model and we don't want to type them all. It is also useful when we are using recipes to create variables that don't exist in the original data yet. If we don't actually want to use all predictors, we can use a `step_select()` to select only the subset we want.
 :::
 
 ```{r}
-## not sure how recipes work :(
-rec <- recipe(prop_D_2018 ~ prop_D_2016 + uncontested_2016, data = train) %>% 
-  step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0))
+
+rec <- recipe(prop_D_2018 ~ ., train) %>% 
+  step_select(prop_D_2018, prop_D_2016, skip = TRUE) %>%
+  step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0)) 
 
 lin_wflow2 <- workflow() %>% 
-  add_formula(prop_D_2018 ~ prop_D_2016 + uncontested_2016) %>% 
   add_recipe(rec) %>% 
-  # step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0)) %>% 
   add_model(linear_spec)
 
 lin_fit2 <- lin_wflow2 %>% 
@@ -226,119 +253,136 @@ lin_fit2 <- lin_wflow2 %>%
 ```
 
 
-Now let's try creating some new model specifications that use more predictors.
+
+## Exercise 10
+
+Now let's examine the fit of our new model and compare it to the previous one.
 
 ::: {.callout-note icon="false"}
-## Exercise 6
+## Exercise 10
 
-Create a new workflow specification adding the vote share from 2014 to the formula (`lin_wflow2`) and another further adding whether or not the candidate was an incumbent in 2018 (`lin_wflow3`). Fit both of these to the training data.
+Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
 
+Have the metrics improved? Focusing on the plot, what do you notice has changed? Does that make sense?
 :::
-
 
 ```{r}
 
+lin_fit2 %>% 
+  augment(train) %>% 
+  metrics(prop_D_2018, .pred)
+
+lin_fit2 %>% 
+  augment(train) %>% 
+  ggplot(aes(x = .pred, y = prop_D_2018)) +
+  geom_point() +
+  theme(aspect.ratio = 1)
 ```
+
+
+## Exercise 11
+
+Now let's try creating some new model specifications that use more predictors. We'll add everything we legitimately can, so all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent. 
 
 ::: {.callout-note icon="false"}
-## Exercise 7
+## Exercise 11
 
-Compute prediction metrics for each of the model workflows on the training data. Which would you pick based on these?
+Create a new recipe, workflow specification, and fitted model using all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent.  Call the relevant workflow, recipe, and models number 3 (e.g. `lin_fit3`).
+:::
+
+
+
+```{r}
+
+rec3 <- recipe(prop_D_2018 ~ ., train) %>% 
+  step_select(prop_D_2018, prop_D_2016, prop_D_2014, incumbent_D_2016, incumbent_D_2018, skip = TRUE) %>%
+  step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0)) 
+
+lin_wflow3 <- workflow() %>% 
+  add_recipe(rec3) %>% 
+  add_model(linear_spec)
+
+lin_fit3 <- lin_wflow3 %>% 
+  fit(data = train)
+```
+
+## Exercise 12
+::: {.callout-note icon="false"}
+## Exercise 12
+
+Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
+
+Have the metrics improved? Which of the three models we've fit seems best?
+:::
+
+```{r}
+lin_fit3 %>% 
+  augment(train) %>% 
+  metrics(prop_D_2018, .pred)
+
+lin_fit3 %>% 
+  augment(train) %>% 
+  ggplot(aes(x = .pred, y = prop_D_2018)) +
+  geom_point() +
+  theme(aspect.ratio = 1)
+```
+
+## Exercise 13
+::: {.callout-note icon="false"}
+## Exercise 13
+
+Now compute the metrics for each of the models when predicting the `test` data. How do the metrics compare? Which of the three models seems best?
+
+If the metrics are different, why is that?
 
 :::
 
 ```{r}
+lin_fit1 %>% 
+  augment(test) %>% 
+  metrics(prop_D_2018, .pred)
 
+lin_fit2 %>% 
+  augment(test) %>% 
+  metrics(prop_D_2018, .pred)
+
+lin_fit3 %>% 
+  augment(test) %>% 
+  metrics(prop_D_2018, .pred)
 ```
 
+## Exercise 14
 
-Now we can look at the test data and see which did better.
+But wait, how would we actually use data or a model like this? Let's take ourselves back to 2019---the federal government was shutting down, Felicity Huffman was in prison, "Old Town Road" was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data.
 
-< exercise >
-
-
-But wait, how would we actually use data like this? Let's take ourselves back to 2019---the federal government was shutting down, Felicity Huffman was in prison, "Old Town Road" was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting from the 2018 data.
-
-
-< exercise >
-
-
-Can use our model to predict the total number of house seats too.
-
-< exercise >
-
-This would be more useful with a measure of uncertainty---perhaps we'll get to something like that later.
-
-
-------------------------------------------------------------------------
-
-## Quarto information
-
-Quarto enables you to weave together content and executable code into a finished document. To learn more about Quarto see <https://quarto.org>
-
-### Running Code
-
-When you click the **Render** button a document will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-You can add options to executable code like this
-
-```{r}
-#| echo: false
-2 * 2
-```
-
-The `echo: false` option disables the printing of code (only output is displayed).
-
-### Additional formatting
-
-Quarto includes "callouts," including: `note`, `tip`, `warning`, `caution`, and `important`. I think it will be useful to use a few of these in formulaic ways. We can use these however by defining a custom title and suppressing the icons where relevant
-
-Let's use the "note" callout for the lab exercises. We can provide our own more informative titles as needed with `##` level headings inside the note as desired. If we like, we can also emd another "hint" callout and collapse them with `collapse=true`.
+To reuse our model, we will cheat and rename our variables so that the model can generate predictions for 2020 using the 2018 data in place of the 2016 data and the 2016 data in place of the 2014 data. 
 
 ::: {.callout-note icon="false"}
-## Exercise 1
+## Exercise 14
 
-Do something involving making a machine learning model, probably!
+Create a new dataset based off of `df` where variables are renamed like so:
 
-::: {.callout-note icon="false" collapse="true"}
-## Hint
+- `*_D_2018` --> `_D_2016`
+- `*_D_2016` --> `_D_2014`
+- `incumbent_2018` is recalculated appropriately to represent incumbency in 2020. 
 
-This would be helpful though.
-:::
-:::
-
-Let's override the icon of the caution callout with `icon=false` for "learning objectives" to start the document.
-
-::: {.callout-caution icon="false"}
-## Learning Objectives
-
-Our learning objectives for this module are:
-
--   Introduce foundational frameworks and processes of machine learning
--   Introduce "splitting" data into training and test splits
--   Demonstrate use of linear regression in `tidymodels`
 :::
 
-::: callout-tip
-And one for tips and tricks etc.
+## Exercise 15
+::: {.callout-note icon="false"}
+## Exercise 15
+Now compute the metrics against the real election results in 2020. How well would such a model do? 
+
+Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating preditions this way.
+
 :::
 
-::: callout-important
-And this important one for things we really want to flag. Probably use this mostly for instructions regarding saving, formatting. and submitting assignments.
+# Wrapping up
+
+When you are finished, knit your Quarto document to a PDF file.
+
+::: {.callout-important icon="false"}
+**MAKE SURE YOU LOOK OVER THIS FILE CAREFULLY BEFORE SUBMITTING**
 :::
 
-::: column-margin
-We can also use the `.column-margin` div to include any kinds of marginal comments, brief tips/tricks, etc.
-:::
-
-### Other Quarto Resources
-
-Some things that look really useful for us:
-
--   [Diagrams guide](https://quarto.org/docs/authoring/diagrams.html)
--   [Code annotation syntax guide](https://quarto.org/docs/authoring/code-annotation.html)
--   [Embedding Videos](https://quarto.org/docs/authoring/videos.html)
+When you are sure it looks good, submit it on Canvas in the appropriate assignment page.

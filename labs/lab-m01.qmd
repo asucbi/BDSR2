@@ -216,7 +216,7 @@ By looking at the predictions against the actual election results, we can see ou
 
 Let's inspect the model's coefficients and see if they offer any clues. Use the `tidy()` function from the `broom` package. What does the intercept represent? Can you see that reflected on the plot above anywhere? Think about this a bit before moving on to the next exercise to see if you can come up with a theory for what is happening. When you've thought it through, you can expand the explanation below.
 
-::: {.callout-warning icon="false" collapse = "true"}
+::: {.callout-warning icon="false" collapse="true"}
 ## Explanation
 
 Of course the intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot---so that's a clue there are actually data points in our data with a proportion of zero. These are *uncontested* elections where there was no Democratic party candidate. 

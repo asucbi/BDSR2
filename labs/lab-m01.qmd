@@ -82,14 +82,14 @@ df <- congress %>%
 Now, do some further  data munging of the sort we learned last semester.
 
 1. Filter `df` to include only the rows for Democrat and Republican candidates
-2. Pivot the data to a wide format, so that for each Congressional district we have variables  representing the proportion of democratic votes in 2016 and 2018, and whether or not there was a democrat incumbent going into the 2018 election. If there is more than one D or R candidate, use the proportion value for the candidate with the most votes.
+2. Pivot the data to a wide format, so that for each Congressional district we have variables  representing the proportion of democratic votes in 2014, 2016, 2018, and 2020, and whether or not there was a democrat incumbent going into the 2018 election. If there is more than one D or R candidate, use the proportion value for the candidate with the most votes.
 3. Replace `NA` values for vote proportion and incumbency with zero---if there's not value it's because no one ran and therefore they got zero votes.
 :::
 
 ```{r}
 df <- df %>% 
   ungroup() %>% 
-  filter(year %in% c(2014, 2016, 2018), party %in% c("D","R")) %>%
+  filter(party %in% c("D","R")) %>%
   group_by(year, district) %>% 
   select(year, state, district, party, prop, incumbent) %>%
   pivot_wider(
@@ -106,9 +106,17 @@ df <- df %>%
 Make sure your `df` is not grouped to avoid unexpected behavior later as you split and add recipes.
 :::
 
-With our data ready in our `df` tibble, we can start building a model! Before we do that though, we need to split our data into training and testing splits. We can use the classic 80% for training and 20% for testing.
 
 ## Exercise 3
+
+With our data ready in our `df` tibble, we can start building a model! Before we do that though, we need to split our data into training and testing splits. We might think more deeply about this in the future, but for now we can use the `tidymodels` default of 75% training 25% testing split.
+
+Before splitting your data, set your random seed so that your results will match the answer key.
+
+```{r}
+set.seed(1234)
+```
+
 
 ::: {.callout-note icon="false"}
 ## Exercise 3
@@ -117,8 +125,8 @@ Using `tidymodels`, split the data into training and testing splits called `trai
 
 :::
 
+
 ```{r}
-set.seed(42)
 df_split <- initial_split(df)
 df_split
 ```
@@ -214,7 +222,6 @@ Let's inspect the model's coefficients and see if they offer any clues. Use the 
 Of course the intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot---so that's a clue there are actually data points in our data with a proportion of zero. These are *uncontested* elections where there was no Democratic party candidate. 
 
 But whenever a candidate actually runs, they do so because they expect to get at least some share of the vote---more than 21\% at least.
-
 :::
 
 :::
@@ -231,29 +238,29 @@ We'd like to add a predictor to our dataset to account for this in our model. Bu
 ::: {.callout-note icon="false"}
 ## Exercise 9
 
-Create a new workflow `lin_wflow2` that adds a `step_mutate()` to add a recipe step creating a new variable called `uncontested_2016` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. The tip below may help.
+Rather than adding a formula to our workflow, instead we'll create a recipe and add that to the workflow. Create a recipe  `rec2` that uses a `step_mutate()` to add a recipe step creating a new variable called `prior_uncontested` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. Remember, now the formula goes in the recipe rather than directly into the workflow. The tip below should help.
 
 Then, fit this new model and call it `lin_fit2`.
 :::
 
 ::: {.callout-tip}
-We can use a `.` in our formula to refer to all other variables. So if we set our formula to `y ~ .` we will tell the model to predict using all other variables. This is useful when we have a LOT of predictors in our model and we don't want to type them all. It is also useful when we are using recipes to create variables that don't exist in the original data yet. If we don't actually want to use all predictors, we can use a `step_select()` to select only the subset we want.
+We can use a `.` in our formula to refer to all other variables. So if we set our formula to `y ~ .` we will tell the model to predict using all other variables. This is useful when we have a LOT of predictors in our model and we don't want to type them all. It is also useful when we are using recipes to create new variables that don't already exist in the original data. 
+
+If we don't actually want to use all predictors, we can use the function `step_select(..., skip = TRUE)` to select only the subset we want (and to skip this step when predicting from an already-fit model).
 :::
 
 ```{r}
 
 rec <- recipe(prop_D_2018 ~ ., train) %>% 
   step_select(prop_D_2018, prop_D_2016, skip = TRUE) %>%
-  step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0)) 
+  step_mutate(prior_uncontested = if_else(prop_D_2016 == 0, 1, 0)) 
 
 lin_wflow2 <- workflow() %>% 
   add_recipe(rec) %>% 
   add_model(linear_spec)
 
-lin_fit2 <- lin_wflow2 %>% 
-  fit(data = train)
+lin_fit2 <- fit(lin_wflow2, data = train)
 ```
-
 
 
 ## Exercise 10
@@ -269,7 +276,6 @@ Have the metrics improved? Focusing on the plot, what do you notice has changed?
 :::
 
 ```{r}
-
 lin_fit2 %>% 
   augment(train) %>% 
   metrics(prop_D_2018, .pred)
@@ -298,7 +304,7 @@ Create a new recipe, workflow specification, and fitted model using all predicto
 
 rec3 <- recipe(prop_D_2018 ~ ., train) %>% 
   step_select(prop_D_2018, prop_D_2016, prop_D_2014, incumbent_D_2016, incumbent_D_2018, skip = TRUE) %>%
-  step_mutate(uncontested_2016 = if_else(prop_D_2016 == 0, 1, 0)) 
+  step_mutate(prior_uncontested = if_else(prop_D_2016 == 0, 1, 0)) 
 
 lin_wflow3 <- workflow() %>% 
   add_recipe(rec3) %>% 
@@ -362,22 +368,49 @@ To reuse our model, we will cheat and rename our variables so that the model can
 ::: {.callout-note icon="false"}
 ## Exercise 14
 
-Create a new dataset based off of `df` where variables are renamed like so:
+Create a new dataset `test2020` based off of `test` where variables are constructed like so:
 
 - `*_D_2018` --> `_D_2016`
 - `*_D_2016` --> `_D_2014`
-- `incumbent_2018` is recalculated appropriately to represent incumbency in 2020. 
+- `incumbent_D_2020` --> `incumbent_D_2018` 
 
 :::
+
+
+```{r}
+test2020 <-  test %>% 
+  mutate(
+    prop_D_2014 = prop_D_2016,
+    prop_D_2016 = prop_D_2018,
+    incumbent_D_2016 = incumbent_D_2018,
+    incumbent_D_2018 = incumbent_D_2020
+  )
+```
+
 
 ## Exercise 15
 ::: {.callout-note icon="false"}
 ## Exercise 15
 Now compute the metrics against the real election results in 2020. How well would such a model do? 
 
-Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating preditions this way.
+Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating predictions this way.
 
 :::
+
+```{r}
+lin_fit1 %>% 
+  augment(test2020) %>% 
+  metrics(prop_D_2020, .pred)
+
+lin_fit2 %>% 
+  augment(test2020) %>% 
+  metrics(prop_D_2020, .pred)
+
+lin_fit3 %>% 
+  augment(test2020) %>% 
+  metrics(prop_D_2020, .pred)
+```
+
 
 # Wrapping up
 

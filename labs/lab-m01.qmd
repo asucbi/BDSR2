@@ -41,7 +41,9 @@ congress <- read_csv("../data/congress.csv")
 
 We're going to start by predicting election results in 2018 from the results the prior election in 2016. 
 
-Before we can really begin that though, we need to do some ... drum roll please ... you guessed it! Data Munging!
+Before we can really begin that though, we need to do some ... drum roll please ...
+
+[![Say the line Bart](../imgs/say-the-line-bart.jpg)]
 
 ## Exercise 1
 

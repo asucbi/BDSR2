@@ -1,11 +1,7 @@
 ---
 title: "BDSR2 lab template"
 author: "Derek Powell"
-format: 
-  html:
-    embed-resources: true
-editor: visual
-theme: cosmo
+editor: source
 ---
 
 ::: {.callout-caution icon="false"}
@@ -25,14 +21,17 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at ne
 Here is where we might bore students with some minutia or a formula like $\hat{y} = \alpha + \beta x$.
 :::
 
+
 # Exercises
 
+## Exercise 1
 ::: {.callout-note icon="false"}
 ## Exercise 1
 
 Copy and paste this template and delete all the boilerplate below.
 :::
 
+## Exercise 2
 ::: {.callout-note icon="false"}
 ## Exercise 2
 
@@ -40,14 +39,19 @@ Get to work and make an actual lab!
 :::
 
 ::: callout-important
-Note that this will render into the `../docs/labs/` folder, so as to appear on our github pages site (once that is set up in the future). Looks like this may cause issues with the built-in viewer in `Rstudio`, so may have some more tweaking to do.
+1. Note that this will render into the `../docs/labs/` folder, so as to appear on our github pages site (once that is set up in the future). Looks like this may cause issues with the built-in viewer in `Rstudio`, so may have some more tweaking to do.
+2. Also note that certain YAML-level options are being controlled by `_quarto.yml`
 :::
 
 ------------------------------------------------------------------------
 
-### Additional formatting
+# Additional formatting
+
+## Callouts
 
 Quarto includes "callouts," including: `note`, `tip`, `warning`, `caution`, and `important`. I think it will be useful to use a few of these in formulaic ways. We can use these however by defining a custom title and suppressing the icons where relevant
+
+### Exercises
 
 Let's use the "note" callout for the lab exercises. We can provide our own more informative titles as needed with `##` level headings inside the note as desired. If we like, we can also emd another "hint" callout and collapse them with `collapse=true`.
 
@@ -63,6 +67,9 @@ This would be helpful though.
 :::
 :::
 
+
+### Learning Objectives
+
 Let's override the icon of the caution callout with `icon=false` for "learning objectives" to start the document.
 
 ::: {.callout-caution icon="false"}
@@ -75,19 +82,48 @@ Our learning objectives for this module are:
 -   Demonstrate use of linear regression in `tidymodels`
 :::
 
+### Tips
+
 ::: callout-tip
 And one for tips and tricks etc.
 :::
+
+::: column-margin
+
+:::
+
+
+### Important
 
 ::: callout-important
 And this important one for things we really want to flag. Probably use this mostly for instructions regarding saving, formatting. and submitting assignments.
 :::
 
 ::: column-margin
-We can also use the `.column-margin` div to include any kinds of marginal comments, brief tips/tricks, etc.
+Sort of like tips, we can also use the `.column-margin` div to add more conceptual asides or footnotes.
 :::
 
-### Other Quarto Resources
+
+## Code and figure formatting
+
+```{r}
+#| message: FALSE
+#| warning: FALSE
+#| fig-cap: This is an example figure and caption with annotations.
+
+library(tidyverse) # <1>
+data(iris) # <2>
+
+iris %>%  # <3>
+  ggplot(aes(x=Sepal.Length, y = Sepal.Width)) + # <3>
+  geom_point() # <3>
+```
+
+1. Load the `tidyverse` package.
+2. Get the `iris` data ready.
+3. Use the `ggplot()` function to make a plot.
+
+# Other Quarto Resources
 
 Some things that look really useful for us:
 

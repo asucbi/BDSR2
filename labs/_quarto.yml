@@ -1,2 +1,8 @@
 project:
   output-dir: "../docs/labs"
+format:   
+  html:
+    toc: true
+    toc-expand: 2
+    embed-resources: true
+theme: cosmo

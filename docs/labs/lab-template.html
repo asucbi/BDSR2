@@ -54,7 +54,26 @@ div.sourceCode
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
-</style>
+
+div.csl-bib-body { }
+div.csl-entry {
+clear: both;
+}
+.hanging-indent div.csl-entry {
+margin-left:2em;
+text-indent:-2em;
+}
+div.csl-left-margin {
+min-width:2em;
+float:left;
+}
+div.csl-right-inline {
+margin-left:2em;
+padding-left:1em;
+}
+div.csl-indent {
+margin-left: 2em;
+}</style>
 
 
 <script>/*!
@@ -3149,6 +3168,7 @@ return!"\t\n\x0B\f\r                　\u2028\u2029
   <li><a href="#important" id="toc-important" class="nav-link" data-scroll-target="#important">Important</a></li>
   </ul></li>
   <li><a href="#code-and-figure-formatting" id="toc-code-and-figure-formatting" class="nav-link" data-scroll-target="#code-and-figure-formatting">Code and figure formatting</a></li>
+  <li><a href="#references-and-citations" id="toc-references-and-citations" class="nav-link" data-scroll-target="#references-and-citations">References and citations</a></li>
   </ul></li>
   <li><a href="#other-quarto-resources" id="toc-other-quarto-resources" class="nav-link" data-scroll-target="#other-quarto-resources">Other Quarto Resources</a></li>
   </ul>
@@ -3365,15 +3385,15 @@ Important
 <dl class="code-annotation-container-grid">
 <dt data-target-cell="annotated-cell-1" data-target-annotation="1">1</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="1" data-code-annotation="1">Load the <code>tidyverse</code> package.</span>
+<span data-code-lines="1" data-code-annotation="1" data-code-cell="annotated-cell-1">Load the <code>tidyverse</code> package.</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="2">2</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="2" data-code-annotation="2">Get the <code>iris</code> data ready.</span>
+<span data-code-lines="2" data-code-annotation="2" data-code-cell="annotated-cell-1">Get the <code>iris</code> data ready.</span>
 </dd>
 <dt data-target-cell="annotated-cell-1" data-target-annotation="3">3</dt>
 <dd>
-<span data-code-cell="annotated-cell-1" data-code-lines="4,5,6" data-code-annotation="3">Use the <code>ggplot()</code> function to make a plot.</span>
+<span data-code-lines="4,5,6" data-code-annotation="3" data-code-cell="annotated-cell-1">Use the <code>ggplot()</code> function to make a plot.</span>
 </dd>
 </dl>
 </div>
@@ -3387,6 +3407,11 @@ Important
 </div>
 </div>
 </section>
+<section id="references-and-citations" class="level2">
+<h2 class="anchored" data-anchor-id="references-and-citations">References and citations</h2>
+<p>You can use pandoc citation style to add citations. Let’s use the convention: <code>[@author1.author2YEAR]</code> and <code>[@author.etalYEAR]</code> (note lowercase names). A bibliography is automatically created at the end of the document</p>
+<p>I’ve started off the references with our main text <span class="citation" data-cites="gareth.etal2014">(<a href="#ref-gareth.etal2014" role="doc-biblioref">James et al. 2014</a>)</span>.</p>
+</section>
 </section>
 <section id="other-quarto-resources" class="level1">
 <h1>Other Quarto Resources</h1>
@@ -3396,9 +3421,14 @@ Important
 <li><a href="https://quarto.org/docs/authoring/code-annotation.html">Code annotation syntax guide</a></li>
 <li><a href="https://quarto.org/docs/authoring/videos.html">Embedding Videos</a></li>
 </ul>
+
 </section>
 
-</main>
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-gareth.etal2014" class="csl-entry" role="listitem">
+James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in r</em>. Springer Publishing Company, Incorporated.
+</div>
+</div></section></div></main>
 <!-- /main column -->
 <script id="quarto-html-after-body" type="application/javascript">
 window.document.addEventListener("DOMContentLoaded", function (event) {

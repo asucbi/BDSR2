@@ -1,6 +1,7 @@
 ---
 title: "BDSR2 lab template"
 author: "Derek Powell"
+bibliography: ../references.bib
 editor: source
 ---
 
@@ -122,6 +123,12 @@ iris %>%  # <3>
 1. Load the `tidyverse` package.
 2. Get the `iris` data ready.
 3. Use the `ggplot()` function to make a plot.
+
+## References and citations
+
+You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` (note lowercase names). A bibliography is automatically created at the end of the document
+
+I've started off the references with our main text [@gareth.etal2014]. 
 
 # Other Quarto Resources
 

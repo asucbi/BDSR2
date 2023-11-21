@@ -1,0 +1,6 @@
+project:
+  output-dir: "../docs/lectures"
+
+format: 
+  revealjs:
+    embed-resources: true

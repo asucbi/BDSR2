@@ -54,6 +54,7 @@ rsconnect/
 
 ## quarto
 /.quarto/
+**/.gitignore
 
 # local-only files
 

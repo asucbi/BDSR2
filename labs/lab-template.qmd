@@ -108,8 +108,8 @@ Sort of like tips, we can also use the `.column-margin` div to add more conceptu
 ## Code and figure formatting
 
 ```{r}
-#| message: FALSE
-#| warning: FALSE
+#| message: false
+#| warning: false
 #| fig-cap: This is an example figure and caption with annotations.
 
 library(tidyverse) # <1>

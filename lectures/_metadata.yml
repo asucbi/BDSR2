@@ -1,0 +1,4 @@
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib

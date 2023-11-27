@@ -4,8 +4,6 @@ subtitle: Behavioral Data Science in R II
 format: 
   revealjs:
     css: style.css
-    self-contained: true
-bibliography: ../references.bib
 ---
 
 ## What is Machine Learning?

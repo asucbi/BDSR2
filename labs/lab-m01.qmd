@@ -1,6 +1,7 @@
 ---
 title: "Module 1 Lab: Election Forcasting"
 author: "Derek Powell"
+bibliography: references.bib
 editor: source
 ---
 
@@ -28,7 +29,7 @@ library(tidyverse)
 library(tidymodels)
 library(broom)
 
-congress <- read_csv("../data/congress.csv")
+congress <- read_csv("data/congress.csv")
 ```
 
 # Exercises
@@ -37,7 +38,7 @@ We're going to start by predicting election results in 2018 from the results the
 
 Before we can really begin that though, we need to do some ... drum roll please ...
 
-\[![Say the line Bart](../imgs/say-the-line-bart.jpg)\]
+\[![Say the line Bart](imgs/say-the-line-bart.jpg)\]
 
 ## Exercise 1
 

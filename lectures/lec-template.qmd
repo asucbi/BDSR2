@@ -1,6 +1,9 @@
 ---
 title: "Presentation Template"
-author: "Derek Powell"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
 bibliography: ../references.bib
 ---
 
@@ -19,10 +22,79 @@ When you click the **Render** button a document will be generated that includes:
 
 When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
 
-```{r}
+```{r echo=TRUE}
 1 + 1
 ```
 
+
+## Column formatting
+
+Machine learning can be applied to tackle many different kinds of problems, including:
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Supervised learning**
+
+- Prediction
+- Classification
+
+:::
+
+::: {.column width="50%"}
+
+
+**Unsupervised learning**
+
+- Clustering
+
+:::
+
+::::
+
+
+## Figure Layouts
+
+:::: {.columns .v-center-container}
+
+::: {.column width="50%"}
+Machine learning can be applied to many different kinds of data, including:
+
+- text
+- audio
+- images
+- video
+- tabular data (e.g. survey data)
+:::
+
+::: {.column width="50%"}
+
+::: {layout-nrow=2}
+
+![Audio](../imgs/audio-spectrogram.png)
+
+![Images](../imgs/MnistExamplesWikipedia.png)
+
+![Text](../imgs/bigdatawordcloud.jpeg)
+
+![Tabular](../imgs/tabulardata.png)
+
+:::
+
+:::
+
+::::
+
+## CSS
+
+See `style.css` for custom formatting options.
+
+## Other formatting
+
+::: callout-tip
+Callouts work the same as for non-presentation documents. I don't think margin notes can be used though.
+:::
 
 ## Citations
 

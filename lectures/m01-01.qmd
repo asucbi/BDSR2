@@ -1,0 +1,109 @@
+---
+title: "What is Machine Learning?"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+    self-contained: true
+bibliography: ../references.bib
+---
+
+## What is Machine Learning?
+
+**Machine Learning** is an umbrella term for a wide family of methods for analyzing and making inferences from patterns in data.
+
+Can think of **Machine Learning** as including:
+
+- Algorithms for finding patterns in data
+- A set of practices for how to:
+  - Manage data
+  - Process data into "features"
+  - Use machine learning models for prediction
+  - Interpret the results of models to build understanding
+
+## Data types
+
+:::: {.columns .v-center-container}
+
+::: {.column width="50%"}
+Machine learning can be applied to many different kinds of data, including:
+
+- text
+- audio
+- images
+- video
+- tabular data (e.g. survey data)
+:::
+
+::: {.column width="50%"}
+
+::: {layout-nrow=2}
+
+![Audio](../imgs/audio-spectrogram.png)
+
+![Images](../imgs/MnistExamplesWikipedia.png)
+
+![Text](../imgs/bigdatawordcloud.jpeg)
+
+![Tabular](../imgs/tabulardata.png)
+
+:::
+
+:::
+
+::::
+
+
+## Problem Types
+
+Machine learning can be applied to tackle many different kinds of problems, including:
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Supervised learning**
+
+- Prediction
+- Classification
+
+:::
+
+::: {.column width="50%"}
+
+
+**Unsupervised learning**
+
+- Clustering
+
+:::
+
+::::
+
+
+# Course Preview
+
+## Classify "toxic" online comments
+
+## Build a Lie Detector
+
+## Group unlabled documents into categories
+
+## Identify handwritten digits with neural networks
+
+## Code
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r}
+1 + 1
+```
+
+
+## Citations
+
+You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
+
+I've started off the references with our main text [@gareth.etal2014]. 
+
+---

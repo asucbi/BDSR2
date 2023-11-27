@@ -1,6 +1,6 @@
 # BDSR2
 
-Repository for Behavioral Data Science in R II course
+Repository for Behavioral Data Science in R II course.
 
 ## Quarto Project Structure
 
@@ -16,6 +16,9 @@ The project is configured so all `.qmd` run from the project's root directory. T
 - `imgs/`: Folder to store all images for lectures/labs/homeworks
 - `quizzes/`: Store any `.qmd` files needed for quizzes. We may want to use subdirectories per unit here, not sure.
 
+## Viewing pages
+
+Hosted by github pages. E.g. https://derekpowell.github.io/BDSR2/labs/lab-m01.html
 
 ## Tech notes and issues
 

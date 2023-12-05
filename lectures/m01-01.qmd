@@ -83,11 +83,15 @@ Machine learning can be applied to tackle many different kinds of problems, incl
 
 ## Classify "toxic" online comments
 
+Build a pipeline for automatic identification of toxic comments, by applying the naive Bayes and penalized logistic regression models to a dataset of comments from Wikipedia’s talk page edits.
+
 ## Build a Lie Detector
 
-## Group unlabled documents into categories
+Use EEG and gaze recordings to identify when participants are lying or telling the truth.
 
-## Identify handwritten digits with neural networks
+## Read handwriting with neural networks
+
+Use neural networks to classify handwritten digits using the MNIST dataset.
 
 ## Code
 

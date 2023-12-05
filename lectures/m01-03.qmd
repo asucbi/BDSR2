@@ -1,0 +1,304 @@
+---
+title: "Machine Learning: The Workflow"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+```{r}
+#| include: false
+
+library(tidyverse)
+```
+
+
+## Machine learning: The basic idea 
+
+::: {.center}
+```{mermaid}
+%%| fig-width: 6.5
+flowchart LR
+  A(Take data) --> B[make a model] --> C(Predict for new data)
+```
+:::
+
+## Test data
+
+Beginning at the end:
+
+::: {.incremental}
+- We want to make prediction for ***new*** data. 
+- To know whether our predictions will be good, need to test our models on ***new*** data
+  - Not the same data that was used to make the model!
+:::
+
+## Step 1: Training and testing splits
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+We split our data into training and testing splits:
+
+:::
+
+::: {.column width="50%"}
+
+```{r}
+#| echo: false
+#| fig-height: 3
+
+tibble(
+  Split = ordered(c("Train", "Test"), levels = c("Train", "Test")),
+  prop = c(.80, .20)
+) %>% 
+  ggplot(aes(x=-prop, y = "", fill = Split)) +
+  geom_bar(stat="identity") +
+  scale_fill_discrete() +
+  theme_minimal(base_size = 18) +
+  theme(
+    legend.position = "top",
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    aspect.ratio = 1/3
+    )
+  
+```
+:::
+
+::::
+
+Using some for **Training** and some for **Testing**:
+
+```{mermaid}
+flowchart LR
+  A(Split data) --> B(Training data)
+  A --> C(Testing data)
+  B --> D[make a model] --> E(Predict for NEW data)
+  E --> C
+```
+
+## Machine learning: Making good model(s)
+
+```{mermaid}
+graph LR
+  A(Training data) --> B[make <b>MANY</b> models] --> D[evaluate + choose]
+  D --> C(Predict for <b>NEW</b> data)
+
+```
+
+::: {.incremental}
+- Building the best model often means making many models and picking the best one
+- Remember: "Best" meaning best at predicting for *new* data
+:::
+
+::: {.fragment}
+Whatever data we use to pick the model won't be new data!
+:::
+
+## Validation data
+
+One solution: create another ***validation*** split of data.
+
+```{r}
+#| echo: false
+#| fig-height: 3
+
+tibble(
+  Split = ordered(c("Train", "Test", "Validation"), levels = c("Train", "Validation", "Test")),
+  prop = c(.7, .15, .15)
+) %>% 
+  ggplot(aes(x=-prop, y = "", fill = Split)) +
+  geom_bar(stat="identity") +
+  scale_fill_discrete() +
+  theme_minimal(base_size = 18) +
+  theme(
+    legend.position = "top",
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank(),
+    aspect.ratio = 1/3
+    )
+  
+```
+- ***Train*** models on the [training data]{.text-red}
+- ***Compare*** and select best model using the [validation data]{.text-green}
+- ***Predict*** future model performance using the [test data]{.text-blue}
+
+## Cross validation
+
+::: {.callout-note}
+## Think about it ...
+Aren't we going to start running out of data?
+:::
+
+::: {.fragment}
+We can use **Cross Validation**
+::: 
+
+::: {.fragment}
+[diagram for this]
+::: 
+
+## The overall machine learning workflow
+
+```{mermaid}
+%%| fig-width: 10
+
+graph LR
+  A(Split data) --> B(Training<br/>data)
+  A --> C(Evaluate on<br/>Testing data)
+  B --> X[Resampling<br/>k-fold]
+  X --> D[Make models] --> E(k-fold<br/>evaluation)
+  E --> Y[Model<br/>selection]
+  Y --> C
+```
+
+## Before the workflow
+
+- data acquisition
+- data preprocessing + cleaning
+- domain understanding
+- exploratory data analysis + visualization
+
+::: {.fragment}
+[AKA: Data Science!]{.text-red}
+:::
+
+## After the workflow
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+### Practical Implementation
+
+- Efficiency
+- Performance Monitoring
+- Model updating and refinement
+
+:::
+
+::: {.column width="50%"}
+
+### Insight and inference
+
+- Feature importance
+- Visualization
+
+:::
+
+::::
+
+
+
+# Implementing the workflow in `tidymodels`
+
+## A case study: something
+
+## Splitting data into training and testing splits
+
+## Cross Validation
+
+## Fitting a model
+
+## Predicting on the test data
+
+
+
+---
+
+## Bullets
+
+When you click the **Render** button a document will be generated that includes:
+
+-   Content authored with markdown
+-   Output from executable code
+
+## Code
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+```{r echo=TRUE}
+1 + 1
+```
+
+
+## Column formatting
+
+Machine learning can be applied to tackle many different kinds of problems, including:
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+**Supervised learning**
+
+- Prediction
+- Classification
+
+:::
+
+::: {.column width="50%"}
+
+
+**Unsupervised learning**
+
+- Clustering
+
+:::
+
+::::
+
+
+## Figure Layouts
+
+:::: {.columns .v-center-container}
+
+::: {.column width="50%"}
+Machine learning can be applied to many different kinds of data, including:
+
+- text
+- audio
+- images
+- video
+- tabular data (e.g. survey data)
+:::
+
+::: {.column width="50%"}
+
+::: {layout-nrow=2}
+
+![Audio](../imgs/audio-spectrogram.png)
+
+![Images](../imgs/MnistExamplesWikipedia.png)
+
+![Text](../imgs/bigdatawordcloud.jpeg)
+
+![Tabular](../imgs/tabulardata.png)
+
+:::
+
+:::
+
+::::
+
+## CSS
+
+See `style.css` for custom formatting options.
+
+## Other formatting
+
+::: callout-tip
+Callouts work the same as for non-presentation documents. I don't think margin notes can be used though.
+:::
+
+## Citations
+
+You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
+
+I've started off the references with our main text [@gareth.etal2014]. 
+
+---

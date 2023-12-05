@@ -1,0 +1,233 @@
+---
+title: "Simple linear models"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+```{r}
+#| include: false
+
+library(tidyverse)
+
+standardize <- function(x){
+  (x-mean(x))/sd(x)
+}
+
+
+N <- 10
+
+set.seed(234234)
+
+dfsim <- tibble(
+  x = rnorm(N, 3, 2),
+  y = 3 + 1/2*x + rnorm(N, 0, 1)
+)
+```
+
+
+## Models as functions
+
+::: {.callout-caution icon="false"}
+## Review
+Remember we said the data is a _function_ of the model and noise
+
+$$\text{data} = f(\text{model, noise})$$
+:::
+
+::: {.fragment}
+- In principle, that function $f$ can be almost anything. 
+- In practice, we can often do a good job of describing the data by defining $f$ to be some linear function---then we have a __linear model__.
+::: 
+
+## Modeling with lines
+
+The simplest kind of linear model is a line!
+$$ y = \alpha + \beta x$$
+- $\alpha$ is the __intercept__
+- $\beta$ is the __coefficient__ for the predictor $x$
+
+$\alpha$ and $\beta$ are the __parameters__ of the model
+
+
+## Fitting lines to many points
+
+::: {.callout-note}
+## Think about it ...
+No line is perfect, how can we tell which line is best?
+:::
+
+```{r}
+#| echo: false
+dfsim %>% 
+  ggplot(aes(x=x, y=y)) + 
+  geom_point() +
+  geom_abline(intercept = 2, slope = .75, color="red") + # slightly off
+  geom_abline(intercept = 3, slope = 1/2, color="blue") + # slightly off
+  geom_abline(intercept = 4, slope = .2, color="purple") + # slightly off
+  theme(aspect.ratio=1) +
+  theme_bw(base_size = 20) +
+  theme(
+      panel.grid=element_blank()
+  ) +
+  coord_cartesian()+
+  xlim(1, 5) +
+  ylim(2,7)
+```
+
+## Residuals
+
+These grey lengths represent the __residuals__, the differences between the predicted value (line) and each observation (point).
+
+```{r}
+#| echo: false
+dfsim %>% 
+    mutate(predy = x*1/2 + 3) %>% 
+  ggplot(aes(x=x, y=y)) +
+  geom_abline(slope = 1/2, intercept = 3, color="blue" ) +
+  geom_segment(aes(xend=x, yend=predy), color="grey") +
+  geom_point() +
+  theme_bw(base_size = 20) +
+  theme(
+      panel.grid=element_blank(),
+      # aspect.ratio=1
+  ) +
+  coord_cartesian()+
+  xlim(1, 5) +
+  ylim(2,7)
+
+```
+
+We want to minimize these errors!
+
+## Least squares regression
+
+A common approach to find the "best" line is to minimize the __sum of the squared residuals__:
+
+$$ e_0^2 + e_1^2 + e_2^2 + ... + e_n^2 = \sum_i e_i^2$$
+
+When we do this, this is called __least squares regression__
+
+## Minimizing loss functions
+
+::: {style="font-size: 75%;"}
+- We want to find the parameters that will minimize this __loss function__ $L$:  
+$$\underset{\alpha, \beta}{\mathrm{argmin}} \, L(x, y, \alpha, \beta)$$ 
+- $x$ and $y$ are our data, so we are looking to minimize this with respect to our __parameters__ $\alpha$ and $\beta$. 
+- We write our regression equation as:  
+$$\hat{y_i} = \alpha + \beta x_i$$
+- Our residuals are the difference between $y$ and $\hat{y}$, so our loss function is:  
+$$L(x, y, \alpha, \beta) = \sum_i (y_i-\hat{y_i})^2$$
+:::
+
+## Linear model vocabulary
+
+- __Response variable__: Variable whose behavior or variation you are trying to understand (denoted $y$)
+- __Predictor variables__: Other variables that you want to use to predict and/or explain the variation in the response
+  - Commonly denoted as $x$ for an individual predictor or $X$ to refer to a set of multiple predictors
+- __Parameters__
+  - Commonly denoted with greek letters $\alpha$ and $\beta$ (with $\beta_i$ for multiple predictors)
+
+
+# Example: Predicting U.S. Presidential elections from economic growth
+
+## Politics and Economics
+
+![](../imgs/its-the-economy-stupid-james-carville-rent-home-own.webp)
+
+## Loading the data
+
+```{r}
+#| echo: true
+library(rosdata)
+data(hibbs)
+
+head(hibbs)
+```
+
+## Step 1: Training and testing splits
+
+```{r}
+#| message: false
+#| echo: true
+library(tidymodels)
+
+set.seed(1234)
+
+df_split <- initial_split(hibbs)
+
+train <- training(df_split)
+test <- testing(df_split)
+```
+
+## Plotting our data
+
+```{r}
+hibbs %>% 
+  ggplot(aes(x=growth, y = vote)) +
+  geom_point(color = "blue") +
+  geom_text(aes(y =  vote - 1, label = year)) +
+  geom_hline(yintercept = 50, linetype = "dashed") +
+  labs(
+    title = "US Economy and Presidential Election outcomes",
+    y = "Incumbent vote share",
+    x = "Economic Growth"
+  ) +
+  scale_x_continuous(labels = scales::percent_format(scale = 1)) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1))
+```
+
+## Step 2: Make a workflow
+
+```{r}
+#| echo: true
+linear_spec <- linear_reg()
+
+lin_wflow1 <- workflow(vote ~ growth) %>% 
+  add_model(linear_spec)
+```
+
+## Step 3: Train the model
+
+```{r}
+#| echo: true
+lin_fit1 <- lin_wflow1 %>% 
+  fit(data = train)
+```
+
+## Examining our model coefficients
+
+```{r}
+#| echo: true
+tidy(lin_fit1)
+```
+
+## Visualizing the model
+
+```{r}
+#| echo: true
+#| code-line-numbers: "|2-4|7"
+lin_fit1 %>% 
+  augment(
+    tibble(growth = c(max(hibbs$growth), min(hibbs$growth)))
+  ) %>% 
+  ggplot(aes(x=growth, y = .pred)) +
+  geom_line() +
+  geom_point(data = train, aes(x=growth, y = vote), color = "blue")
+```
+
+
+## Assessing the model's fit
+
+```{r}
+#| echo: true
+lin_fit1 %>% 
+  augment(train) %>% 
+  metrics(vote, .pred)
+
+lin_fit1 %>% 
+  augment(test) %>% 
+  metrics(vote, .pred)
+```

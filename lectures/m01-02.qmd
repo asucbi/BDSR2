@@ -1,0 +1,108 @@
+---
+title: "Statistical and Machine Learning Models"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    margin: 0.1
+    css: style.css
+bibliography: ../references.bib
+---
+
+## What is a model?
+
+::: {.callout-caution icon="false"}
+##
+Models are a way to create a simplified or controllable version of some scientific topic of interest.
+:::
+
+## Physical models {.center}
+
+Engineers construct physical models to test the properties of their designs and to predict how complex systems will operate.
+
+![](../imgs/1440px-USCAE_Bay_Model_-_San_Francisco_Bay_Detail.jpg)
+
+## Model animals {.center}
+
+Biologists use model animals to examine biological systems and to conduct experiments that cannot be ethically conducted on humans.
+
+![](../imgs/1626px-White_rat_on_table.jpg)
+
+
+## MONIAC
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+
+The MONIAC was a model of macroeconomic factors that used hydraulics moving water between tanks with pumps and drains to represent the flow of money to different areas of the economy.
+
+:::
+
+::: {.column width="50%"}
+![](../imgs/738px-MONIAC_computer.jpg)
+
+:::
+
+::::
+
+
+## Statistical Models 
+
+::: {.callout-caution icon="false"}
+##
+Provide an abstract, mathematical description of the topic or process of scientific interest
+:::
+
+
+::: {.fragment}
+In the context of data science we create models of the __data generating process__.
+
+- __Data__ are the objects of interest
+- Work to construct model of the process or processes that generated that data
+
+:::
+
+## Schema of statistical models
+
+The general format is:
+
+$$\text{data} = \text{model} + \text{noise}$$
+
+::: {.fragment}
+Or more generally:
+
+$$\text{data} = f(\text{model, noise})$$
+
+The data are a __function__ of the model and noise.
+:::
+
+## The purpose of statistical models
+
+As (data) scientists, we use models for ...
+
+- __Prediction__
+	- Predict a value for a new hypothetical observation
+	- Forecast the future
+	- Classify into categories
+- __Inference__
+	- Describe relationships
+		- e.g. between lead exposure and personality
+	- Test interventions to determine causal relationships
+
+## Machine Learning vs. Statistics
+
+- In **Statistics** we tend to be mostly focused on **inference**
+- In **Machine Learning** we tend to be mostly focused on **prediction**
+
+::: {.fragment}
+But both methods can be serve both purposes!
+:::
+
+## Machine learning model schema
+
+We can think of machine learning models as following the same schema:
+
+$$\text{data} = f(\text{model, noise})$$
+
+But the notion of data being a **function** of the model is often stretched a bit further. That is, it often is less connected to how we think about how the world works and more of an abstraction for prediction.

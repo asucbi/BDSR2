@@ -33,3 +33,5 @@ Hosted by github pages. E.g. https://derekpowell.github.io/BDSR2/labs/lab-m01.ht
 ## Requirements
 
 - Quarto v1.3+
+- Packages
+	+ [`rosdata`](https://github.com/avehtari/ROS-Examples/tree/master)

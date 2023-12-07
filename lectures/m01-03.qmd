@@ -17,9 +17,9 @@ library(tidyverse)
 
 ::: {.center}
 ```{mermaid}
-%%| fig-width: 6.5
+%%| fig-width: 9.5
 flowchart LR
-  A(Take data) --> B[make a model] --> C(Predict for new data)
+  A[(Data)] -- used to make --> B[Model] -- used to make --> C{{Predictions}}
 ```
 :::
 
@@ -33,7 +33,7 @@ Beginning at the end:
   - Not the same data that was used to make the model!
 :::
 
-## Step 1: Training and testing splits
+## Splitting the ~~baby~~ data
 
 :::: {.columns}
 
@@ -73,30 +73,49 @@ tibble(
 Using some for **Training** and some for **Testing**:
 
 ```{mermaid}
-flowchart LR
-  A(Split data) --> B(Training data)
-  A --> C(Testing data)
-  B --> D[make a model] --> E(Predict for NEW data)
-  E --> C
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
+  d[(Data)] --> split([Split]) --> trainSplit[(Training)]
+  split --> testSplit[(Testing)]
+  trainSplit --> model[Model]
+  model --> val{{Final Validation}}
+  testSplit  ---> val
+  
 ```
 
 ## Machine learning: Making good model(s)
 
-```{mermaid}
-graph LR
-  A(Training data) --> B[make <b>MANY</b> models] --> D[evaluate + choose]
-  D --> C(Predict for <b>NEW</b> data)
 
-```
+:::: {.columns}
 
-::: {.incremental}
+::: {.column width="50%"}
+
 - Building the best model often means making many models and picking the best one
-- Remember: "Best" meaning best at predicting for *new* data
-:::
+- Remember: ***Best*** meaning best at predicting for ***new*** data
 
 ::: {.fragment}
 Whatever data we use to pick the model won't be new data!
 :::
+
+:::
+
+::: {.column width="50%"}
+
+
+```{mermaid}
+%%| fig-width: 4.5
+graph LR
+  trainSplit[(Training)] --> m1[Model 1] & m2[Model 2] & m3[...] & m4[Model j]
+  
+  m1 & m2 & m3 & m4 --> sel{{Model selection}}
+
+```
+
+:::
+
+::::
+
+
 
 ## Validation data
 
@@ -108,7 +127,7 @@ One solution: create another ***validation*** split of data.
 
 tibble(
   Split = ordered(c("Train", "Test", "Validation"), levels = c("Train", "Validation", "Test")),
-  prop = c(.7, .15, .15)
+  prop = c(.6, .2, .2)
 ) %>% 
   ggplot(aes(x=-prop, y = "", fill = Split)) +
   geom_bar(stat="identity") +
@@ -127,44 +146,173 @@ tibble(
 - ***Compare*** and select best model using the [validation data]{.text-green}
 - ***Predict*** future model performance using the [test data]{.text-blue}
 
-## Cross validation
+## Data Budget
 
 ::: {.callout-note}
 ## Think about it ...
 Aren't we going to start running out of data?
 :::
 
-::: {.fragment}
-We can use **Cross Validation**
+::: {.incremental}
+- More training data $\rightarrow$ better models
+- More validation/testing data $\rightarrow$ more accurate validation
 ::: 
 
 ::: {.fragment}
-[diagram for this]
+How can we use as much data as possible to get the best models and evaluations?
 ::: 
+
+## Cross Validation
+
+```{r}
+library(patchwork)
+
+col_ <- function(x, nrow, ncol){
+  col <- floor((x-1)/ncol) + 1
+  return(col)
+}
+
+row_ <- function(x, nrow, ncol){
+  return( -1*((x-1) - nrow*col_(x, nrow, ncol) + 1 ) )
+}
+
+ids <- seq(1,25,1)
+shuffled_ids <- dplyr::row_number(runif(25))
+
+## make 5 copies
+expand_grid(
+  id = ids,
+  fold = c(1,2,3,4,5)
+) %>% 
+  group_by(fold) %>% 
+  mutate(
+    order_id = id,
+    row = -row_(order_id, 5, 5),
+    col = -col_(order_id, 5, 5),
+    # Split = if_else(-col==fold, "Validation", "Train"),
+    fold = paste("Fold", fold)
+    ) %>% 
+  ggplot(aes(x = row, y = col, label = id)) +
+  geom_tile(fill = "lightgrey", color = "black") +
+  geom_text(size=3) +
+  facet_wrap(~fold, nrow = 1) +
+  # scale_fill_manual(values = c("lightyellow", "lightblue")) +
+  theme_minimal() +
+  theme(
+    aspect.ratio=1,
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank()
+    ) +
+  labs(title = "Make k copies of the data") +
+
+## Randomize ...
+expand_grid(
+  id = ids,
+  fold = c(1,2,3,4,5)
+) %>% 
+  group_by(fold) %>% 
+  mutate(
+    order_id = shuffled_ids,
+    row = -row_(order_id, 5, 5),
+    col = -col_(order_id, 5, 5),
+    # Split = if_else(-col==fold, "Validation", "Train"),
+    fold = paste("Fold", fold)
+    ) %>% 
+  ggplot(aes(x = row, y = col, label = id)) +
+  geom_tile(fill = "lightgrey", color = "black") +
+  geom_text(size=3) +
+  facet_wrap(~fold, nrow = 1) +
+  # scale_fill_manual(values = c("lightyellow", "lightblue")) +
+  theme_minimal() +
+  theme(
+    aspect.ratio=1,
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank()
+    ) +
+  labs(title = "Randomize ...") +
+
+## ... and assign to train and test splits
+expand_grid(
+  id = ids,
+  fold = c(1,2,3,4,5)
+) %>% 
+  group_by(fold) %>% 
+  mutate(
+    order_id = shuffled_ids,
+    row = -row_(order_id, 5, 5),
+    col = -col_(order_id, 5, 5),
+    Split = if_else(-col==fold, "Validation", "Train"),
+    fold = paste("Fold", fold)
+    ) %>% 
+  ggplot(aes(x = row, y = col, label = id)) +
+  geom_tile(aes(fill=Split), color = "black") +
+  geom_text(size=3) +
+  facet_wrap(~fold, nrow = 1) +
+  scale_fill_manual(values = c("lightyellow", "lightblue")) +
+  theme_minimal() +
+  theme(
+    aspect.ratio=1,
+    panel.grid = element_blank(),
+    axis.title = element_blank(),
+    axis.text = element_blank()
+    ) +
+  labs(title = "... and assign to train and test splits") +
+  plot_layout(ncol = 1)
+  
+```
+
+
+## Cross Validation workflow
+
+```{mermaid}
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
+  trainSplit[(Training)] --> resamp([Resampling])
+  resamp --> m1 & m2 & m3 & m4
+  
+  subgraph K-folds
+  m1[Model 1] & m2[Model 2] & m3[...] & m4[Model j]
+  end
+
+  m1 & m2 & m3 & m4 --> sel{{Model selection}}
+
+```
 
 ## The overall machine learning workflow
 
 ```{mermaid}
 %%| fig-width: 10
-
+%%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph LR
-  A(Split data) --> B(Training<br/>data)
-  A --> C(Evaluate on<br/>Testing data)
-  B --> X[Resampling<br/>k-fold]
-  X --> D[Make models] --> E(k-fold<br/>evaluation)
-  E --> Y[Model<br/>selection]
-  Y --> C
+  d[(Data)] --> split([Split]) --> trainSplit[(Training)]
+  split --> testSplit[(Testing)]
+  trainSplit --> resamp([Resampling])
+  resamp --> m1 & m2 & m3 & m4
+  
+  subgraph K-folds
+  m1[Model 1] & m2[Model 2] & m3[...] & m4[Model j]
+  end
+
+  m1 & m2 & m3 & m4 --> sel{{Model selection}}
+  sel --> final[Final Model]
+  trainSplit --> final
+  final --> val{{Final Validation}}
+  testSplit ------> val
+  
+  
 ```
 
 ## Before the workflow
 
-- data acquisition
-- data preprocessing + cleaning
-- domain understanding
-- exploratory data analysis + visualization
+- Data acquisition
+- Data preprocessing + cleaning
+- Domain understanding
+- Exploratory data analysis + visualization
 
 ::: {.fragment}
-[AKA: Data Science!]{.text-red}
+[***AKA: Data Science!***]{.text-red}
 :::
 
 ## After the workflow
@@ -186,25 +334,24 @@ graph LR
 ### Insight and inference
 
 - Feature importance
-- Visualization
+- Visualization and insights
 
 :::
 
 ::::
 
 
-
 # Implementing the workflow in `tidymodels`
 
-## A case study: something
+## A case study: Taxi tips
 
 ## Splitting data into training and testing splits
 
-## Cross Validation
+## Setting up Cross Validation
 
-## Fitting a model
+## Fitting models and selecting the best
 
-## Predicting on the test data
+## Validating on the test data
 
 
 

@@ -412,12 +412,12 @@
 <section id="machine-learning-the-basic-idea" class="slide level2">
 <h2>Machine learning: The basic idea</h2>
 <div class="center">
-<div class="cell" data-reveal="true" data-fig-width="6.5">
+<div class="cell" data-reveal="true" data-fig-width="9.5">
 <div class="cell-output-display">
 <div>
 <p>
 </p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
-  A(Take data) --&gt; B[make a model] --&gt; C(Predict for new data)
+  A[(Data)] -- used to make --&gt; B[Model] -- used to make --&gt; C{{Predictions}}
 </pre>
 <div id="mermaid-tooltip-1" class="mermaidTooltip">
 
@@ -441,8 +441,8 @@
 </ul>
 </div>
 </section>
-<section id="step-1-training-and-testing-splits" class="slide level2">
-<h2>Step 1: Training and testing splits</h2>
+<section id="splitting-the-baby-data" class="slide level2">
+<h2>Splitting the <del>baby</del> data</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p>We split our data into training and testing splits:</p>
@@ -459,11 +459,14 @@
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-2">flowchart LR
-  A(Split data) --&gt; B(Training data)
-  A --&gt; C(Testing data)
-  B --&gt; D[make a model] --&gt; E(Predict for NEW data)
-  E --&gt; C
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-2">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
+  d[(Data)] --&gt; split([Split]) --&gt; trainSplit[(Training)]
+  split --&gt; testSplit[(Testing)]
+  trainSplit --&gt; model[Model]
+  model --&gt; val{{Final Validation}}
+  testSplit  ---&gt; val
+  
 </pre>
 <div id="mermaid-tooltip-2" class="mermaidTooltip">
 
@@ -475,13 +478,24 @@
 </section>
 <section id="machine-learning-making-good-models" class="slide level2">
 <h2>Machine learning: Making good model(s)</h2>
-<div class="cell" data-reveal="true">
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Building the best model often means making many models and picking the best one</li>
+<li>Remember: <strong><em>Best</em></strong> meaning best at predicting for <strong><em>new</em></strong> data</li>
+</ul>
+<div class="fragment">
+<p>Whatever data we use to pick the model won’t be new data!</p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell" data-reveal="true" data-fig-width="4.5">
 <div class="cell-output-display">
 <div>
 <p>
 </p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-3">graph LR
-  A(Training data) --&gt; B[make <b>MANY</b> models] --&gt; D[evaluate + choose]
-  D --&gt; C(Predict for <b>NEW</b> data)
+  trainSplit[(Training)] --&gt; m1[Model 1] &amp; m2[Model 2] &amp; m3[...] &amp; m4[Model j]
+  
+  m1 &amp; m2 &amp; m3 &amp; m4 --&gt; sel{{Model selection}}
 
 </pre>
 <div id="mermaid-tooltip-3" class="mermaidTooltip">
@@ -491,14 +505,7 @@
 </div>
 </div>
 </div>
-<div>
-<ul>
-<li class="fragment">Building the best model often means making many models and picking the best one</li>
-<li class="fragment">Remember: “Best” meaning best at predicting for <em>new</em> data</li>
-</ul>
 </div>
-<div class="fragment">
-<p>Whatever data we use to pick the model won’t be new data!</p>
 </div>
 </section>
 <section id="validation-data" class="slide level2">
@@ -511,8 +518,8 @@
 <li><strong><em>Predict</em></strong> future model performance using the <span class="text-blue">test data</span></li>
 </ul>
 </section>
-<section id="cross-validation" class="slide level2">
-<h2>Cross validation</h2>
+<section id="data-budget" class="slide level2">
+<h2>Data Budget</h2>
 <div class="callout callout-note callout-captioned callout-style-default">
 <div class="callout-body">
 <div class="callout-caption">
@@ -526,11 +533,44 @@
 </div>
 </div>
 </div>
-<div class="fragment">
-<p>We can use <strong>Cross Validation</strong></p>
+<div>
+<ul>
+<li class="fragment">More training data <span class="math inline">\(\rightarrow\)</span> better models</li>
+<li class="fragment">More validation/testing data <span class="math inline">\(\rightarrow\)</span> more accurate validation</li>
+</ul>
 </div>
 <div class="fragment">
-<p>[diagram for this]</p>
+<p>How can we use as much data as possible to get the best models and evaluations?</p>
+</div>
+</section>
+<section id="cross-validation" class="slide level2">
+<h2>Cross Validation</h2>
+
+<img data-src="m01-03_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+<section id="cross-validation-workflow" class="slide level2">
+<h2>Cross Validation workflow</h2>
+<div class="cell" data-reveal="true">
+<div class="cell-output-display">
+<div>
+<p>
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-4">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
+  trainSplit[(Training)] --&gt; resamp([Resampling])
+  resamp --&gt; m1 &amp; m2 &amp; m3 &amp; m4
+  
+  subgraph K-folds
+  m1[Model 1] &amp; m2[Model 2] &amp; m3[...] &amp; m4[Model j]
+  end
+
+  m1 &amp; m2 &amp; m3 &amp; m4 --&gt; sel{{Model selection}}
+
+</pre>
+<div id="mermaid-tooltip-4" class="mermaidTooltip">
+
+</div>
+<p></p>
+</div>
+</div>
 </div>
 </section>
 <section id="the-overall-machine-learning-workflow" class="slide level2">
@@ -539,15 +579,26 @@
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-4">graph LR
-  A(Split data) --&gt; B(Training<br>data)
-  A --&gt; C(Evaluate on<br>Testing data)
-  B --&gt; X[Resampling<br>k-fold]
-  X --&gt; D[Make models] --&gt; E(k-fold<br>evaluation)
-  E --&gt; Y[Model<br>selection]
-  Y --&gt; C
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-5">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+graph LR
+  d[(Data)] --&gt; split([Split]) --&gt; trainSplit[(Training)]
+  split --&gt; testSplit[(Testing)]
+  trainSplit --&gt; resamp([Resampling])
+  resamp --&gt; m1 &amp; m2 &amp; m3 &amp; m4
+  
+  subgraph K-folds
+  m1[Model 1] &amp; m2[Model 2] &amp; m3[...] &amp; m4[Model j]
+  end
+
+  m1 &amp; m2 &amp; m3 &amp; m4 --&gt; sel{{Model selection}}
+  sel --&gt; final[Final Model]
+  trainSplit --&gt; final
+  final --&gt; val{{Final Validation}}
+  testSplit ------&gt; val
+  
+  
 </pre>
-<div id="mermaid-tooltip-4" class="mermaidTooltip">
+<div id="mermaid-tooltip-5" class="mermaidTooltip">
 
 </div>
 <p></p>
@@ -558,13 +609,13 @@
 <section id="before-the-workflow" class="slide level2">
 <h2>Before the workflow</h2>
 <ul>
-<li>data acquisition</li>
-<li>data preprocessing + cleaning</li>
-<li>domain understanding</li>
-<li>exploratory data analysis + visualization</li>
+<li>Data acquisition</li>
+<li>Data preprocessing + cleaning</li>
+<li>Domain understanding</li>
+<li>Exploratory data analysis + visualization</li>
 </ul>
 <div class="fragment">
-<p><span class="text-red">AKA: Data Science!</span></p>
+<p><span class="text-red"><strong><em>AKA: Data Science!</em></strong></span></p>
 </div>
 </section>
 <section id="after-the-workflow" class="slide level2">
@@ -581,7 +632,7 @@
 <h3 id="insight-and-inference">Insight and inference</h3>
 <ul>
 <li>Feature importance</li>
-<li>Visualization</li>
+<li>Visualization and insights</li>
 </ul>
 </div>
 </div>
@@ -591,20 +642,20 @@
 <h1>Implementing the workflow in <code>tidymodels</code></h1>
 
 </section>
-<section id="a-case-study-something" class="slide level2">
-<h2>A case study: something</h2>
+<section id="a-case-study-taxi-tips" class="slide level2">
+<h2>A case study: Taxi tips</h2>
 </section>
 <section id="splitting-data-into-training-and-testing-splits" class="slide level2">
 <h2>Splitting data into training and testing splits</h2>
 </section>
-<section id="cross-validation-1" class="slide level2">
-<h2>Cross Validation</h2>
+<section id="setting-up-cross-validation" class="slide level2">
+<h2>Setting up Cross Validation</h2>
 </section>
-<section id="fitting-a-model" class="slide level2">
-<h2>Fitting a model</h2>
+<section id="fitting-models-and-selecting-the-best" class="slide level2">
+<h2>Fitting models and selecting the best</h2>
 </section>
-<section id="predicting-on-the-test-data" class="slide level2">
-<h2>Predicting on the test data</h2>
+<section id="validating-on-the-test-data" class="slide level2">
+<h2>Validating on the test data</h2>
 </section>
 <section id="bullets" class="slide level2">
 <h2>Bullets</h2>

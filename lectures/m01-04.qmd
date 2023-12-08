@@ -16,7 +16,6 @@ standardize <- function(x){
   (x-mean(x))/sd(x)
 }
 
-
 N <- 10
 
 set.seed(234234)

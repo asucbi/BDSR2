@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="m01-01_files/libs/clipboard/clipboard.min.js"></script>
-<script src="m01-01_files/libs/quarto-html/tabby.min.js"></script>
-<script src="m01-01_files/libs/quarto-html/popper.min.js"></script>
-<script src="m01-01_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="m01-01_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="m01-01_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="m01-01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="m02-02_files/libs/clipboard/clipboard.min.js"></script>
+<script src="m02-02_files/libs/quarto-html/tabby.min.js"></script>
+<script src="m02-02_files/libs/quarto-html/popper.min.js"></script>
+<script src="m02-02_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="m02-02_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="m02-02_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="m02-02_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.0.36">
 
-  <title>What is Machine Learning?</title>
+  <title>Probability Foundations</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="m01-01_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="m01-01_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="m02-02_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="m02-02_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -22,13 +22,77 @@
     div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="m01-01_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link rel="stylesheet" href="m02-02_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link rel="stylesheet" href="style.css">
-  <link href="m01-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="m01-01_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="m01-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="m01-01_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link href="m02-02_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="m02-02_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="m02-02_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="m02-02_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
   .callout {
@@ -319,142 +383,438 @@
     <div class="slides">
 
 <section id="title-slide" class="center">
-  <h1 class="title">What is Machine Learning?</h1>
+  <h1 class="title">Probability Foundations</h1>
   <p class="subtitle">Behavioral Data Science in R II</p>
 </section>
 
-<section id="what-is-machine-learning" class="slide level2">
-<h2>What is Machine Learning?</h2>
-<p><strong>Machine Learning</strong> is an umbrella term for a wide family of methods for analyzing and making inferences from patterns in data.</p>
-<p>Can think of <strong>Machine Learning</strong> as including:</p>
+<section class="slide level2">
+
+<p><span class="math display">\[\newcommand{\ind}{\perp\!\!\!\!\perp}\]</span></p>
+</section>
+<section id="what-is-a-probability" class="slide level2">
+<h2>What is a probability?</h2>
+<blockquote>
+<p>The theory of probabilities is basically just common sense reduced to calculus; it makes one appreciate with exactness that which accurate minds feel with a sort of instinct, often without being able to account for it —Laplace, 1829</p>
+</blockquote>
+</section>
+<section id="what-is-a-probability-1" class="slide level2">
+<h2>What is a probability?</h2>
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(P(A)\)</span>: Probability of event <span class="math inline">\(A\)</span></p>
+</div>
+</div>
+</div>
+<div style="font-size: 80%;">
 <ul>
-<li>Algorithms for finding patterns in data</li>
-<li>A set of practices for how to:
+<li>Probabilities are numbers from 0 and 1
 <ul>
-<li>Manage data</li>
-<li>Process data into “features”</li>
-<li>Use machine learning models for prediction</li>
-<li>Interpret the results of models to build understanding</li>
+<li>The probability of an impossible event is zero, the probability of an absolutely certain event is 1</li>
+</ul></li>
+<li><strong>Bayesian</strong>: Represent the degree of certainty that an event will happen</li>
+<li><strong>Frequentist</strong>: Represent the proportion of times an event would happen if the same situation were repeated infinitely many times</li>
+</ul>
+</div>
+</section>
+<section id="terminology" class="slide level2">
+<h2>Terminology</h2>
+<div style="font-size: 80%;">
+<ul>
+<li><strong>Experiment</strong>: A situation being described by probability theory</li>
+<li><strong>Elementary event</strong>: A unique possible outcome from an experiment</li>
+<li><strong>(Non-elementary) Event</strong>: A set of events</li>
+<li><strong>Sample space</strong>: All the possible elementary events (<span class="math inline">\(\Omega\)</span>)</li>
+<li><strong>Probability distribution</strong>: A complete description of the probability of all events in the sample space.
+<ul>
+<li>For <span class="math inline">\(\Omega\)</span> the sample space of all possibilities, <span class="math inline">\(P(\Omega) = 1\)</span>. That is the sum of all the probabilities for all possible events is equal to one.</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="notation-1" class="slide level2">
+<h2>Notation</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
+<ul>
+<li><span class="math inline">\(P(X)\)</span>: Probability of <span class="math inline">\(X\)</span></li>
+<li><span class="math inline">\(P(X \cap Y)\)</span>: Probability of <span class="math inline">\(X\)</span> and <span class="math inline">\(Y\)</span></li>
+<li><span class="math inline">\(P(X \cup Y)\)</span>: Probability of <span class="math inline">\(X\)</span> or <span class="math inline">\(Y\)</span></li>
+</ul>
+</div>
+</div>
+</div>
+<p><span class="math inline">\(\cup\)</span> and <span class="math inline">\(\cap\)</span> are set notations for union and intersection</p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="../imgs/set-relations.png"></p>
+</div>
+</div>
+</section>
+<section id="conditional-probability" class="slide level2">
+<h2>Conditional probability</h2>
+<p>We often want to talk about the probability of multiple variables and their relationships</p>
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(P(A | B)\)</span>: Probability of event A given event B</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<p><span class="math display">\[P(A|B) = \frac{P(A \cap B)}{P(B)}\]</span></p>
+</div>
+<div class="fragment" style="font-size: 80%;">
+<ul>
+<li>What is the probability that it will be unseasonably warm tomorrow? <span class="math inline">\((A)\)</span></li>
+<li>What is the probability that it will be unseasonably warm tomorrow, given that it was unseasonably warm today? <span class="math inline">\((A|B)\)</span></li>
+</ul>
+</div>
+</section>
+<section id="visualizing-conditional-probability" class="slide level2">
+<h2>Visualizing conditional probability</h2>
+
+<img data-src="../imgs/cond-prob-viz2.jpeg" class="r-stretch"></section>
+<section id="independence" class="slide level2">
+<h2>Independence</h2>
+<ul>
+<li><p>If knowing event B happened tells you something about event A happening, or vice versa, then events A and B are <strong>dependent</strong></p>
+<ul>
+<li><span class="math inline">\(P(A|B) \neq P(A)\)</span></li>
+</ul></li>
+<li><p>If not, they are said to be <strong>independent</strong></p>
+<ul>
+<li><span class="math inline">\(P(A | B) = P(A)\)</span></li>
+</ul></li>
+<li><p>We will denote the probability of an event <span class="math inline">\(A\)</span> as <span class="math inline">\(P(A)\)</span></p></li>
+</ul>
+</section>
+<section id="joint-probability" class="slide level2">
+<h2>Joint probability</h2>
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(P(A,B)\)</span>: The joint probability of <span class="math inline">\(A\)</span> and <span class="math inline">\(B\)</span></p>
+</div>
+</div>
+</div>
+<p><strong>The joint probability over two coin flips:</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th>Flip 1</th>
+<th>Flip 2</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>H</td>
+<td>H</td>
+<td>.25</td>
+</tr>
+<tr class="even">
+<td>H</td>
+<td>T</td>
+<td>.25</td>
+</tr>
+<tr class="odd">
+<td>T</td>
+<td>H</td>
+<td>.25</td>
+</tr>
+<tr class="even">
+<td>T</td>
+<td>T</td>
+<td>.25</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="more-probability-rules" class="slide level2">
+<h2>More probability rules</h2>
+<ul>
+<li><strong>AND</strong>: The probability that two independent events A and B <strong>both</strong> occur is the product of their probabilities
+<ul>
+<li><span class="math inline">\(A \ind B \iff P(A \text{ and } B ) = P(A) \cdot P(B)\)</span></li>
+</ul></li>
+<li><strong>OR</strong>: The probability that either <span class="math inline">\(A\)</span> <strong>or</strong> <span class="math inline">\(B\)</span> occurs is their sum, minus the probability that they both occur.
+<ul>
+<li><span class="math inline">\(A \ind B \iff P(A \text{ or } B ) = P(A) + P(B) - P(A) \cdot P(B)\)</span></li>
 </ul></li>
 </ul>
 </section>
-<section id="data-types" class="slide level2">
-<h2>Data types</h2>
-<div class="columns v-center-container">
-<div class="column" style="width:50%;">
-<p>Machine learning can be applied to many different kinds of data, including:</p>
-<ul>
-<li>text</li>
-<li>audio</li>
-<li>images</li>
-<li>video</li>
-<li>tabular data (e.g.&nbsp;survey data)</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<div class="quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/audio-spectrogram.png"></p>
-<p></p><figcaption>Audio</figcaption><p></p>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/MnistExamplesWikipedia.png"></p>
-<p></p><figcaption>Images</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/bigdatawordcloud.jpeg"></p>
-<p></p><figcaption>Text</figcaption><p></p>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/tabulardata.png"></p>
-<p></p><figcaption>Tabular</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
+<section id="visualizing-probability-rules" class="slide level2">
+<h2>Visualizing probability rules</h2>
 </section>
-<section id="problem-types" class="slide level2">
-<h2>Problem Types</h2>
-<p>Machine learning can be applied to tackle many different kinds of problems, including:</p>
+<section id="random-variables" class="slide level2">
+<h2>Random Variables</h2>
+<ul>
+<li>We will use capital letters to denote <strong>Random Variables</strong></li>
+<li><span class="math inline">\(X\)</span> is a random variable that can take on different <strong>realized</strong> values (<strong>realizations</strong>)</li>
+<li>Formally, if <span class="math inline">\(X\)</span> is binary (0 or 1) we might write something like <span class="math inline">\(X : \Omega \rightarrow \{0, 1\}\)</span></li>
+</ul>
+</section>
+<section id="probability-distributions" class="slide level2">
+<h2>Probability distributions</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>Supervised learning</strong></p>
-<ul>
-<li>Prediction</li>
-<li>Classification</li>
-</ul>
+<p>A probability distribution of a RV describes how probabilities are distributed over all realizable values of the RV.</p>
 </div><div class="column" style="width:50%;">
-<p><strong>Unsupervised learning</strong></p>
+<p><strong>Distribution of Derek’s shirts</strong></p>
+<div style="font-size: 50%;">
+<table>
+<thead>
+<tr class="header">
+<th>Shirt</th>
+<th>P</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Black t-shirt</td>
+<td>.45</td>
+</tr>
+<tr class="even">
+<td>Black sweater</td>
+<td>.3</td>
+</tr>
+<tr class="odd">
+<td>Flannel</td>
+<td>.2</td>
+</tr>
+<tr class="even">
+<td>Oxford</td>
+<td>.10</td>
+</tr>
+<tr class="odd">
+<td>Patterned button-up</td>
+<td>.05</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
 <ul>
-<li>Clustering</li>
+<li><span class="math inline">\(P(X)\)</span>: Probability distribution for RV <span class="math inline">\(X\)</span> (e.g.&nbsp;Table 1)</li>
+<li><span class="math inline">\(P(X=x)\)</span>: Probability that <span class="math inline">\(X\)</span> takes on value <span class="math inline">\(x\)</span> (e.g.&nbsp;Flannel <span class="math inline">\(= .2\)</span>)</li>
 </ul>
 </div>
 </div>
+</div>
 </section>
-<section>
-<section id="course-preview" class="title-slide slide level1 center">
-<h1>Course Preview</h1>
-
+<section id="types-of-probability-distributions-and-functions" class="slide level2">
+<h2>Types of probability distributions and functions</h2>
+<ul>
+<li><strong><em>Discrete</em></strong> probability distributions like the binomial distribution are defined only for a specific number of discrete events. E.g. for the binomial the number of trials <span class="math inline">\(n\)</span> and successes <span class="math inline">\(x\)</span> must be integer values where <span class="math inline">\(x \leq n\)</span>.</li>
+<li><strong><em>Continuous</em></strong> probability distributions are defined for infinitely many values.</li>
+</ul>
 </section>
-<section id="forecast-love-in-the-time-of-covid-19" class="slide level2">
-<h2>Forecast love in the time of COVID-19</h2>
-<p>Build an ML model to predict which couples will stay together and which will break up during the COVID-19 pandemic using demographic and survey data.</p>
-
-<img data-src="../imgs/ambiguous-couple.jpeg" class="r-stretch"></section>
-<section id="classify-toxic-online-comments" class="slide level2">
-<h2>Classify “toxic” online comments</h2>
-<p>Build a pipeline for automatic identification of toxic comments, by applying the naive Bayes and penalized logistic regression models to a dataset of comments from Wikipedia’s talk page edits.</p>
-
-<img data-src="../imgs/love-hate.jpeg" class="r-stretch"></section>
-<section id="build-a-lie-detector" class="slide level2">
-<h2>Build a Lie Detector</h2>
-<p>Use EEG and gaze recordings to identify when participants are lying or telling the truth.</p>
-
-<img data-src="../imgs/eeg-gaze-ex.jpeg" class="r-stretch"></section>
-<section id="read-handwriting-with-neural-networks" class="slide level2">
-<h2>Read handwriting with neural networks</h2>
-<p>Use neural networks to classify handwritten digits using the MNIST dataset.</p>
-
-<img data-src="../imgs/mnist-classifier.webp" class="r-stretch"><div class="footer footer-default">
+<section id="example-binomial-distribution" class="slide level2">
+<h2>Example: Binomial distribution</h2>
+<p>What is the probability of having <span class="math inline">\(x\)</span> successes in <span class="math inline">\(n\)</span> trials where probability of success on each trial is <span class="math inline">\(p\)</span>?</p>
+<p>For any integer-valued <span class="math inline">\(n\)</span> and <span class="math inline">\(x \in 1, 2, 3, ..., n\)</span>:</p>
+<p><span class="math display">\[P(x; n, p) = \frac{n!}{x!(n-x)!} p^x (1-p)^{n-x}\]</span></p>
+<p>or we can use <code>R</code>:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">dbinom</span>(x, size, prob)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="likelihood-of-data" class="slide level2">
+<h2>Likelihood of data</h2>
+<p>In Machine Learning, we often call the probability of data we have observed the <strong>likelihood</strong> of the data.</p>
+<div class="callout callout-note no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Think about it …</strong></p>
+</div>
+<div class="callout-content">
+<p>Suppose I flip 3 fair coins and get 3 heads. What is the likelihood of this data?</p>
+</div>
+</div>
+</div>
+<div class="fragment">
+<p>Intuitively:</p>
+<p><span class="math display">\[0.5 \times 0.5 \times 0.5 = .125\]</span></p>
+</div>
+</section>
+<section id="likelihood-of-data-ii" class="slide level2">
+<h2>Likelihood of data II</h2>
+<div class="callout callout-note no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Think about it …</strong></p>
+</div>
+<div class="callout-content">
+<p>Suppose I flip 7 fair coins and get 3 heads. What is the likelihood of this data?</p>
+</div>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="fragment" style="font-size: 80%;">
+<p>… not so intuitive anymore!</p>
+<div>
+<ul>
+<li class="fragment">Need to account for all of the ways we could arrive at this:
+<ul>
+<li class="fragment">HHHTTTT, HHTHTTT, HTTHTHT, …, etc.</li>
+</ul></li>
+<li class="fragment">But, we can apply the binomial distribution</li>
+</ul>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment">
+<p><span class="math display">\[P(x; n, p) = \frac{7!}{3!(7-3)!} (.5)^3 (1-.5)^4\]</span></p>
+<p>or</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">dbinom</span>(<span class="dv">3</span>, <span class="dv">7</span>, .<span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.2734375</code></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="maximum-likelihood" class="slide level2">
+<h2>Maximum likelihood</h2>
+<ul>
+<li>Typically we are not interested in the actual likelihood value of the data by itself</li>
+<li>Instead, we are interested in what values for the <strong>parameters</strong> of some model would maximize the likelihood of the data.</li>
+<li>We call these estimates the <strong>maximum likelihood estimates</strong> of the parameters.</li>
+</ul>
+</section>
+<section id="milgrams-obedience-experiments" class="slide level2">
+<h2>Milgram’s obedience experiments</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div style="font-size: 65%;">
+<ul>
+<li>Seminal but unethical experiments testing obedience to authority</li>
+<li>Participants were told they were assigned to be the “teacher” in a memory experiment</li>
+<li>Teachers were to train the learners by administering electric shocks for incorrect answers</li>
+<li>Shocks started out small but eventually reached a “lethal” voltage</li>
+<li>Participants did not know the shocks were fake and the “learner” was actually an actor playing a role</li>
+</ul>
+</div>
+</div><div class="column" style="width:50%;">
+<p><img data-src="../imgs/Milgram-experiment-750x375.jpeg"></p>
+</div>
+</div>
+<div class="fragment" style="font-size: 80%;">
+<p>In one experiment, 65% (26 of 40) participants obeyed all the way to administering a “lethal” shock.</p>
+</div>
+</section>
+<section id="milgams-morals" class="slide level2">
+<h2>Milgam’s morals</h2>
+<blockquote>
+<p>“If we fail to intervene, although we know a man is being made upset, why separate these actions of ours from those of the subject, who feels he is causing discomfort to another … why do we feel justified in carrying through the experiment, and why is this any different from the justifications that the obedient subjects feel.” —Stanley Milgram (<a href="http://www.gina-perry.com/2013/11/13/kohlberg-milgram-and-morals/">source</a>)</p>
+</blockquote>
+<p>Imagine Milgram actually began as a fairly ethical man. What must he have believed would happen in his experiments such that they would be acceptable to perform?</p>
+</section>
+<section id="binomial-rate-model" class="slide level2">
+<h2>Binomial rate model</h2>
+<ul>
+<li>We can model participants’ behavior like a series of independent coin flips, where there is some probability <span class="math inline">\(\pi\)</span> that each participant will obey.</li>
+<li>With this model, we can use the binomial distribution to calculate the likelihood of the observed data.</li>
+</ul>
+</section>
+<section id="likelihood-of-milgrams-data" class="slide level2">
+<h2>Likelihood of Milgram’s data</h2>
+<p>Suppose Milgram thought only 10% of his participants would carry through obeying to the end of the experiment. Under Milgram’s imagined model, what would the likelihood of the data be?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">dbinom</span>(<span class="dv">26</span>, <span class="dv">40</span>, .<span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 5.309001e-17</code></pre>
+</div>
+</div>
+<p>Suppose his graduate student believed that 40% of participants would obey. Under the student’s imagined model, what would the likelihood of the data be?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">dbinom</span>(<span class="dv">26</span>, <span class="dv">40</span>, .<span class="dv">40</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.0008190209</code></pre>
+</div>
+</div>
+</section>
+<section id="binomial-loss-function" class="slide level2">
+<h2>Binomial loss function</h2>
+<div class="callout callout-note no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Think about it …</strong></p>
+</div>
+<div class="callout-content">
+<p>If 26 out of 40 (65%) obeyed, what value for <span class="math inline">\(\pi\)</span> would maximize the likelihood of the observed data?</p>
+</div>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="fragment">
+<div class="cell" data-layout-align="center" data-output-location="column">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="m02-02_files/figure-revealjs/unnamed-chunk-5-1.png" width="480"></p>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment" style="font-size: 75%;">
+<p>The maximum likelihood estimate for a binomial rate is just the observed proportion.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="section" class="slide level2">
+<h2></h2>
+</section>
+<section id="more-details" class="title-slide slide level1 center">
+<h1>More details</h1>
+<div class="footer footer-default">
 
 </div>
-</section></section>
+</section>
     </div>
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="m01-01_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="m02-02_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="m01-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="m01-01_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="m01-01_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="m01-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="m01-01_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="m01-01_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="m01-01_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="m01-01_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="m01-01_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="m02-02_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -649,6 +1009,48 @@
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        function fireSlideChanged(previousSlide, currentSlide) {
+
+          // dispatch for htmlwidgets
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for reveal
+        if (window.Reveal) {
+          window.Reveal.addEventListener("slidechanged", function(event) {
+            fireSlideChanged(event.previousSlide, event.currentSlide);
+          });
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

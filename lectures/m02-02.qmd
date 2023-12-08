@@ -1,0 +1,352 @@
+---
+title: "Probability Foundations"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+$$\newcommand{\ind}{\perp\!\!\!\!\perp}$$
+
+```{r}
+#| include: false
+library(tidyverse)
+```
+
+
+## What is a probability?
+
+> The theory of probabilities is basically just common sense reduced to calculus; it makes one appreciate with exactness that which accurate minds feel with a sort of instinct, often without being able to account for it 
+---Laplace, 1829
+
+## What is a probability?
+
+::: {.callout-caution icon="false"}
+## Notation
+$P(A)$: Probability of event $A$
+:::
+
+::: {style="font-size: 80%;"}
+
+- Probabilities are numbers from 0 and 1
+  + The probability of an impossible event is zero, the probability of an absolutely certain event is 1
+- **Bayesian**: Represent the degree of certainty that an event will happen
+- **Frequentist**: Represent the proportion of times an event would happen if the same situation were repeated infinitely many times
+:::
+
+
+## Terminology
+
+::: {style="font-size: 80%;"}
+
+- __Experiment__: A situation being described by probability theory
+- __Elementary event__: A unique possible outcome from an experiment
+- __(Non-elementary) Event__: A set of events
+- __Sample space__: All the possible elementary events ($\Omega$)
+- __Probability distribution__: A complete description of the probability of all events in the sample space.
+  + For $\Omega$ the sample space of all possibilities, $P(\Omega) = 1$. That is the sum of all the probabilities for all possible events is equal to one.
+
+:::
+
+## Notation
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.callout-caution icon="false"}
+## Notation
+
+- $P(X)$: Probability of $X$
+- $P(X \cap Y)$: Probability of $X$ and $Y$
+- $P(X \cup Y)$: Probability of $X$ or $Y$
+:::
+
+$\cup$ and $\cap$ are set notations for union and intersection 
+
+:::
+::: {.column width="50%"}
+![](../imgs/set-relations.png)
+:::
+::::
+
+## Conditional probability
+
+We often want to talk about the probability of multiple variables and their relationships
+
+::: {.callout-caution icon="false"}
+## Notation
+ $P(A | B)$: Probability of event A given event B
+:::
+
+:::{.fragment}
+$$P(A|B) = \frac{P(A \cap B)}{P(B)}$$
+:::
+
+
+
+::: {.fragment style="font-size: 80%;"}
+- What is the probability that it will be unseasonably warm tomorrow? $(A)$
+- What is the probability that it will be unseasonably warm tomorrow, given that it was unseasonably warm today? $(A|B)$
+:::
+
+## Visualizing conditional probability
+
+![](../imgs/cond-prob-viz2.jpeg)
+
+## Independence
+
+- If knowing event B happened tells you something about event A happening, or vice versa, then events A and B are **dependent**
+
+  - $P(A|B) \neq P(A)$
+
+- If not, they are said to be **independent**
+
+  - $P(A | B) = P(A)$
+
+- We will denote the probability of an event $A$ as $P(A)$
+
+## Joint probability
+
+::: {.callout-caution icon="false"}
+## Notation
+$P(A,B)$: The joint probability of $A$ and $B$
+:::
+  
+**The joint probability over two coin flips:**
+
+| Flip 1 | Flip 2 |  P  |
+| ------ | ------ | --- |
+| H      | H      | .25 |
+| H      | T      | .25 |
+| T      | H      | .25 |
+| T      | T      | .25 |
+
+## More probability rules
+
+- **AND**: The probability that two independent events A and B **both** occur is the product of their probabilities
+  + $A \ind B \iff P(A \text{ and } B ) = P(A) \cdot P(B)$
+
+- **OR**: The probability that either $A$ **or** $B$ occurs is their sum, minus the probability that they both occur.
+  + $A \ind B \iff P(A \text{ or } B ) = P(A) + P(B) - P(A) \cdot P(B)$
+
+## Visualizing probability rules
+
+## Random Variables
+
+- We will use capital letters to denote **Random Variables**
+- $X$ is a random variable that can take on different **realized** values (**realizations**)
+- Formally, if $X$ is binary (0 or 1) we might write something like $X : \Omega \rightarrow \{0, 1\}$
+
+## Probability distributions
+
+:::: {.columns}
+
+::: {.column width="50%"}
+
+A probability distribution of a RV describes how probabilities are distributed over all realizable values of the RV.
+
+:::
+
+::: {.column width="50%"}
+
+**Distribution of Derek's shirts**
+
+::: {style="font-size: 50%;"}
+ 
+| Shirt       | P|
+|---------------------|-----|
+| Black t-shirt       | .45 |
+| Black sweater       | .3  |
+| Flannel             | .2  |
+| Oxford              | .10 |
+| Patterned button-up | .05 |
+
+:::
+:::
+::::
+
+::: {.callout-caution icon="false"}
+## Notation
+ - $P(X)$: Probability distribution for RV $X$ (e.g. Table 1)
+ - $P(X=x)$: Probability that $X$ takes on value $x$ (e.g. Flannel $= .2$)
+:::
+
+
+## Types of probability distributions and functions
+
+- ___Discrete___ probability distributions like the binomial distribution are defined only for a specific number of discrete events. E.g. for the binomial the number of trials $n$ and successes $x$ must be integer values where $x \leq n$.
+- ___Continuous___ probability distributions are defined for infinitely many values.
+
+
+
+## Example: Binomial distribution
+
+What is the probability of having $x$ successes in $n$ trials where probability of success on each trial is $p$? 
+
+For any integer-valued $n$ and $x \in 1, 2, 3, ..., n$:
+$$P(x; n, p) = \frac{n!}{x!(n-x)!} p^x (1-p)^{n-x}$$
+
+or we can use `R`:
+
+```r
+dbinom(x, size, prob)
+```
+
+## Likelihood of data
+
+In Machine Learning, we often call the probability of data we have observed the **likelihood** of the data.
+
+::: {.callout-note icon="false"}
+## Think about it ...
+Suppose I flip 3 fair coins and get 3 heads. What is the likelihood of this data?
+:::
+
+::: {.fragment}
+Intuitively:
+
+$$0.5 \times 0.5 \times 0.5 = .125$$
+:::
+
+## Likelihood of data II
+
+::: {.callout-note icon="false"}
+## Think about it ...
+Suppose I flip 7 fair coins and get 3 heads. What is the likelihood of this data?
+:::
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {.fragment style="font-size: 80%;"}
+... not so intuitive anymore!
+
+:::{.incremental}
+- Need to account for all of the ways we could arrive at this:
+  + HHHTTTT, HHTHTTT, HTTHTHT, ..., etc.
+- But, we can apply the binomial distribution
+:::
+:::
+:::
+::: {.column width="50%"}
+
+::: {.fragment}
+$$P(x; n, p) = \frac{7!}{3!(7-3)!} (.5)^3 (1-.5)^4$$
+
+or
+
+```{r}
+#| echo: true
+dbinom(3, 7, .5)
+```
+
+:::
+:::
+::::
+
+
+
+
+## Maximum likelihood
+
+- Typically we are not interested in the actual likelihood value of the data by itself
+- Instead, we are interested in what values for the **parameters** of some model would maximize the likelihood of the data.
+- We call these estimates the **maximum likelihood estimates** of the parameters.
+
+## Milgram's obedience experiments
+:::: {.columns}
+::: {.column width="50%"}
+::: {style="font-size: 65%;"}
+- Seminal but unethical experiments testing obedience to authority
+- Participants were told they were assigned to be the "teacher" in a memory experiment
+- Teachers were to train the learners by administering electric shocks for incorrect answers
+- Shocks started out small but eventually reached a "lethal" voltage
+- Participants did not know the shocks were fake and the "learner" was actually an actor playing a role
+:::
+
+:::
+::: {.column width="50%"}
+![](../imgs/Milgram-experiment-750x375.jpeg)
+:::
+::::
+
+::: {.fragment style="font-size: 80%;"}
+In one experiment, 65% (26 of 40) participants obeyed all the way to administering a "lethal" shock.
+:::
+
+
+## Milgam's morals 
+
+> “If we fail to intervene, although we know a man is being made upset, why separate these actions of ours from those of the subject, who feels he is causing discomfort to another ... why do we feel justified in carrying through the experiment, and why is this any different from the justifications that the obedient subjects feel.” ---Stanley Milgram ([source](http://www.gina-perry.com/2013/11/13/kohlberg-milgram-and-morals/))
+
+Imagine Milgram actually began as a fairly ethical man. What must he have believed would happen in his experiments such that they would be acceptable to perform?
+
+## Binomial rate model
+
+- We can model participants' behavior like a series of independent coin flips, where there is some probability $\pi$ that each participant will obey.
+- With this model, we can use the binomial distribution to calculate the likelihood of the observed data.
+
+## Likelihood of Milgram's data
+
+Suppose Milgram thought only 10% of his participants would carry through obeying to the end of the experiment. Under Milgram's imagined model, what would the likelihood of the data be?
+
+```{r}
+#| echo: true
+dbinom(26, 40, .10)
+```
+
+Suppose his graduate student believed that 40% of participants would obey. Under the student's imagined model, what would the likelihood of the data be?
+
+```{r}
+#| echo: true
+dbinom(26, 40, .40)
+```
+
+## Binomial loss function
+
+::: {.callout-note icon="false"}
+## Think about it ...
+If 26 out of 40 (65%) obeyed, what value for $\pi$ would maximize the likelihood of the observed data?
+:::
+
+:::: {.columns}
+::: {.column width="50%"}
+
+::: {.fragment}
+
+```{r}
+#| echo: false  
+#| output-location: column
+#| fig-height: 3
+#| fig-width: 5
+#| fig-align: center
+tibble(
+  prop = seq(0.001, .999, .001),
+  likeli = dbinom(26, 40, prop)
+) %>% 
+  ggplot(aes(x=prop, y = likeli)) +
+  geom_line() +
+  geom_vline(
+    data = . %>% filter(likeli==max(likeli)), 
+    mapping = aes(xintercept = prop), linetype="dashed", color = "blue"
+    ) +
+  geom_text(
+    data = . %>% filter(likeli==max(likeli)), 
+    mapping = aes(label = prop, x = prop - .05), y = .01, color = "blue"
+    )
+```
+
+:::
+:::
+::: {.column width="50%"}
+
+::: {.fragment style="font-size: 75%;"}
+The maximum likelihood estimate for a binomial rate is just the observed proportion.
+:::
+
+:::
+::::
+
+
+## 
+
+# More details
+

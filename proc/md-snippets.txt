@@ -1,0 +1,63 @@
+	
+snippet twocol
+	:::: {.columns}
+	::: {.column width="50%"}
+	
+	:::
+	::: {.column width="50%"}
+	
+	:::
+	::::
+
+snippet tip
+	::: callout-tip
+	
+	:::
+	
+snippet exercise
+	## Exercise ${1:number}
+	::: {.callout-note icon="false"}
+	## Exercise ${1:number}
+	Copy and paste this template and delete all the boilerplate below.
+	:::
+	
+snippet hint
+	::: {.callout-note icon="false" collapse="true"}
+	## Hint
+	
+	:::
+	
+snippet fragment
+	::: {.fragment}
+	
+	:::
+	
+snippet margin
+	::: column-margin
+	
+	:::
+
+snippet lo
+	::: {.callout-caution icon="false"}
+	## Learning Objectives
+	
+	Our learning objectives for this module are:
+	
+	- 
+	:::
+	
+snippet notation
+	::: {.callout-caution icon="false"}
+	## Notation
+	
+	:::
+	
+snippet textsize
+	::: {style="font-size: 50%;"}
+	
+	:::
+	
+snippet layout
+	::: {layout-nrow={1:rows}}
+	
+	:::

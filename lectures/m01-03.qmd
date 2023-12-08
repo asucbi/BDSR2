@@ -148,7 +148,7 @@ tibble(
 
 ## Data Budget
 
-::: {.callout-note}
+::: {.callout-note icon="false"}
 ## Think about it ...
 Aren't we going to start running out of data?
 :::

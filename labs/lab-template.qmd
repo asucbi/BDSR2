@@ -68,7 +68,6 @@ This would be helpful though.
 :::
 :::
 
-
 ### Learning Objectives
 
 Let's override the icon of the caution callout with `icon=false` for "learning objectives" to start the document.

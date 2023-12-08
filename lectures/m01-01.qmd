@@ -81,31 +81,26 @@ Machine learning can be applied to tackle many different kinds of problems, incl
 
 # Course Preview
 
+## Forecast love in the time of COVID-19
+
+Build an ML model to predict which couples will stay together and which will break up during the COVID-19 pandemic using demographic and survey data.
+
+![](../imgs/ambiguous-couple.jpeg)
+
 ## Classify "toxic" online comments
 
 Build a pipeline for automatic identification of toxic comments, by applying the naive Bayes and penalized logistic regression models to a dataset of comments from Wikipedia’s talk page edits.
+
+![](../imgs/love-hate.jpeg)
 
 ## Build a Lie Detector
 
 Use EEG and gaze recordings to identify when participants are lying or telling the truth.
 
+![](../imgs/eeg-gaze-ex.jpeg)
+
 ## Read handwriting with neural networks
 
 Use neural networks to classify handwritten digits using the MNIST dataset.
 
-## Code
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r}
-1 + 1
-```
-
-
-## Citations
-
-You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
-
-I've started off the references with our main text [@gareth.etal2014]. 
-
----
+![](../imgs/mnist-classifier.webp)

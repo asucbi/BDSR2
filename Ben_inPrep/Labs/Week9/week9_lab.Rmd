@@ -1,0 +1,138 @@
+---
+title: "week9_lab"
+output: html_document
+date: "2023-11-07"
+---
+
+```{r setup, include=FALSE}
+library(tidymodels)
+library(tidyverse)
+library(tidyclust)
+library(gridExtra)
+```
+
+```{r}
+rm(list = ls(all = TRUE))
+
+df = read_csv('/Users/jfalanda/Documents/Courses/BDSII/Content/Labs/Week9/Mall_customers.xls')
+
+head(df)
+```
+```{r}
+df$Gender = factor(df$Gender)
+colnames(df)<- c("ID", "Gender","Age","AnnualIncome","SpendingScore")
+```
+
+```{r}
+ggplot(df, aes(x = Age)) + 
+  geom_histogram(aes(y = after_stat(density)))+
+  geom_density()+
+  scale_x_continuous(limits=c(0, 80))
+
+ggplot(df, aes(x = AnnualIncome)) + 
+  geom_histogram(aes(y = after_stat(density)))+
+  geom_density()+
+  scale_x_continuous(limits=c(0, 80))
+
+ggplot(df, aes(x = SpendingScore)) + 
+  geom_histogram(aes(y = after_stat(density)))+
+  geom_density()+
+  scale_x_continuous(limits=c(0, 80))
+```
+
+```{r}
+ggplot(df, aes(x = "", y = Gender, fill = Gender)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0)
+```
+```{r}
+plots = list()
+i = 0
+layout(matrix(c(1, 2, 3,
+                4, 5, 6,
+                7, 8, 9), nrow=3, byrow=TRUE))
+for(x in c("Age", "AnnualIncome", "SpendingScore")){
+  
+  for(y in c("Age", "AnnualIncome", "SpendingScore")){
+    
+    i = i + 1
+    
+    p <- ggplot(df, aes_string(x, y, group = "Gender", color = "Gender")) + geom_point() + geom_smooth(method = "lm")+ guides(color=FALSE)
+    
+    plots[[i]] = p
+    
+  }
+}
+
+do.call(grid.arrange,plots)
+```
+```{r}
+kmeans_spec <- k_means(num_clusters = 3)
+
+kmeans_fit <- kmeans_spec %>% 
+  fit(~ Age + SpendingScore, data = df)
+
+clust_df <- kmeans_fit %>% 
+  augment(df)
+```
+
+```{r}
+ggplot(clust_df, aes(x = Age, y = SpendingScore, color = .pred_cluster)) + geom_point()
+```
+
+# Tuning the value of k using the elbow method
+```{r} 
+customer_cv <- vfold_cv(df, v = 5)
+
+kmeans_spec <- k_means(num_clusters = tune())
+
+customer_rec <- recipe(~ Age + SpendingScore, data = df)
+
+kmeans_wflow <- workflow(customer_rec, kmeans_spec)
+
+clust_num_grid <- grid_regular(num_clusters(), levels = 10)
+
+res <- tune_cluster(
+  kmeans_wflow,
+  resamples = customer_cv,
+  grid = clust_num_grid,
+  control = control_grid(save_pred = TRUE, extract = identity),
+  metrics = cluster_metric_set(sse_within_total,sse_total, sse_ratio)
+)
+
+res_metrics <- res %>% collect_metrics()
+
+```
+
+```{r}
+res_metrics %>%
+  filter(.metric == "sse_ratio") %>%
+  ggplot(aes(x = num_clusters, y = mean)) +
+  geom_point() +
+  geom_line() +
+  theme_minimal() +
+  ylab("mean WSS/TSS ratio, over 5 folds") +
+  xlab("Number of clusters") +
+  scale_x_continuous(breaks = 1:10)
+```
+```{r}
+kmeans_spec <- k_means(num_clusters = 4)
+
+kmeans_fit <- kmeans_spec %>% 
+  fit(~ Age + SpendingScore, data = df)
+
+clust_df <- kmeans_fit %>% 
+  augment(df)
+```
+
+```{r}
+ggplot(clust_df, aes(x = Age, y = SpendingScore, color = .pred_cluster)) + geom_point()
+```
+```{r}
+centroids <- kmeans_fit %>% extract_centroids()
+ggplot(clust_df, aes(x = Age, y = SpendingScore, color = .pred_cluster)) + geom_point() +
+  geom_point(data = centroids, aes(x = Age, y = SpendingScore, color = .cluster), size = 10, shape = "X")
+
+```
+
+

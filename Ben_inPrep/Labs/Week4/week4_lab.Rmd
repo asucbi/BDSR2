@@ -1,0 +1,94 @@
+---
+title: "week4_lab"
+output: html_document
+date: "2023-11-06"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidymodels)
+library(tidyverse)
+```
+
+
+```{r}
+rm(list = ls(all = TRUE))
+
+df = read_csv('/Users/jfalanda/Documents/Courses/BDSII/Content/Labs/Week4/OriginalProcessedData.csv')
+
+colnames(df) <- gsub("~","", colnames(df))
+
+df$Activity = factor(df$Activity)
+
+```
+
+```{r}
+
+ggplot(df, aes(x = Activity, fill = Activity))+geom_bar()
+
+```
+```{r}
+ggplot(df, aes(x = ACCELEROMETER_X_mean, y = ACCELEROMETER_Y_mean, color = as.factor(Activity))) + geom_point()
+
+```
+
+```{r}
+ggplot(df, aes(x = GRAVITY_X_mean, y = GRAVITY_Y_mean, color = as.factor(Activity))) + geom_point()
+
+```
+```{r}
+library(Rtsne)
+
+tsne <- df %>% 
+  select(-Activity) %>% 
+  Rtsne()
+
+df = df %>% transform(tsne1 = tsne$Y[,1], tsne2 = tsne$Y[,2])
+
+ggplot(df, aes(x = tsne1, y = tsne2, color = Activity)) + geom_point()
+```
+
+
+```{r}
+df_split = initial_split(df)
+df_train <- training(df_split)
+df_test <- testing(df_split)
+```
+
+```{r}
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = 5
+)
+```
+
+```{r}
+knn_fit <-
+  workflow() %>%
+    add_formula(Activity ~ GRAVITY_X_mean + GRAVITY_Y_mean) %>%
+    add_model(knn_spec) %>%
+    fit(data = df_train)
+
+# df_fit <-
+#   workflow() %>%
+#     add_formula(Activity ~ ACCELEROMETER_X_mean + ACCELEROMETER_Y_mean) %>%
+#     add_model(knn_spec) %>%
+#     fit(data = df_train)
+
+# df_fit <-
+#   workflow() %>%
+#     add_formula(Activity ~ tsne1 + tsne2) %>%
+#     add_model(knn_spec) %>%
+#     fit(data = df_train)
+```
+
+```{r}
+df_pred <- augment(knn_fit, new_data = df_test) %>% transform(correct = ifelse(.pred_class == Activity, 1, 0)) %>% 
+  relocate(.pred_class, Activity, correct)
+```
+
+```{r}
+sum(df_pred$correct)/nrow(df_pred)
+```
+

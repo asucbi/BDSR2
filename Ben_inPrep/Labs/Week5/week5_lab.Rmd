@@ -1,0 +1,110 @@
+---
+title: "week5_lab"
+output: html_document
+date: "2023-11-07"
+---
+
+```{r setup, include=FALSE}
+library(tidymodels)
+library(tidyverse)
+library(MASS)
+```
+
+```{r}
+rm(list = ls(all = TRUE))
+
+simulate_data <- function(n_observations){
+    # simulate data for logistic regression. There will be two real predictors and 3 fake predictors.
+    set.seed(123)
+    
+    # simulate the predictors
+    x1 <- rnorm(n_observations,0,2)
+    x2 <- rnorm(n_observations,0,2)
+    x3 <- rnorm(n_observations,0,2)
+    x4 <- rnorm(n_observations,0,2)
+    x5 <- rnorm(n_observations,0,2)
+
+    # simulate the response
+    z <- 0.5 + 2*x1 + 3*x2 
+    pr = 1/(1+exp(-z)) 
+    y = rbinom(n_observations,1,pr)
+    Class <- as.factor(y)
+
+    # return the data frame
+    return(data.frame(Class, x1, x2, x3, x4, x5))
+}
+
+df_sim = simulate_data(50)
+
+```
+
+```{r}
+ggplot(df_sim, aes(x = x1, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+
+ggplot(df_sim, aes(x = x2, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+```
+
+```{r}
+ggplot(df_sim, aes(x = x3, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+
+ggplot(df_sim, aes(x = x4, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+
+ggplot(df_sim, aes(x = x5, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+```
+
+```{r}
+m0 <- glm(Class ~ 1, family = "binomial", data = df_sim)
+glance(m0)
+
+m1 <- glm(Class ~ x1, family = "binomial", data = df_sim)
+glance(m1)
+
+m2 <- glm(Class ~ x1 + x2, family = "binomial", data = df_sim)
+glance(m2)
+
+m3 <- glm(Class ~ x1 + x2 + x3, family = "binomial", data = df_sim)
+glance(m03)
+
+m4 <- glm(Class ~ x1 + x2 + x3 + x4, family = "binomial", data = df_sim)
+glance(m4)
+
+m5 <- glm(Class ~ x1 + x2 + x3 + x4 + x5, family = "binomial", data = df_sim)
+glance(m5)
+
+anova(m0,m1,m2,m3,m4,m5, test = "Chisq")
+
+```
+
+```{r}
+df_split = initial_split(df_sim)
+df_train <- training(df_split)
+df_test <- testing(df_split)
+```
+
+```{r}
+mfull <- glm(Class ~ x1 + x2 + x3 + x4 + x5, family = "binomial", data = df_train)
+
+df_pred = df_test %>% transform(prob = predict(mfull, newdata = df_test[,2:6], type = "response")) %>% transform(.pred_class = ifelse(prob > .5, 1, 0)) %>% transform(correct = ifelse(.pred_class == Class, 1, 0)) %>% 
+  relocate(.pred_class, Class, correct)
+
+sum(df_pred$correct)/nrow(df_pred)
+
+```
+
+```{r}
+mreal <- glm(Class ~ x1 + x2, family = "binomial", data = df_train)
+
+df_pred = df_test %>% transform(prob = predict(mreal, newdata = df_test[,2:6], type = "response")) %>% transform(.pred_class = ifelse(prob > .5, 1, 0)) %>% transform(correct = ifelse(.pred_class == Class, 1, 0)) %>% 
+  relocate(.pred_class, Class, correct)
+
+sum(df_pred$correct)/nrow(df_pred)
+
+```
+
+
+

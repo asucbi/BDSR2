@@ -40,13 +40,17 @@ fnames <- list.files("harvard dialect survey/")
 
 full_data <- bind_rows(map(fnames, make_state_df))
 
-full_data %>% 
+states <- state.name
+names(states) <- state.abb
+
+full_data <- full_data %>% 
   mutate(
     item_num = str_match(item, "[0-9]+\\. "),
     item = str_replace(item, item_num, ""),
     item_num = str_sub(item_num, 1, -3)
   ) %>% 
-  mutate(prop = ans_prop/100) %>% 
-  select(state, item_num, item, ans_ind, ans_text, prop)
+  mutate(ans_prop = ans_prop/100) %>% 
+  select(state, item_num, item, ans_ind, ans_text, ans_prop) %>% 
+  mutate(state = str_to_lower(states[state]))
 
-write_csv(full_data, "hds.csv")
+write_csv(full_data, "../../data/hds.csv")

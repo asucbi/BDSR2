@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Derek Powell">
+
+<title>Module 2 Lab: Harvard Dialect Locator</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="lab-m02_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab-m02_files/libs/quarto-html/quarto.js"></script>
+<script src="lab-m02_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab-m02_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab-m02_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab-m02_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab-m02_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab-m02_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab-m02_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab-m02_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link" data-scroll-target="#the-data">The Data</a></li>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">Exercise 4</a></li>
+  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5">Exercise 5</a></li>
+  <li><a href="#exercise-6" id="toc-exercise-6" class="nav-link" data-scroll-target="#exercise-6">Exercise 6</a></li>
+  <li><a href="#exercise-7" id="toc-exercise-7" class="nav-link" data-scroll-target="#exercise-7">Exercise 7</a></li>
+  <li><a href="#exercise-8" id="toc-exercise-8" class="nav-link" data-scroll-target="#exercise-8">Exercise 8</a></li>
+  <li><a href="#exercise-9" id="toc-exercise-9" class="nav-link" data-scroll-target="#exercise-9">Exercise 9</a></li>
+  <li><a href="#exercise-10" id="toc-exercise-10" class="nav-link" data-scroll-target="#exercise-10">Exercise 10</a></li>
+  <li><a href="#bonus-exercise" id="toc-bonus-exercise" class="nav-link" data-scroll-target="#bonus-exercise">BONUS exercise</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content page-columns page-full" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Module 2 Lab: Harvard Dialect Locator</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Derek Powell </p>
+          </div>
+  </div>
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="callout-caution callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Our learning objectives for this module are:</p>
+<ul>
+<li>Review advanced data munging and visualization skills</li>
+<li>Apply new knowledge of probability foundations</li>
+<li>Build a Naive Bayes Classifier from scratch</li>
+</ul>
+</div>
+</div>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>What does the way you speak say about where you’re from?</p>
+<p>American regional dialects are a fascinating aspect of the linguistic landscape of the United States. They illustrate the diverse cultural, historical, and social influences that have shaped various communities across the country. Each dialect has its own way of pronouncing words, and sometimes even unique words and phrases, which can tell us a lot about the local culture and history. Each dialect, with its unique pronunciation, vocabulary, and syntax, is not just a means of communication but a window into the local identity and heritage of its speakers. These dialects reveal how migration, settlement patterns, and historical events have influenced language evolution, offering insights into the way people think, interact, and view the world around them. The study and preservation of these dialects are essential for understanding the dynamic nature of American English and for appreciating the profound diversity that characterizes the United States. By exploring these regional variations, we gain a deeper understanding of the complexities of American culture and the nuanced ways in which language reflects and shapes our experiences.</p>
+<p>The 10 years ago, the New York Times published the “NYT Dialect Quiz” that asks a series of questions about your use of American english, and from that predicts the location you live and/or grew up. Most of the questions used in the quiz are based on those in the Harvard Dialect Survey, a linguistics project begun in 2002 by Bert Vaux and Scott Golder.</p>
+<p>In this lab, we will build our own predictive model using a subset of the original data from the Harvard Dialect Survey. Our model will output the probability a respondent is from a given state based on the answers to 20 questions about their manner of speaking.</p>
+</section>
+<section id="the-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-data">The Data</h2>
+<p>There are two sets of data for this lab, both located in the <code>data/</code> folder. The data we will use to build our model been scraped from the Harvard Dialect Survey <a href="http://dialect.redlog.net/">website</a> and reformatted into the csv file <code>hds.csv</code>. Then we have our data for prediction—these are survey responses for our 20-question quiz. You should have already completed the survey yourself, so you can also see how the model does for you personally!</p>
+<p>Due to the nature of the data, we won’t quite follow the workflow we discussed last module. Instead, we will treat all of the <code>hds</code> data as our “training” data, and we will treat our new survey data as an illustrative validation/test set, but we would really want more data to do a proper test.</p>
+<p>First, we’ll load in the Harvard Dialect Survey data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>hds <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/hds.csv"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 6
+  state   item_num item  ans_ind ans_text                                ans_p…¹
+  &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;                                     &lt;dbl&gt;
+1 alabama        1 aunt  a       "[] as in \"ah\""                        0.0373
+2 alabama        1 aunt  b       "[] as in \"ant\""                       0.842 
+3 alabama        1 aunt  c       "[] as in \"caught\""                    0.0124
+4 alabama        1 aunt  d       "I have the same vowel in \"ah\", \"ca…  0.0124
+5 alabama        1 aunt  e       "I pronounce it the same as \"ain't\""   0.0456
+6 alabama        1 aunt  f       "I use [/] when referring to the gener…  0.0249
+# … with abbreviated variable name ¹​ans_prop</code></pre>
+</div>
+</div>
+<p>Then, we’ll load in our data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># read the other dataset in</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exercise-1" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
+<p>Before we start modeling, let’s do some exploratory data analysis on the HDS data.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Make a map for one item color coding each state by the most common answer</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># map_data("state")</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="co"># hds %&gt;% </span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(item == "1. aunt") %&gt;% </span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(state) %&gt;% </span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(ans_prop == max(ans_prop)) %&gt;% </span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   left_join(map_data("state"), )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exercise-2" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
+<p>Hopefully this is kind of fun, but let’s also do some even more basic EDA. If we look, there are 28695 rows in the dataset, which with 50 states would give 573.9 rows per state. Does that make sense?</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compare the rows representing two different states to diagnose what is going on. Use some kind of join or other comparison to highlight the issue and briefly explain. When you have finished, you can confirm you’ve got it by expanding the explanation below.</p>
+</div>
+</div>
+<div class="callout-warning callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Explanation
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>You should have seen that some answer responses are missing for some states. Presumably, these are answers that were not given by anyone from that state. We need to address this, as we can’t be missing rows when we go to make our model.</p>
+<p>To fix this, we can use a series of joins, including a new type of join you haven’t seen before: a cross join. The function <code>cross_join(x, y)</code> joins all of the rows in <code>x</code> with all of the rows with <code>y</code>, resulting in <code>nrow(x) * nrow(y)</code> rows. We want to first make a skeleton of the data we want, which is all of the distinct items and answers joined with all of the 50 states. Then, we can join the original data back onto this skeleton and fill in any resulting <code>NA</code> values with zeros.</p>
+</div>
+</div>
+</div>
+</section>
+<section id="exercise-3" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fix the problem as described in the explanation above. You can overwrite the <code>hds</code> dataset when you’ve got the solution.</p>
+</div>
+</div>
+</section>
+<section id="exercise-4" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4">Exercise 4</h2>
+<p>Our efforts have fixed the structure of the dataset, but they have left many rows with zero values (assuming you replaced the <code>NA</code>s). In the original data survey data, no one gave these answers, so the proportion should be zero. But, can we use these values directly in our model? The maximum-likelihood estimate for the conditional probability would be zero, but could this cause problems?</p>
+<p>Ahem, basically, yes. If we include zero conditional probabilities in our model, it might so happen that we later make a <strong>new</strong> observation where <span class="math inline">\(P(d)=0\)</span>. If so, we’ll end up dividing by zero, and the model won’t be able to make a prediction.</p>
+<p>One way to fix this is with <strong>smoothing</strong>. Instead of using the maximum likelihood parameter estimates, we use smoothed estimates. Methods differ (a common one is “Laplace Smoothing”), but the idea behind all of them is to replace observed zero proportions with some small positive probability value and then renormalize the probabilities.</p>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Normalization
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>A key feature of probabilities is that the total probabilities of events in a sample space sum to one. If they don’t sum to one, then they ain’t probabilities! “Normalization” of a set of values (e.g.&nbsp;likelihoods) is a common step in probability calculations needed to ensure that the resulting values remain (or become) probabilities.</p>
+<p>We can normalize any set of values to sum to one by dividing each by the sum of the whole set. Taking <span class="math inline">\(x'_i\)</span> to be the normalized value of <span class="math inline">\(x_i\)</span>:</p>
+<p><span class="math display">\[x'_i = \frac{x_i}{\sum_i x_i}\]</span></p>
+</div>
+</div>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>There is no 100% principled way to do this. If we had more training and validation data, we might treat the degree of smoothing as a <strong>hyperparameter</strong> we could tune (more on that in later modules). For now, find the minimum observed <code>ans_prop</code> and replace the <code>NA</code> values with a value 1/10 as large. Then, renormalize the probabilities of the answers to ensure they sum to one for each question and state pair.</p>
+<p>You can again overwrite the <code>hds</code> dataset when you’ve got the solution.</p>
+</div>
+</div>
+</section>
+<section id="exercise-5" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5">Exercise 5</h2>
+<p>Let’s grab out one respondent from our validation survey data to experiment on as we build our model code. We can put me, the author, in the hot seat, so let’s grab the row for Derek Powell.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Implement the basic model as shown in lecture to generate predicted probabilities for all 50 states for this one respondent’s data. Print the first few lines of the tibble of predictions.</p>
+</div>
+</div>
+</section>
+<section id="exercise-6" class="level2 page-columns page-full">
+<h2 class="anchored" data-anchor-id="exercise-6">Exercise 6</h2>
+<p>Great! Now we are going to make this code a bit simpler. Think back to Bayes’ Rule and recall that we called the the <span class="math inline">\(P(d)\)</span> term the “normalization” term and that we sometimes went so far as to leave it out and express Bayes Rule as the proportionality:</p>
+<p><span class="math display">\[P(h|d) \propto P(d|h)P(h)\]</span></p>
+<p>It turns out we can often ignore this term when thinking about probabilities, as we can skip computing it directly and simply normalize the values computed from the expression above.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p>This is only true exactly as I’m showing it here in the case of discrete probability distributions. Things are a bit different in the case of continuous probability distributions.</p>
+</div></div><p>As is often the case, the right notation makes this clear:</p>
+<p><span class="math display">\[p(H=h|d) = \frac{P(d|H=h)P(H=h)}{\sum_hP(d|H=h)P(H=h)}\]</span></p>
+<p>As this makes clearer, the probability of the data <span class="math inline">\(P(d)\)</span> is just the probability of the data given each hypothesis, summed over all the possible hypotheses. But this is exactly what we are doing when we calculate <code>likeli*prior</code> for each state, so we can just divide by the sum. I.e. we can normalize these values into probabilities.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Modify model code to skip explicitly calculating the probability of the data (<code>pdata</code> in the lecture code) and instead simply normalize the <code>likeli*prior</code> values.</p>
+</div>
+</div>
+</section>
+<section id="exercise-7" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Calculating with log-probabilities
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Often, calculations of probabilities are computed in terms of log-probabilities (i.e.&nbsp;in log-space, or after log-transformation)</li>
+<li>In log-space, multiplication becomes addition</li>
+</ul>
+<p><span class="math display">\[log(a \times b) = log(a) + log(b) \]</span></p>
+<ul>
+<li>Then, log-probabilites are transformed back into probabilities through exponentiation</li>
+</ul>
+<p>The function <code>log()</code> takes the log of a value (transforms probabilities into log-probabilities) and the function <code>exp()</code> exponentiates the log back into the original value (transforms log probabilities into probabilities). i.e.&nbsp;<code>exp(log(x)) == x</code>.</p>
+</div>
+</div>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Further modify the code to perform the computations in log-space. Confirm that the results are the same.</p>
+</div>
+</div>
+</section>
+<section id="exercise-8" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-8">Exercise 8</h2>
+<p>We have created a “model” through a process of joining against a dataframe of conditional probabilities. Now let’s transform this code into something more closely resembling the model functions we have seen.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Let’s do three things:</p>
+<ol type="1">
+<li>Test generating predicted probabilities for multiple respondents’ data, revising the code if necessary.</li>
+<li>Rewrite this code to output only the top predicted state and probability.</li>
+<li>Wrap this process up into a function that we can call on to output this for arbitrary data.</li>
+</ol>
+<p>Your function should take the following form <code>nb_model(input_data)</code> and should output a tibble with one row per participant. <code>id</code> should indicate the participant’s id, <code>.pred</code> should indicate the predicted state, and <code>.prob</code> should indicate the probability associated with that state.</p>
+</div>
+</div>
+</section>
+<section id="exercise-9" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-9">Exercise 9</h2>
+<p>Now it’s time to examine our predictions!</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compare your predictions to the actual observed values in our survey data. Compute an accuracy metric and compare to chance accuracy (briefly describe).</p>
+</div>
+</div>
+</section>
+<section id="exercise-10" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-10">Exercise 10</h2>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Make a map of predictions for your own data and see if it makes sense. Did our model predict where you grew up? Where you have lived?</p>
+</div>
+</div>
+</section>
+<section id="bonus-exercise" class="level2">
+<h2 class="anchored" data-anchor-id="bonus-exercise">BONUS exercise</h2>
+<p>So far, we have assumed a <strong>uniform prior</strong> over classes (states), calculated as <code>1/n()</code>. But we might be able to do better with an <strong>informative prior</strong>. One approach would be to estimate a prior empirically from our training dataset—we could use the proportion of respondents from each state as the prior probability a new datapoint would come from that state. Alternatively, in this context, we might recognize that our new survey is not as representative as the training data, and instead is very location-biased, since I administered it to people at ASU. So, we might form a prior based on distance from Arizona. Or, we might combine these ideas.</p>
+<p>Let’s keep things relatively simple while experimenting with this a bit by forming a prior based on the population of U.S. states.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 11 (bonus)
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Join that to the original <code>hds</code> data and include that probability as the prior when making predictions. Then, rerun the calculations from exercises 9 and 10. Compare what you find.</p>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

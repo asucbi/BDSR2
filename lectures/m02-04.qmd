@@ -19,7 +19,7 @@ bibliography: ../references.bib
 
 ## Quiz
 
-What do you call a sweet, non-alcoholic, carbonated beverage?
+What is your generic term for a sweetened carbonated beverage?
 ![](../imgs/soda-v-pop.jpeg)
 
 ## Wisconsin: A state divided
@@ -64,8 +64,8 @@ As with the binomial distribution, the maximum likelihood estimate for $\pi_i$ i
 ::: {.column width="40%"}
 |       | East | West |
 |-------|------|------|
-| pop   |   61 |   76 |
-| soda  |  177 |  139 |
+| pop   |   61 |   139 |
+| soda  |  177 |   76 |
 | coke  |   10 |   29 |
 | other |    2 |    6 |
 | **total** |  250 |  250 |
@@ -76,8 +76,8 @@ $$\rightarrow$$
 ::: {.column width="40%"}
 |       | East | West |
 |-------|------|------|
-| pop   |   .24 |   .30 |
-| soda  |  .71 |  .56 |
+| pop   |   .24 |   .56 |
+| soda  |  .71 |  .30 |
 | coke  |   .04 |   .12 |
 | other |    .01 |    .02 |
 :::
@@ -89,16 +89,16 @@ $$\rightarrow$$
 I'm a Wisconsinite and I say "soda"---what's the probability I am from Eastern Wisconsin?
 
 ::: {.fragment}
-bayes rule
+$$P(h|d) = \frac{P(d|h)P(h)}{P(d)}$$
 :::
 
 ::: {.fragment}
-sub in numbers and result
+$$P(h|d) = \frac{(.71) (.50)}{(.71)(.50) + (.30)(.50)} = .702$$
 :::
 
 ## Adding up observations
 
-- Generally, we can't figure out which state someone is from based on only one aspect of their dialect. 
+- Generally, we can't figure out where someone is from based on only one aspect of their dialect. 
 - Instead, we need to be able to combine multiple pieces of evidence.
 - We want: $P(h|d_1, d_2, ..., d_j)$
 - But we generally don't know how to write out a distribution or function for this probability
@@ -136,14 +136,6 @@ If we have:
 
 $$P(C_j | x_1, x_2, ..., x_k) \propto P(C_j) \prod^k_{i=1}P(x_i|C_j)$$
 
-
-## Sidebar: Calculating with log-probabilities
-
-- Often, calculations of probabilities are computed in terms of log-probabilities (i.e. in log-space, or after log-transformation)
-- In log-space, multiplication becomes addition
-
-$$log(a \times b) = log(a) + log(b) $$
-
 ## Example
 
 Let's examine 3 items from the Harvard dialect survey for the Midwestern states.
@@ -156,15 +148,10 @@ states <- state.name
 names(states) <- state.abb
 
 hds <- read_csv("data/hds.csv")
+
 hds_mini <- hds %>% 
-  filter(
-    grepl("4. caramel", item) | 
-      grepl("105. What is your generic term for a sweetened carbonated beverage?", item) |
-      grepl("21. pecan", item)
-    ) %>% 
-  filter(state %in% c("WI","MN", "MI", "OH", "IL", "IA", "IN")) %>% 
-  mutate(ans_prop = ans_prop/100.) %>% 
-  mutate(state = states[state])
+  filter(item_num %in% c(4, 105, 21)) %>% 
+  filter(state %in% c("wisconsin","minnesota", "michigan", "ohio", "illinois", "iowa", "indiana"))
 ```
 
 ```{r}
@@ -173,22 +160,39 @@ head(hds_mini, 10)
 ```
 ## Multinomial Naive Bayes: The Code
 
+
+:::.hidden
+```{r}
+# res <- left_join(x, hds_mini, by = c("item", "ans_ind")) %>%
+#   group_by(state) %>%
+#   summarize(likeli = prod(ans_prop)) %>%
+#   ungroup() %>%
+#   mutate(prior = c(.1,.1,.1,.1,.1,.1,.4)) %>% 
+#   mutate(likeli = likeli*prior/sum(likeli*prior))
+```
+:::
+
 ::: {style="font-size: 80%;"}
 
 ```{r}
 #| echo: true
 x <- tribble(
-  ~item, ~ans_ind,
-  "4. caramel", "a",
-  "21. pecan", "c",
-  "105. What is your generic term for a sweetened carbonated beverage?", "a"
+  ~item_num, ~ans_ind,
+  4, "a",
+  21, "c",
+  105, "a"
 )
 
-res <- left_join(x, hds_mini, by = c("item", "ans_ind")) %>% 
+res <- left_join(x, hds_mini, by = c("item_num", "ans_ind")) %>% 
   group_by(state) %>% 
-  summarize(likeli = prod(ans_prop)) %>% 
-  ungroup() %>% 
-  mutate(likeli = likeli/sum(likeli))
+  summarize(
+    likeli = prod(ans_prop)
+    ) %>%
+  mutate(
+    prior = 1/n(),
+    pdata = sum(likeli*prior),
+    posterior = likeli*prior/pdata
+  )
 
 res
 ```
@@ -199,8 +203,8 @@ res
 ```{r}
 #| echo: false
 
-left_join(map_data("state"), res %>% mutate(region = str_to_lower(state))) %>% 
-  ggplot(aes(x=long, y = lat, group = group, fill = likeli)) +
+left_join(map_data("state"), res %>% mutate(region = state)) %>% 
+  ggplot(aes(x=long, y = lat, group = group, fill = posterior)) +
   geom_polygon(color = "black") +
   coord_quickmap(xlim = c(-100, -80), ylim = c(37.5, 50)) +
   scale_fill_viridis_c(option = "viridis") +

@@ -166,7 +166,8 @@ Learning Objectives
 <section id="introduction" class="level2">
 <h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
 <p>What does the way you speak say about where you’re from?</p>
-<p>American regional dialects are a fascinating aspect of the linguistic landscape of the United States. They illustrate the diverse cultural, historical, and social influences that have shaped various communities across the country. Each dialect has its own way of pronouncing words, and sometimes even unique words and phrases, which can tell us a lot about the local culture and history. Each dialect, with its unique pronunciation, vocabulary, and syntax, is not just a means of communication but a window into the local identity and heritage of its speakers. These dialects reveal how migration, settlement patterns, and historical events have influenced language evolution, offering insights into the way people think, interact, and view the world around them. The study and preservation of these dialects are essential for understanding the dynamic nature of American English and for appreciating the profound diversity that characterizes the United States. By exploring these regional variations, we gain a deeper understanding of the complexities of American culture and the nuanced ways in which language reflects and shapes our experiences.</p>
+<p>American regional dialects illustrate the diverse cultural, historical, and social influences that have shaped various communities across the country. Each dialect has its own way of pronouncing words, and sometimes even unique words and phrases, which can tell us a lot about the local culture and history. Each dialect, with its unique pronunciation, vocabulary, and syntax, is not just a means of communication but a window into the local identity and heritage of its speakers. These dialects reveal how migration, settlement patterns, and historical events have influenced language evolution, offering insights into the way people think, interact, and view the world around them. The study and preservation of these dialects are essential for understanding the dynamic nature of American English and for appreciating the profound diversity that characterizes the United States. By exploring these regional variations, we gain a deeper understanding of the complexities of American culture and the nuanced ways in which language reflects and shapes our experiences.</p>
+<p><img src="../imgs/nyt-dialect-ex.png" class="img-fluid"></p>
 <p>The 10 years ago, the New York Times published the “NYT Dialect Quiz” that asks a series of questions about your use of American english, and from that predicts the location you live and/or grew up. Most of the questions used in the quiz are based on those in the Harvard Dialect Survey, a linguistics project begun in 2002 by Bert Vaux and Scott Golder.</p>
 <p>In this lab, we will build our own predictive model using a subset of the original data from the Harvard Dialect Survey. Our model will output the probability a respondent is from a given state based on the answers to 20 questions about their manner of speaking.</p>
 </section>
@@ -214,6 +215,7 @@ Exercise 1
 <p>Make a map for one item color coding each state by the most common answer</p>
 </div>
 </div>
+<div class="hidden">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># map_data("state")</span></span>
 <span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -222,6 +224,7 @@ Exercise 1
 <span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="co">#   group_by(state) %&gt;% </span></span>
 <span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#   filter(ans_prop == max(ans_prop)) %&gt;% </span></span>
 <span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#   left_join(map_data("state"), )</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </div>
 </section>
 <section id="exercise-2" class="level2">

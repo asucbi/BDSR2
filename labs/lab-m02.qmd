@@ -19,7 +19,9 @@ Our learning objectives for this module are:
 
 What does the way you speak say about where you’re from? 
 
-American regional dialects are a fascinating aspect of the linguistic landscape of the United States. They illustrate the diverse cultural, historical, and social influences that have shaped various communities across the country. Each dialect has its own way of pronouncing words, and sometimes even unique words and phrases, which can tell us a lot about the local culture and history. Each dialect, with its unique pronunciation, vocabulary, and syntax, is not just a means of communication but a window into the local identity and heritage of its speakers. These dialects reveal how migration, settlement patterns, and historical events have influenced language evolution, offering insights into the way people think, interact, and view the world around them. The study and preservation of these dialects are essential for understanding the dynamic nature of American English and for appreciating the profound diversity that characterizes the United States. By exploring these regional variations, we gain a deeper understanding of the complexities of American culture and the nuanced ways in which language reflects and shapes our experiences.
+American regional dialects illustrate the diverse cultural, historical, and social influences that have shaped various communities across the country. Each dialect has its own way of pronouncing words, and sometimes even unique words and phrases, which can tell us a lot about the local culture and history. Each dialect, with its unique pronunciation, vocabulary, and syntax, is not just a means of communication but a window into the local identity and heritage of its speakers. These dialects reveal how migration, settlement patterns, and historical events have influenced language evolution, offering insights into the way people think, interact, and view the world around them. The study and preservation of these dialects are essential for understanding the dynamic nature of American English and for appreciating the profound diversity that characterizes the United States. By exploring these regional variations, we gain a deeper understanding of the complexities of American culture and the nuanced ways in which language reflects and shapes our experiences.
+
+![](../imgs/nyt-dialect-ex.png)
 
 The 10 years ago, the New York Times published the "NYT Dialect Quiz" that asks a series of questions about your use of American english, and from that predicts the location you live and/or grew up. Most of the questions used in the quiz are based on those in the Harvard Dialect Survey, a linguistics project begun in 2002 by Bert Vaux and Scott Golder.
 
@@ -58,6 +60,7 @@ Before we start modeling, let's do some exploratory data analysis on the HDS dat
 Make a map for one item color coding each state by the most common answer
 :::
 
+:::{.hidden}
 ```{r}
 # map_data("state")
 
@@ -67,6 +70,7 @@ Make a map for one item color coding each state by the most common answer
 #   filter(ans_prop == max(ans_prop)) %>% 
 #   left_join(map_data("state"), )
 ```
+:::
 
 ## Exercise 2
 
@@ -128,6 +132,8 @@ Implement the basic model as shown in lecture to generate predicted probabilitie
 :::
 
 ## Exercise 6
+
+
 
 Great! Now we are going to make this code a bit simpler. Think back to Bayes' Rule and recall that we called the the $P(d)$ term the "normalization" term and that we sometimes went so far as to leave it out and express Bayes Rule as the proportionality:
 

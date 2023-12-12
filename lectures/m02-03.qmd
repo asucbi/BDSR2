@@ -1,0 +1,135 @@
+---
+title: "Bayesian Inference & Bayes' Rule"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## Bayesian Inference
+
+Idea is, what should you believe about a hypothesis based on some data?
+
+[ expand on this more]
+
+## Bayes' Rule
+
+:::: {.columns}
+::: {.column width="70%"}
+$$P(h|d) = \frac{P(d|h)P(h)}{P(d)}$$
+
+- Posterior: $P(h|d)$
+- Likelihood: $P(d|h)$
+- Prior: $P(h)$
+- Normalizing constant: $P(d)$
+
+:::
+::: {.column width="30%"}
+![](../imgs/Thomas_Bayes.gif)
+:::
+::::
+
+
+## Diagnosing vampirism
+
+Suppose we are vampire hunters and our lab has just processed a positive blood test for vampirism. We can calculate the probability that the suspect is a vampire as:
+
+$$ P(vampire|positive) = \frac{P(positive|vampire)P(vampire)}{P(positive)} $$
+
+::: {.fragment}
+
+where 
+
+$$
+\begin{multline*}
+P(positive) = \\
+P(positive|vampire)P(vampire) +  \\
+P(positive|\neg vampire)P(\neg vampire)
+\end{multline*}
+$$
+
+:::
+
+
+## Diagnosing vampirism: Numerical example
+
+$$ P(vampire|positive) = \frac{P(positive|vampire)P(vampire)}{P(positive)} $$
+
+Suppose the test successfully detects vampirism 95% of the time, and only issues a false-positive 1% of the time. Of course, vampires are rare, only 0.1% of the population.
+
+```{r vampire-test}
+#| echo: true
+#| output-location: fragment
+p_pos_g_vamp <- .95
+p_pos_g_human <- .01
+p_vamp <- .001
+p_pos <- p_pos_g_vamp*p_vamp + p_pos_g_human*(1-p_vamp)
+
+(p_pos_g_vamp * p_vamp) / p_pos
+```
+
+
+## Counting vampires
+
+::: {style="font-size: 80%;"}
+
+- 95 out of 100 tests on vampires will be positive (95%)
+- 1 out of 100 tests on humans will be positive (1%)
+- 100 out of 100,000 people are vampires (0.1%)
+
+::: {.fragment}
+If we test 100,000 people for vampirism, we can expect:
+
+- 95/100 vampires to test positive
+- 1000 non-vampires to test positive
+- So out of 1095 positive tests, 95 are vampires $\rightarrow \frac{95}{1095} = .086$
+:::
+
+:::
+
+
+## Bayesian approaches to science
+
+[turn the crank, etc.]
+
+## Challenges to Bayesian approaches to science
+
+- Need to define priors 
+- Many ML models do not have clear Bayesian definitions
+- Not everything is flipping coins, can be hard to define the right model or exhaust the space of models (a problem for all approaches)
+
+## Bayesian vs. Likelihoodist approaches
+
+- Maximum likelihood approaches focus only on the likelihood term of Bayes Rule
+- Seek the model $\mathcal{M}$ that maximizes the likelihood of the observed (or future) data
+
+::: {.fragment}
+
+Roughly ...
+
+:::: {.columns}
+::: {.column width="50%"}
+**Bayesian**
+
+$$P(\mathcal{M}|d) \propto P(d|\mathcal{M})P(\mathcal{M})$$
+:::
+::: {.column width="50%"}
+**Likelihoodist**
+
+$$P(\mathcal{M}|d) \propto P(d|\mathcal{M})$$
+:::
+::::
+
+:::
+
+## Maximum likelihood
+
+:::{.incremental}
+- Indifference to the prior probability of hypotheses can be problematic
+- Say we flip a coin 10 times and get 6 heads
+- P(d|\text{fair coin}) < P(d|\text{60% biased coin})
+- Use of cross validation approaches can help with this in some cases
+:::
+
+

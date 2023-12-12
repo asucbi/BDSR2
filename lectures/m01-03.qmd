@@ -9,6 +9,12 @@ bibliography: ../references.bib
 ```{r}
 #| include: false
 
+# todo: try to get mermaids renderd out as svg so they will be less buggy
+# but of course this is buggy
+# use:
+# %%| mermaid-format: svg
+
+
 library(tidyverse)
 ```
 
@@ -73,6 +79,7 @@ tibble(
 Using some for **Training** and some for **Testing**:
 
 ```{mermaid}
+
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph LR
   d[(Data)] --> split([Split]) --> trainSplit[(Training)]
@@ -103,6 +110,7 @@ Whatever data we use to pick the model won't be new data!
 
 
 ```{mermaid}
+
 %%| fig-width: 4.5
 graph LR
   trainSplit[(Training)] --> m1[Model 1] & m2[Model 2] & m3[...] & m4[Model j]
@@ -258,7 +266,7 @@ expand_grid(
     axis.title = element_blank(),
     axis.text = element_blank()
     ) +
-  labs(title = "... and assign to train and test splits") +
+  labs(title = "... and assign different train/test splits within each fold") +
   plot_layout(ncol = 1)
   
 ```
@@ -267,7 +275,8 @@ expand_grid(
 ## Cross Validation workflow
 
 ```{mermaid}
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
+
+
 graph LR
   trainSplit[(Training)] --> resamp([Resampling])
   resamp --> m1 & m2 & m3 & m4
@@ -283,8 +292,8 @@ graph LR
 ## The overall machine learning workflow
 
 ```{mermaid}
-%%| fig-width: 10
-%%{init: {"flowchart": {"htmlLabels": false}} }%%
+%%| fig-width: 9.5
+
 graph LR
   d[(Data)] --> split([Split]) --> trainSplit[(Training)]
   split --> testSplit[(Testing)]

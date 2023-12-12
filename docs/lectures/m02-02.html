@@ -387,15 +387,13 @@
   <p class="subtitle">Behavioral Data Science in R II</p>
 </section>
 
-<section class="slide level2">
-
-<p><span class="math display">\[\newcommand{\ind}{\perp\!\!\!\!\perp}\]</span></p>
-</section>
 <section id="what-is-a-probability" class="slide level2">
 <h2>What is a probability?</h2>
 <blockquote>
-<p>The theory of probabilities is basically just common sense reduced to calculus; it makes one appreciate with exactness that which accurate minds feel with a sort of instinct, often without being able to account for it —Laplace, 1829</p>
+<p>Probability theory is nothing but common sense reduced to calculation.<br>
+—Laplace, 1829</p>
 </blockquote>
+<p><span class="math display">\[\newcommand{\ind}{\perp\!\!\!\perp}\]</span></p>
 </section>
 <section id="what-is-a-probability-1" class="slide level2">
 <h2>What is a probability?</h2>
@@ -558,9 +556,6 @@
 </ul></li>
 </ul>
 </section>
-<section id="visualizing-probability-rules" class="slide level2">
-<h2>Visualizing probability rules</h2>
-</section>
 <section id="random-variables" class="slide level2">
 <h2>Random Variables</h2>
 <ul>
@@ -635,9 +630,27 @@
 <h2>Example: Binomial distribution</h2>
 <p>What is the probability of having <span class="math inline">\(x\)</span> successes in <span class="math inline">\(n\)</span> trials where probability of success on each trial is <span class="math inline">\(p\)</span>?</p>
 <p>For any integer-valued <span class="math inline">\(n\)</span> and <span class="math inline">\(x \in 1, 2, 3, ..., n\)</span>:</p>
-<p><span class="math display">\[P(x; n, p) = \frac{n!}{x!(n-x)!} p^x (1-p)^{n-x}\]</span></p>
+<p><span class="math display">\[P(x; n, \pi) = {n\choose x}  \pi^x (1-\pi)^{n-x}\]</span></p>
 <p>or we can use <code>R</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">dbinom</span>(x, size, prob)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="sidebar-binomial-coefficient" class="slide level2">
+<h2>Sidebar: Binomial Coefficient</h2>
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
+<p><strong>Binomial coefficient</strong></p>
+<p><span class="math display">\[{n\choose k} =  \frac{n!}{k!(n-k)!}\]</span></p>
+<p>Pronounced “n choose k”, to denote the number of combinations that can be made by selecting k items from a set of n total items.</p>
+<p><strong>Factorial</strong></p>
+<p><span class="math display">\[n! = n \times (n-1) \times (n-2) \times ... \times 2 \times 1 \]</span></p>
+<p>Pronounced “n factorial”</p>
+</div>
+</div>
+</div>
 </section>
 <section id="likelihood-of-data" class="slide level2">
 <h2>Likelihood of data</h2>
@@ -788,12 +801,6 @@
 </div>
 </div>
 </div>
-</section>
-<section id="section" class="slide level2">
-<h2></h2>
-</section>
-<section id="more-details" class="title-slide slide level1 center">
-<h1>More details</h1>
 <div class="footer footer-default">
 
 </div>

@@ -488,11 +488,12 @@ graph LR
 <p>Whatever data we use to pick the model won’t be new data!</p>
 </div>
 </div><div class="column" style="width:50%;">
-<div class="cell" data-reveal="true" data-fig-width="4.5">
+<div class="cell" data-reveal="true">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-3">graph LR
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-3">%%| fig-width: 4.5
+graph LR
   trainSplit[(Training)] --&gt; m1[Model 1] &amp; m2[Model 2] &amp; m3[...] &amp; m4[Model j]
   
   m1 &amp; m2 &amp; m3 &amp; m4 --&gt; sel{{Model selection}}
@@ -520,12 +521,9 @@ graph LR
 </section>
 <section id="data-budget" class="slide level2">
 <h2>Data Budget</h2>
-<div class="callout callout-note callout-captioned callout-style-default">
+<div class="callout callout-note no-icon callout-captioned callout-style-default">
 <div class="callout-body">
 <div class="callout-caption">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
 <p><strong>Think about it …</strong></p>
 </div>
 <div class="callout-content">
@@ -553,7 +551,7 @@ graph LR
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-4">%%{init: {"flowchart": {"htmlLabels": false}} }%%
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-4">
 graph LR
   trainSplit[(Training)] --&gt; resamp([Resampling])
   resamp --&gt; m1 &amp; m2 &amp; m3 &amp; m4
@@ -575,12 +573,11 @@ graph LR
 </section>
 <section id="the-overall-machine-learning-workflow" class="slide level2">
 <h2>The overall machine learning workflow</h2>
-<div class="cell" data-reveal="true" data-fig-width="10">
+<div class="cell" data-reveal="true" data-fig-width="9.5">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-5">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph LR
+</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-5">graph LR
   d[(Data)] --&gt; split([Split]) --&gt; trainSplit[(Training)]
   split --&gt; testSplit[(Testing)]
   trainSplit --&gt; resamp([Resampling])

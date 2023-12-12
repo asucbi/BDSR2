@@ -1,0 +1,210 @@
+---
+title: "Classification with Naive Bayes"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## NYT Dialect quiz
+
+![](../imgs/nyt-dialect-ex.png)
+
+## Classification
+
+- Classify data according to **discrete** labels or groups
+- **Binary:** yes/no, spam/ham, positive/negative, etc.
+- **Categorical**: [happy, sadness, anger, fear, disgust, surprise]
+
+## Quiz
+
+What do you call a sweet, non-alcoholic, carbonated beverage?
+![](../imgs/soda-v-pop.jpeg)
+
+## Wisconsin: A state divided
+
+
+:::: {.columns}
+::: {.column width="70%"}
+- In Eastern Wisconsin, most people call soft drinks "soda"
+- In Western Wisconsin, most people call soft drinks "pop"
+
+Consider some (imaginary) survey data. If we know someone is from Wisconsin, can we use this data to help us determine which part of the state they are from?
+:::
+::: {.column width="30%"}
+![](../imgs/wi-pop-soda.jpg)
+
+
+::: {style="font-size: 65%;"}
+
+|       | East | West |
+|-------|------|------|
+| pop   |   61 |   76 |
+| soda  |  177 |  139 |
+| coke  |   10 |   29 |
+| other |    2 |    6 |
+| **total** |  250 |  250 |
+:::
+
+
+:::
+::::
+
+
+## Multinomial distribution
+
+$$P(x;n, \pi) = {n\choose x_1, x_2,..., x_m}  \prod^k_{i=1} \pi^{x_i} $$
+
+As with the binomial distribution, the maximum likelihood estimate for $\pi_i$ is the proportion of observations in category $i$.
+
+## Multinomial MLE
+
+:::: {.columns .v-center-container }
+::: {.column width="40%"}
+|       | East | West |
+|-------|------|------|
+| pop   |   61 |   76 |
+| soda  |  177 |  139 |
+| coke  |   10 |   29 |
+| other |    2 |    6 |
+| **total** |  250 |  250 |
+:::
+::: {.column width="10%"}
+$$\rightarrow$$
+:::
+::: {.column width="40%"}
+|       | East | West |
+|-------|------|------|
+| pop   |   .24 |   .30 |
+| soda  |  .71 |  .56 |
+| coke  |   .04 |   .12 |
+| other |    .01 |    .02 |
+:::
+::::
+
+
+## Bayesian Inference
+
+I'm a Wisconsinite and I say "soda"---what's the probability I am from Eastern Wisconsin?
+
+::: {.fragment}
+bayes rule
+:::
+
+::: {.fragment}
+sub in numbers and result
+:::
+
+## Adding up observations
+
+- Generally, we can't figure out which state someone is from based on only one aspect of their dialect. 
+- Instead, we need to be able to combine multiple pieces of evidence.
+- We want: $P(h|d_1, d_2, ..., d_j)$
+- But we generally don't know how to write out a distribution or function for this probability
+
+## Adding up independent observations
+
+... unless the observations are ***independent***!
+
+::: {.callout-note icon="false"}
+## Think about it ...
+
+What was the formula for calculating the probability of two independent variables?
+:::
+
+::: {.fragment}
+If $d_1$ and $d_2$ are independent, then:
+
+$$P(h|d_1, d_2) = P(h|d_1) \times P(h|d_2)$$
+:::
+
+
+## Naive Bayes: The idea
+
+- The key idea behind Naive Bayes is to assume independence between the features used for prediction.
+- Models the features as independently caused by the class label or category membership
+
+[diagram]
+
+## Multi-class Naive Bayes Classifier: The math
+
+If we have:  
+
+- $m$ classes $C_1, C_2, ..., C_m$
+- $k$ features $x_1, x_2, ..., x_k$:
+
+$$P(C_j | x_1, x_2, ..., x_k) \propto P(C_j) \prod^k_{i=1}P(x_i|C_j)$$
+
+
+## Sidebar: Calculating with log-probabilities
+
+- Often, calculations of probabilities are computed in terms of log-probabilities (i.e. in log-space, or after log-transformation)
+- In log-space, multiplication becomes addition
+
+$$log(a \times b) = log(a) + log(b) $$
+
+## Example
+
+Let's examine 3 items from the Harvard dialect survey for the Midwestern states.
+
+```{r}
+#| include: false
+library(tidyverse)
+
+states <- state.name
+names(states) <- state.abb
+
+hds <- read_csv("data/hds.csv")
+hds_mini <- hds %>% 
+  filter(
+    grepl("4. caramel", item) | 
+      grepl("105. What is your generic term for a sweetened carbonated beverage?", item) |
+      grepl("21. pecan", item)
+    ) %>% 
+  filter(state %in% c("WI","MN", "MI", "OH", "IL", "IA", "IN")) %>% 
+  mutate(ans_prop = ans_prop/100.) %>% 
+  mutate(state = states[state])
+```
+
+```{r}
+#| echo: true
+head(hds_mini, 10)
+```
+## Multinomial Naive Bayes: The Code
+
+::: {style="font-size: 80%;"}
+
+```{r}
+#| echo: true
+x <- tribble(
+  ~item, ~ans_ind,
+  "4. caramel", "a",
+  "21. pecan", "c",
+  "105. What is your generic term for a sweetened carbonated beverage?", "a"
+)
+
+res <- left_join(x, hds_mini, by = c("item", "ans_ind")) %>% 
+  group_by(state) %>% 
+  summarize(likeli = prod(ans_prop)) %>% 
+  ungroup() %>% 
+  mutate(likeli = likeli/sum(likeli))
+
+res
+```
+:::
+
+## Visualizing the results
+
+```{r}
+#| echo: false
+
+left_join(map_data("state"), res %>% mutate(region = str_to_lower(state))) %>% 
+  ggplot(aes(x=long, y = lat, group = group, fill = likeli)) +
+  geom_polygon(color = "black") +
+  coord_quickmap(xlim = c(-100, -80), ylim = c(37.5, 50)) +
+  scale_fill_viridis_c(option = "viridis") +
+  theme_void() +
+  labs(fill = "Prob.")
+```
+

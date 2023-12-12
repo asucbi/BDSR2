@@ -7,18 +7,20 @@ format:
 bibliography: ../references.bib
 ---
 
-$$\newcommand{\ind}{\perp\!\!\!\!\perp}$$
 
 ```{r}
 #| include: false
 library(tidyverse)
 ```
 
-
 ## What is a probability?
 
-> The theory of probabilities is basically just common sense reduced to calculus; it makes one appreciate with exactness that which accurate minds feel with a sort of instinct, often without being able to account for it 
+> Probability theory is nothing but common sense reduced to calculation.  
 ---Laplace, 1829
+
+
+$$\newcommand{\ind}{\perp\!\!\!\perp}$$
+
 
 ## What is a probability?
 
@@ -129,7 +131,6 @@ $P(A,B)$: The joint probability of $A$ and $B$
 - **OR**: The probability that either $A$ **or** $B$ occurs is their sum, minus the probability that they both occur.
   + $A \ind B \iff P(A \text{ or } B ) = P(A) + P(B) - P(A) \cdot P(B)$
 
-## Visualizing probability rules
 
 ## Random Variables
 
@@ -178,19 +179,34 @@ A probability distribution of a RV describes how probabilities are distributed o
 - ___Continuous___ probability distributions are defined for infinitely many values.
 
 
-
 ## Example: Binomial distribution
 
 What is the probability of having $x$ successes in $n$ trials where probability of success on each trial is $p$? 
 
 For any integer-valued $n$ and $x \in 1, 2, 3, ..., n$:
-$$P(x; n, p) = \frac{n!}{x!(n-x)!} p^x (1-p)^{n-x}$$
+$$P(x; n, \pi) = {n\choose x}  \pi^x (1-\pi)^{n-x}$$
 
 or we can use `R`:
 
 ```r
 dbinom(x, size, prob)
 ```
+
+## Sidebar: Binomial Coefficient
+
+::: {.callout-caution icon="false"}
+## Notation
+
+**Binomial coefficient**
+$${n\choose k} =  \frac{n!}{k!(n-k)!}$$
+Pronounced "n choose k", to denote the number of combinations that can be made by selecting k items from a set of n total items.
+
+**Factorial**
+
+$$n! = n \times (n-1) \times (n-2) \times ... \times 2 \times 1 $$ 
+Pronounced "n factorial"
+:::
+
 
 ## Likelihood of data
 
@@ -346,7 +362,4 @@ The maximum likelihood estimate for a binomial rate is just the observed proport
 ::::
 
 
-## 
-
-# More details
 

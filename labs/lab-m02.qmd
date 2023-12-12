@@ -170,44 +170,46 @@ The function `log()` takes the log of a value (transforms probabilities into log
 Further modify the code to perform the computations in log-space. Confirm that the results are the same.
 :::
 
+
 ## Exercise 8
-
-We have created a "model" through a process of joining against a dataframe of conditional probabilities. Now let's transform this code into something more closely resembling the model functions we have seen.
-
 ::: {.callout-note icon="false"}
 ## Exercise 8
+Make a map of predictions for your own data and see if it makes sense. Did our model predict where you grew up? Where you have lived?
+:::
+
+
+## Exercise 9
+
+We have created a "model" through a process of joining against a dataframe of conditional probabilities. Let's close by transforming this code into something more closely resembling the model functions we have seen before and generally use in Machine Learning.
+
+::: {.callout-note icon="false"}
+## Exercise 9
 Let's do three things:
 
 1. Test generating predicted probabilities for multiple respondents' data, revising the code if necessary.
 2. Rewrite this code to output only the top predicted state and probability.
 3. Wrap this process up into a function that we can call on to output this for arbitrary data.
 
-Your function should take the following form `nb_model(input_data)` and should output a tibble with one row per participant. `id` should indicate the participant's id, `.pred` should indicate the predicted state, and `.prob` should indicate the probability associated with that state.
+Your function should take the following form `nb_predict(input_data)` and should output a tibble with one row per participant. The column `id` should indicate the participant's id, `.pred` should indicate the predicted state, and `.prob` should indicate the probability associated with that state.
 :::
 
-## Exercise 9
-
-Now it's time to examine our predictions!
+## Exercise 10
 
 ::: {.callout-note icon="false"}
-## Exercise 9
+## Exercise 10
 Compare your predictions to the actual observed values in our survey data. Compute an accuracy metric and compare to chance accuracy (briefly describe).
-:::
-
-## Exercise 10
-::: {.callout-note icon="false"}
-## Exercise 10
-Make a map of predictions for your own data and see if it makes sense. Did our model predict where you grew up? Where you have lived?
 :::
 
 ## BONUS exercise
 
-So far, we have assumed a **uniform prior** over classes (states), calculated as `1/n()`. But we might be able to do better with an **informative prior**. One approach would be to estimate a prior empirically from our training dataset---we could use the proportion of respondents from each state as the prior probability a new datapoint would come from that state. Alternatively, in this context, we might recognize that our new survey is not as representative as the training data, and instead is very location-biased, since I administered it to people at ASU. So, we might form a prior based on distance from Arizona. Or, we might combine these ideas.
+So far, we have assumed a **uniform prior** over classes (states), calculated as `1/n()`. But we might be able to do better with an **informative prior**. 
+
+One approach would be to estimate a prior empirically from our training dataset---we could use the proportion of respondents from each state as the prior probability a new datapoint would come from that state. Alternatively, in this context, we might recognize that our new survey is not as representative as the training data, and instead is very location-biased, since I administered it to people at ASU. So, we might form a prior based on distance from Arizona. Or, we might combine these ideas.
 
 Let's keep things relatively simple while experimenting with this a bit by forming a prior based on the population of U.S. states. 
 
 ::: {.callout-note icon="false"}
 ## Exercise 11 (bonus)
-Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Join that to the original `hds` data and include that probability as the prior when making predictions. Then, rerun the calculations from exercises 9 and 10. Compare what you find.
+Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Join that to the original `hds` data and modify your code and functions as needed to include that probability as the prior when making predictions. Rerun the calculations from exercises 8 and 10. Compare what you find with the uniform vs uninformative prior.
 :::
 

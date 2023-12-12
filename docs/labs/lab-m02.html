@@ -390,7 +390,6 @@ Exercise 7
 </section>
 <section id="exercise-8" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-8">Exercise 8</h2>
-<p>We have created a “model” through a process of joining against a dataframe of conditional probabilities. Now let’s transform this code into something more closely resembling the model functions we have seen.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -401,19 +400,13 @@ Exercise 8
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Let’s do three things:</p>
-<ol type="1">
-<li>Test generating predicted probabilities for multiple respondents’ data, revising the code if necessary.</li>
-<li>Rewrite this code to output only the top predicted state and probability.</li>
-<li>Wrap this process up into a function that we can call on to output this for arbitrary data.</li>
-</ol>
-<p>Your function should take the following form <code>nb_model(input_data)</code> and should output a tibble with one row per participant. <code>id</code> should indicate the participant’s id, <code>.pred</code> should indicate the predicted state, and <code>.prob</code> should indicate the probability associated with that state.</p>
+<p>Make a map of predictions for your own data and see if it makes sense. Did our model predict where you grew up? Where you have lived?</p>
 </div>
 </div>
 </section>
 <section id="exercise-9" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-9">Exercise 9</h2>
-<p>Now it’s time to examine our predictions!</p>
+<p>We have created a “model” through a process of joining against a dataframe of conditional probabilities. Let’s close by transforming this code into something more closely resembling the model functions we have seen before and generally use in Machine Learning.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -424,7 +417,13 @@ Exercise 9
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Compare your predictions to the actual observed values in our survey data. Compute an accuracy metric and compare to chance accuracy (briefly describe).</p>
+<p>Let’s do three things:</p>
+<ol type="1">
+<li>Test generating predicted probabilities for multiple respondents’ data, revising the code if necessary.</li>
+<li>Rewrite this code to output only the top predicted state and probability.</li>
+<li>Wrap this process up into a function that we can call on to output this for arbitrary data.</li>
+</ol>
+<p>Your function should take the following form <code>nb_predict(input_data)</code> and should output a tibble with one row per participant. The column <code>id</code> should indicate the participant’s id, <code>.pred</code> should indicate the predicted state, and <code>.prob</code> should indicate the probability associated with that state.</p>
 </div>
 </div>
 </section>
@@ -440,13 +439,14 @@ Exercise 10
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Make a map of predictions for your own data and see if it makes sense. Did our model predict where you grew up? Where you have lived?</p>
+<p>Compare your predictions to the actual observed values in our survey data. Compute an accuracy metric and compare to chance accuracy (briefly describe).</p>
 </div>
 </div>
 </section>
 <section id="bonus-exercise" class="level2">
 <h2 class="anchored" data-anchor-id="bonus-exercise">BONUS exercise</h2>
-<p>So far, we have assumed a <strong>uniform prior</strong> over classes (states), calculated as <code>1/n()</code>. But we might be able to do better with an <strong>informative prior</strong>. One approach would be to estimate a prior empirically from our training dataset—we could use the proportion of respondents from each state as the prior probability a new datapoint would come from that state. Alternatively, in this context, we might recognize that our new survey is not as representative as the training data, and instead is very location-biased, since I administered it to people at ASU. So, we might form a prior based on distance from Arizona. Or, we might combine these ideas.</p>
+<p>So far, we have assumed a <strong>uniform prior</strong> over classes (states), calculated as <code>1/n()</code>. But we might be able to do better with an <strong>informative prior</strong>.</p>
+<p>One approach would be to estimate a prior empirically from our training dataset—we could use the proportion of respondents from each state as the prior probability a new datapoint would come from that state. Alternatively, in this context, we might recognize that our new survey is not as representative as the training data, and instead is very location-biased, since I administered it to people at ASU. So, we might form a prior based on distance from Arizona. Or, we might combine these ideas.</p>
 <p>Let’s keep things relatively simple while experimenting with this a bit by forming a prior based on the population of U.S. states.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -458,7 +458,7 @@ Exercise 11 (bonus)
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Join that to the original <code>hds</code> data and include that probability as the prior when making predictions. Then, rerun the calculations from exercises 9 and 10. Compare what you find.</p>
+<p>Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Join that to the original <code>hds</code> data and modify your code and functions as needed to include that probability as the prior when making predictions. Rerun the calculations from exercises 8 and 10. Compare what you find with the uniform vs uninformative prior.</p>
 </div>
 </div>
 </section>

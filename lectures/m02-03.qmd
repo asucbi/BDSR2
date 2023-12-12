@@ -123,12 +123,14 @@ $$P(\mathcal{M}|d) \propto P(d|\mathcal{M})$$
 
 :::
 
-## Maximum likelihood
+## Maximum ~~likelihood~~ trouble?
+
+Indifference to the prior probability of hypotheses can be problematic
 
 :::{.incremental}
-- Indifference to the prior probability of hypotheses can be problematic
 - Say we flip a coin 10 times and get 6 heads
-- P(d|\text{fair coin}) < P(d|\text{60% biased coin})
+- $P(d|\text{fair coin}) < P(d|\text{60% biased coin})$
+- MLE approaches work best with relatively large amounts of data
 - Use of cross validation approaches can help with this in some cases
 :::
 

@@ -7,99 +7,59 @@ format:
 bibliography: ../references.bib
 ---
 
-## Quarto
+## Classification
 
-Quarto enables you to weave together content and executable code into a finished presentation. To learn more about Quarto presentations see <https://quarto.org/docs/presentations/>.
+Classification involves predicting **discrete** categorical outcomes.
 
-## Bullets
+- Whether an event/outcome occurred
+- To which class does an observation belong
+- Etc.
 
-When you click the **Render** button a document will be generated that includes:
+## Common Applications
 
--   Content authored with markdown
--   Output from executable code
+::: {style="font-size: 80%;"}
+- Sentiment Analysis
+- Emotion Classification
+- Character recognition
+- Image classification
+- Spam filtering
+- Document classification
+- Medical Diagnosis
+- Fraud detection
+- Churn prediction
+:::
 
-## Code
+And many more!
 
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+## Dialect locator
 
-```{r echo=TRUE}
-1 + 1
-```
-
-
-## Column formatting
-
-Machine learning can be applied to tackle many different kinds of problems, including:
 
 :::: {.columns}
-
 ::: {.column width="50%"}
-
-**Supervised learning**
-
-- Prediction
-- Classification
-
+::: {style="font-size: 80%;"}
+- Using data from the Harvard Dialect Survey of 30,934 respondents
+- Build our own Naive Bayes classifier to predict which state someone grew up in based on their dialect
+- Emphasizing probability foundations and data munging
 :::
 
-::: {.column width="50%"}
-
-
-**Unsupervised learning**
-
-- Clustering
-
 :::
-
+::: {.column width="50%"}
+![](../imgs/nyt-dialect-ex.png)
+:::
 ::::
 
 
-## Figure Layouts
+## Predicting which couples will break-up or stay together during the COVID-19 Pandemic
 
-:::: {.columns .v-center-container}
-
+:::: {.columns}
 ::: {.column width="50%"}
-Machine learning can be applied to many different kinds of data, including:
-
-- text
-- audio
-- images
-- video
-- tabular data (e.g. survey data)
+::: {style="font-size: 80%;"}
+- Using data from Stanford's longitudinal How Couples Meet and Stay Together (HCMST) study with data from over 3,000 couples
+- Build a logistic regression model to predict relationship status in 2020 using data from 2017
 :::
 
+:::
 ::: {.column width="50%"}
-
-::: {layout-nrow=2}
-
-![Audio](../imgs/audio-spectrogram.png)
-
-![Images](../imgs/MnistExamplesWikipedia.png)
-
-![Text](../imgs/bigdatawordcloud.jpeg)
-
-![Tabular](../imgs/tabulardata.png)
-
+![](../imgs/ambiguous-couple.jpeg)
 :::
-
-:::
-
 ::::
-
-## CSS
-
-See `style.css` for custom formatting options.
-
-## Other formatting
-
-::: callout-tip
-Callouts work the same as for non-presentation documents. I don't think margin notes can be used though.
-:::
-
-## Citations
-
-You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
-
-I've started off the references with our main text [@gareth.etal2014]. 
-
----

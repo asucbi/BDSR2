@@ -57,18 +57,24 @@ Before we start modeling, let's do some exploratory data analysis on the HDS dat
 ::: {.callout-note icon="false"}
 ## Exercise 1
 
-Make a map for one item color coding each state by the most common answer
+Make a map for one item color coding each state by the most common answer.
 :::
 
 :::{.hidden}
 ```{r}
-# map_data("state")
-
-# hds %>% 
-#   filter(item == "1. aunt") %>% 
-#   group_by(state) %>% 
-#   filter(ans_prop == max(ans_prop)) %>% 
-#   left_join(map_data("state"), )
+hds %>%
+  filter(item == "pecan") %>%
+  group_by(state) %>%
+  filter(ans_prop == max(ans_prop)) %>%
+  left_join(map_data("state"), by = c("state"="region")) %>% 
+  ggplot(aes(x=long, y = lat, group = group, fill = ans_text, alpha = ans_prop)) +
+  geom_polygon(color = "black") +
+  coord_quickmap() +
+  scale_fill_viridis_d(option = "viridis", guide = "legend") +
+  theme_void() +
+  scale_alpha_continuous() +
+  theme(legend.position = "bottom", legend.direction = "vertical") +
+  labs(fill = "Answer", alpha = "Answer prop.")
 ```
 :::
 
@@ -95,6 +101,16 @@ To fix this, we can use a series of joins, including a new type of join you have
 ## Exercise 3
 
 Fix the problem as described in the explanation above. You can overwrite the `hds` dataset when you've got the solution.
+:::
+
+:::{.hidden}
+```{r}
+hds <- hds %>% 
+  distinct(item, ans_ind, ans_text) %>% 
+  cross_join(hds %>% distinct(state)) %>% 
+  left_join(hds)
+```
+
 :::
 
 ## Exercise 4

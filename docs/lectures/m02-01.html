@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="m02-03_files/libs/clipboard/clipboard.min.js"></script>
-<script src="m02-03_files/libs/quarto-html/tabby.min.js"></script>
-<script src="m02-03_files/libs/quarto-html/popper.min.js"></script>
-<script src="m02-03_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="m02-03_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="m02-03_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="m02-03_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="m02-01_files/libs/clipboard/clipboard.min.js"></script>
+<script src="m02-01_files/libs/quarto-html/tabby.min.js"></script>
+<script src="m02-01_files/libs/quarto-html/popper.min.js"></script>
+<script src="m02-01_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="m02-01_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="m02-01_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="m02-01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.0.36">
 
-  <title>Bayesian Inference &amp; Bayes’ Rule</title>
+  <title>Introduction to Classification</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="m02-03_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="m02-03_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="m02-01_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="m02-01_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -22,77 +22,13 @@
     div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      { color: #003b4f; background-color: #f1f3f5; }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span { color: #003b4f; } /* Normal */
-    code span.al { color: #ad0000; } /* Alert */
-    code span.an { color: #5e5e5e; } /* Annotation */
-    code span.at { color: #657422; } /* Attribute */
-    code span.bn { color: #ad0000; } /* BaseN */
-    code span.bu { } /* BuiltIn */
-    code span.cf { color: #003b4f; } /* ControlFlow */
-    code span.ch { color: #20794d; } /* Char */
-    code span.cn { color: #8f5902; } /* Constant */
-    code span.co { color: #5e5e5e; } /* Comment */
-    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
-    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
-    code span.dt { color: #ad0000; } /* DataType */
-    code span.dv { color: #ad0000; } /* DecVal */
-    code span.er { color: #ad0000; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #ad0000; } /* Float */
-    code span.fu { color: #4758ab; } /* Function */
-    code span.im { color: #00769e; } /* Import */
-    code span.in { color: #5e5e5e; } /* Information */
-    code span.kw { color: #003b4f; } /* Keyword */
-    code span.op { color: #5e5e5e; } /* Operator */
-    code span.ot { color: #003b4f; } /* Other */
-    code span.pp { color: #ad0000; } /* Preprocessor */
-    code span.sc { color: #5e5e5e; } /* SpecialChar */
-    code span.ss { color: #20794d; } /* SpecialString */
-    code span.st { color: #20794d; } /* String */
-    code span.va { color: #111111; } /* Variable */
-    code span.vs { color: #20794d; } /* VerbatimString */
-    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="m02-03_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link rel="stylesheet" href="m02-01_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link rel="stylesheet" href="style.css">
-  <link href="m02-03_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="m02-03_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="m02-03_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="m02-03_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link href="m02-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="m02-01_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="m02-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="m02-01_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
   .callout {
@@ -383,123 +319,65 @@
     <div class="slides">
 
 <section id="title-slide" class="center">
-  <h1 class="title">Bayesian Inference &amp; Bayes’ Rule</h1>
+  <h1 class="title">Introduction to Classification</h1>
   <p class="subtitle">Behavioral Data Science in R II</p>
 </section>
 
-<section id="bayesian-inference" class="slide level2">
-<h2>Bayesian Inference</h2>
-<p>Idea is, what should you believe about a hypothesis based on some data?</p>
-<p>[ expand on this more]</p>
-</section>
-<section id="bayes-rule" class="slide level2">
-<h2>Bayes’ Rule</h2>
-<div class="columns">
-<div class="column" style="width:70%;">
-<p><span class="math display">\[P(h|d) = \frac{P(d|h)P(h)}{P(d)}\]</span></p>
+<section id="classification" class="slide level2">
+<h2>Classification</h2>
+<p>Classification involves predicting <strong>discrete</strong> categorical outcomes.</p>
 <ul>
-<li>Posterior: <span class="math inline">\(P(h|d)\)</span></li>
-<li>Likelihood: <span class="math inline">\(P(d|h)\)</span></li>
-<li>Prior: <span class="math inline">\(P(h)\)</span></li>
-<li>Normalizing constant: <span class="math inline">\(P(d)\)</span></li>
+<li>Whether an event/outcome occurred</li>
+<li>To which class does an observation belong</li>
+<li>Etc.</li>
 </ul>
-</div><div class="column" style="width:30%;">
-<p><img data-src="../imgs/Thomas_Bayes.gif"></p>
-</div>
-</div>
 </section>
-<section id="diagnosing-vampirism" class="slide level2">
-<h2>Diagnosing vampirism</h2>
-<p>Suppose we are vampire hunters and our lab has just processed a positive blood test for vampirism. We can calculate the probability that the suspect is a vampire as:</p>
-<p><span class="math display">\[ P(vampire|positive) = \frac{P(positive|vampire)P(vampire)}{P(positive)} \]</span></p>
-<div class="fragment">
-<p>where</p>
-<p><span class="math display">\[
-\begin{multline*}
-P(positive) = \\
-P(positive|vampire)P(vampire) +  \\
-P(positive|\neg vampire)P(\neg vampire)
-\end{multline*}
-\]</span></p>
-</div>
-</section>
-<section id="diagnosing-vampirism-numerical-example" class="slide level2">
-<h2>Diagnosing vampirism: Numerical example</h2>
-<p><span class="math display">\[ P(vampire|positive) = \frac{P(positive|vampire)P(vampire)}{P(positive)} \]</span></p>
-<p>Suppose the test successfully detects vampirism 95% of the time, and only issues a false-positive 1% of the time. Of course, vampires are rare, only 0.1% of the population.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>p_pos_g_vamp <span class="ot">&lt;-</span> .<span class="dv">95</span></span>
-<span id="cb1-2"><a href="#cb1-2"></a>p_pos_g_human <span class="ot">&lt;-</span> .<span class="dv">01</span></span>
-<span id="cb1-3"><a href="#cb1-3"></a>p_vamp <span class="ot">&lt;-</span> .<span class="dv">001</span></span>
-<span id="cb1-4"><a href="#cb1-4"></a>p_pos <span class="ot">&lt;-</span> p_pos_g_vamp<span class="sc">*</span>p_vamp <span class="sc">+</span> p_pos_g_human<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>p_vamp)</span>
-<span id="cb1-5"><a href="#cb1-5"></a></span>
-<span id="cb1-6"><a href="#cb1-6"></a>(p_pos_g_vamp <span class="sc">*</span> p_vamp) <span class="sc">/</span> p_pos</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<div class="cell fragment">
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.08683729</code></pre>
-</div>
-</div>
-</section>
-<section id="counting-vampires" class="slide level2">
-<h2>Counting vampires</h2>
+<section id="common-applications" class="slide level2">
+<h2>Common Applications</h2>
 <div style="font-size: 80%;">
 <ul>
-<li>95 out of 100 tests on vampires will be positive (95%)</li>
-<li>1 out of 100 tests on humans will be positive (1%)</li>
-<li>100 out of 100,000 people are vampires (0.1%)</li>
-</ul>
-<div class="fragment">
-<p>If we test 100,000 people for vampirism, we can expect:</p>
-<ul>
-<li>95/100 vampires to test positive</li>
-<li>1000 non-vampires to test positive</li>
-<li>So out of 1095 positive tests, 95 are vampires <span class="math inline">\(\rightarrow \frac{95}{1095} = .086\)</span></li>
+<li>Sentiment Analysis</li>
+<li>Emotion Classification</li>
+<li>Character recognition</li>
+<li>Image classification</li>
+<li>Spam filtering</li>
+<li>Document classification</li>
+<li>Medical Diagnosis</li>
+<li>Fraud detection</li>
+<li>Churn prediction</li>
 </ul>
 </div>
-</div>
+<p>And many more!</p>
 </section>
-<section id="bayesian-approaches-to-science" class="slide level2">
-<h2>Bayesian approaches to science</h2>
-<p>[turn the crank, etc.]</p>
-</section>
-<section id="challenges-to-bayesian-approaches-to-science" class="slide level2">
-<h2>Challenges to Bayesian approaches to science</h2>
-<ul>
-<li>Need to define priors</li>
-<li>Many ML models do not have clear Bayesian definitions</li>
-<li>Not everything is flipping coins, can be hard to define the right model or exhaust the space of models (a problem for all approaches)</li>
-</ul>
-</section>
-<section id="bayesian-vs.-likelihoodist-approaches" class="slide level2">
-<h2>Bayesian vs.&nbsp;Likelihoodist approaches</h2>
-<ul>
-<li>Maximum likelihood approaches focus only on the likelihood term of Bayes Rule</li>
-<li>Seek the model <span class="math inline">\(\mathcal{M}\)</span> that maximizes the likelihood of the observed (or future) data</li>
-</ul>
-<div class="fragment">
-<p>Roughly …</p>
+<section id="dialect-locator" class="slide level2">
+<h2>Dialect locator</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>Bayesian</strong></p>
-<p><span class="math display">\[P(\mathcal{M}|d) \propto P(d|\mathcal{M})P(\mathcal{M})\]</span></p>
-</div><div class="column" style="width:50%;">
-<p><strong>Likelihoodist</strong></p>
-<p><span class="math display">\[P(\mathcal{M}|d) \propto P(d|\mathcal{M})\]</span></p>
+<div style="font-size: 80%;">
+<ul>
+<li>Using data from the Harvard Dialect Survey of 30,934 respondents</li>
+<li>Build our own Naive Bayes classifier to predict which state someone grew up in based on their dialect</li>
+<li>Emphasizing probability foundations and data munging</li>
+</ul>
 </div>
+</div><div class="column" style="width:50%;">
+<p><img data-src="../imgs/nyt-dialect-ex.png"></p>
 </div>
 </div>
 </section>
-<section id="maximum-likelihood-trouble" class="slide level2">
-<h2>Maximum <del>likelihood</del> trouble?</h2>
-<p>Indifference to the prior probability of hypotheses can be problematic</p>
-<div>
+<section id="predicting-which-couples-will-break-up-or-stay-together-during-the-covid-19-pandemic" class="slide level2">
+<h2>Predicting which couples will break-up or stay together during the COVID-19 Pandemic</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div style="font-size: 80%;">
 <ul>
-<li class="fragment">Say we flip a coin 10 times and get 6 heads</li>
-<li class="fragment"><span class="math inline">\(P(d|\text{fair coin}) &lt; P(d|\text{60% biased coin})\)</span></li>
-<li class="fragment">MLE approaches work best with relatively large amounts of data</li>
-<li class="fragment">Use of cross validation approaches can help with this in some cases</li>
+<li>Using data from Stanford’s longitudinal How Couples Meet and Stay Together (HCMST) study with data from over 3,000 couples</li>
+<li>Build a logistic regression model to predict relationship status in 2020 using data from 2017</li>
 </ul>
+</div>
+</div><div class="column" style="width:50%;">
+<p><img data-src="../imgs/ambiguous-couple.jpeg"></p>
+</div>
 </div>
 <div class="footer footer-default">
 
@@ -509,19 +387,19 @@ P(positive|\neg vampire)P(\neg vampire)
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="m02-03_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="m02-01_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="m02-03_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="m02-03_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="m02-03_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="m02-03_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="m02-03_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="m02-03_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="m02-03_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="m02-03_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="m02-03_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="m02-01_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -716,48 +594,6 @@ P(positive|\neg vampire)P(\neg vampire)
         ]
       });
     </script>
-    
-    <script>
-      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
-      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
-      // slide changes (different for each slide format).
-      (function () {
-        function fireSlideChanged(previousSlide, currentSlide) {
-
-          // dispatch for htmlwidgets
-          const event = window.document.createEvent("Event");
-          event.initEvent("slideenter", true, true);
-          window.document.dispatchEvent(event);
-
-          // dispatch for shiny
-          if (window.jQuery) {
-            if (previousSlide) {
-              window.jQuery(previousSlide).trigger("hidden");
-            }
-            if (currentSlide) {
-              window.jQuery(currentSlide).trigger("shown");
-            }
-          }
-        }
-
-        // hookup for reveal
-        if (window.Reveal) {
-          window.Reveal.addEventListener("slidechanged", function(event) {
-            fireSlideChanged(event.previousSlide, event.currentSlide);
-          });
-        }
-
-        // hookup for slidy
-        if (window.w3c_slidy) {
-          window.w3c_slidy.add_observer(function (slide_num) {
-            // slide_num starts at position 1
-            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
-          });
-        }
-
-      })();
-    </script>
-
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.0.36">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Derek Powell">
+
+<title>BDSR2 Homework template</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="hw-u01_files/libs/clipboard/clipboard.min.js"></script>
+<script src="hw-u01_files/libs/quarto-html/quarto.js"></script>
+<script src="hw-u01_files/libs/quarto-html/popper.min.js"></script>
+<script src="hw-u01_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="hw-u01_files/libs/quarto-html/anchor.min.js"></script>
+<link href="hw-u01_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="hw-u01_files/libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="hw-u01_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="hw-u01_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="hw-u01_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="dark">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link active" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">Exercise 4</a></li>
+  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5">Exercise 5</a></li>
+  <li><a href="#exercise-6" id="toc-exercise-6" class="nav-link" data-scroll-target="#exercise-6">Exercise 6</a></li>
+  <li><a href="#exercise-7" id="toc-exercise-7" class="nav-link" data-scroll-target="#exercise-7">Exercise 7</a></li>
+  <li><a href="#exercise-8" id="toc-exercise-8" class="nav-link" data-scroll-target="#exercise-8">Exercise 8</a></li>
+  <li><a href="#exercise-9" id="toc-exercise-9" class="nav-link" data-scroll-target="#exercise-9">Exercise 9</a></li>
+  <li><a href="#exercise-10" id="toc-exercise-10" class="nav-link" data-scroll-target="#exercise-10">Exercise 10</a></li>
+  <li><a href="#exercise-11" id="toc-exercise-11" class="nav-link" data-scroll-target="#exercise-11">Exercise 11</a></li>
+  <li><a href="#exercise-12" id="toc-exercise-12" class="nav-link" data-scroll-target="#exercise-12">Exercise 12</a></li>
+  <li><a href="#exercise-13" id="toc-exercise-13" class="nav-link" data-scroll-target="#exercise-13">Exercise 13</a></li>
+  <li><a href="#exercise-14" id="toc-exercise-14" class="nav-link" data-scroll-target="#exercise-14">Exercise 14</a></li>
+  <li><a href="#exercise-15" id="toc-exercise-15" class="nav-link" data-scroll-target="#exercise-15">Exercise 15</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">BDSR2 Homework template</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Derek Powell </p>
+          </div>
+  </div>
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="callout-caution callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Our learning objectives for this homework are:</p>
+<ul>
+<li>Learn to use a template to make HW documents for BDSR2</li>
+<li>Have something we can copy and paste to get started</li>
+</ul>
+</div>
+</div>
+<p>intro to relationships and hcmst dataset</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
+✔ ggplot2 3.4.1     ✔ purrr   0.3.4
+✔ tibble  3.2.1     ✔ dplyr   1.1.1
+✔ tidyr   1.2.1     ✔ stringr 1.5.0
+✔ readr   2.1.2     ✔ forcats 0.5.2
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/hcmst.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Rows: 2107 Columns: 38
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+dbl (38): id, w2_brokeup, w1_age, w1_p_page, w1_attraction, w1_q21a_year, w1...
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<p>Outline</p>
+<ul>
+<li><p>EDA to check class balance</p></li>
+<li><p>EDA to plot something like relationship quality against proportion broken up</p></li>
+<li><p>Munging to create some new variables, taking note of variable types</p></li>
+<li><p>Split into training and test splits (stratifying)</p></li>
+<li><p>Set up 10-fold cv</p></li>
+<li><p>Create model 1 with “public” features</p></li>
+<li><p>Create model 2 with “private” features</p></li>
+<li><p>Evaluate performance</p></li>
+<li><p>Marginal plot of relationship quality / sex frequency from model predictions</p></li>
+<li><p>Create new model with COVID-related predictors</p></li>
+<li><p>Is it better? Interpret wrt covid-stressors (if this is lame, just skip this section)</p></li>
+<li><p>Finish by closing the loop retraining on all data and predicting on test data</p></li>
+</ul>
+<section id="exercise-1" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
+<p>We want to predict which couples will stay together and which will break up. First, let’s see how many breakups we have in our dataset.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 1
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Examine the balance of the classes for the <code>w2_breakup</code> variable.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(w2_brokeup)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  w2_brokeup     n
+       &lt;dbl&gt; &lt;int&gt;
+1          0  1920
+2          1   187</code></pre>
+</div>
+</div>
+</section>
+<section id="exercise-2" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
+<p>Let’s do some more exploratory data analysis. One variable that seems likely to be highly predictive of whether couples break up is relationship quality. This quality measure is reverse-coded, as shown in the codebook entry below (note: it has been renamed for clarity).</p>
+<p><img src="../imgs/hcmst-rel-qual-code.png" class="img-fluid"></p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Make a plot of the <strong>proportion</strong> of couples who broke up by relationship quality. Then, make a plot of the <strong>number</strong> of couples who broke up, plotted by relationship quality. Compare and interpret the two plots. Briefly discuss what this might mean for our ability to predict breakups from just this variable.</p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">prop =</span> <span class="fu">mean</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> prop)) <span class="sc">+</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="hw-u01_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">cnt =</span> <span class="fu">sum</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> cnt)) <span class="sc">+</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
+</div>
+<div class="cell-output-display">
+<p><img src="hw-u01_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="exercise-3" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
+<p>Let’s zoom back out and look at all the variables present in the dataset. A few notes on the variable name formatting:</p>
+<ul>
+<li><code>id</code> indicates respondent id number</li>
+<li><code>w1_</code> indicates wave 1 (2017); <code>w2_</code> indicates wave 2 (2020)</li>
+<li><code>*_p_</code> indicates a value for the respondent’s partner (otherwise, for the respondent)</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hcmst)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Rows: 2,107
+Columns: 38
+$ id                           &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13…
+$ w2_brokeup                   &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ w1_age                       &lt;dbl&gt; 48, 68, 39, 54, 48, 59, 72, 55, 73, 46, 4…
+$ w1_p_page                    &lt;dbl&gt; 46, 71, 49, 59, 34, 52, 75, 55, 79, 46, 3…
+$ w1_attraction                &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+$ w1_q21a_year                 &lt;dbl&gt; 2013, 1964, 1999, 1989, 2011, 1993, 1981,…
+$ w1_p_edu                     &lt;dbl&gt; 11, 10, 10, 13, 11, 12, 10, 10, 9, 10, 9,…
+$ w1_p_polparty                &lt;dbl&gt; 1, 3, 7, 4, 2, 2, 7, 1, 6, 2, 4, 3, 7, 5,…
+$ w1_same_hs                   &lt;dbl&gt; 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2,…
+$ w1_same_college              &lt;dbl&gt; NA, 1, 2, NA, 2, 2, 2, NA, NA, 1, NA, NA,…
+$ w1_partnership_status_cohab  &lt;dbl&gt; 1, 1, 1, 1, 4, 1, 4, 1, 1, 1, 1, 3, 1, 1,…
+$ w1_rel_qual                  &lt;dbl&gt; 1, 1, 1, 1, NA, 1, NA, 2, 1, 2, 3, 2, 2, …
+$ w1_sex_frequency             &lt;dbl&gt; 3, 5, 3, 4, NA, 5, NA, 3, 5, 5, 5, 2, 5, …
+$ w1_otherdate_all             &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+$ w1_same_sex_couple_gender    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ w1_married                   &lt;dbl&gt; 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1,…
+$ w1_cohab                     &lt;dbl&gt; 1, 1, 1, 1, NA, 1, NA, 1, 1, 1, 1, 2, 1, …
+$ w1_hh_income                 &lt;dbl&gt; 13, 12, 15, 16, 14, 15, 4, 12, 11, 14, 8,…
+$ w1_employed                  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 6, 1, 5, 1, 1, 1, 4, 1,…
+$ w1_polparty                  &lt;dbl&gt; 6, 3, 7, 2, 3, 2, 7, 1, 3, 2, 6, 7, 7, 5,…
+$ w1_relig_attend              &lt;dbl&gt; 6, 4, 4, 2, 5, 4, 6, 1, 6, 6, 6, 5, 2, 2,…
+$ w1_times_marrid              &lt;dbl&gt; 3, 1, 1, 1, 3, 2, 2, 1, 3, 2, 2, 2, 1, 1,…
+$ w1_p_race                    &lt;dbl&gt; 7, 7, 5, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 5,…
+$ w1_how_met                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
+$ w1_earned_more               &lt;dbl&gt; 3, 3, 1, 3, 1, 1, 3, 3, 3, 4, 1, 3, 3, 3,…
+$ w1_p_gender                  &lt;dbl&gt; 1, 1, 2, 2, 2, 2, 1, 1, 1, 2, 2, 1, 1, 1,…
+$ w1_gender                    &lt;dbl&gt; 2, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2,…
+$ w1_q24_met_through_family    &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,…
+$ w1_q24_met_through_friend    &lt;dbl&gt; 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0,…
+$ w1_q24_met_through_as_nghbrs &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
+$ w2_nonshelter                &lt;dbl&gt; NA, 1, 1, 1, NA, NA, 2, 1, NA, 1, 1, NA, …
+$ w2_shelter_combo_months      &lt;dbl&gt; 0.25, 0.00, 0.00, 0.00, 0.75, 0.75, 0.00,…
+$ w2_myhealth                  &lt;dbl&gt; 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…
+$ w2_myhealth_why_1            &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ w2_parthealth                &lt;dbl&gt; 2, 2, 2, 2, NA, 2, NA, 2, 2, 2, 2, 2, 2, …
+$ w2_parthealth_why_1          &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
+$ w1_yrsed                     &lt;dbl&gt; 12, 13, 14, 12, 13, 13, 13, 12, 12, 14, 1…
+$ w1_p_yrsed                   &lt;dbl&gt; 14, 13, 13, 17, 14, 16, 13, 13, 12, 13, 1…</code></pre>
+</div>
+</div>
+<p>All of these (except <code>id</code> and <code>w2_brokeup</code>) are variables we might use as <strong>features</strong> in our model. In addition, we might want to do some <strong>feature engineering</strong> to create new features that might be more predictive. For instance, demographic for respondents and their partners might be translated into differences between members of the couples. Look at the features present and imagine some new features you might engineer by combining them in different ways.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create the following new features and add them to the <code>hcmst</code> dataset:</p>
+<ul>
+<li><code>w1_male_earner</code>: whether a male partner in the relationship earns more (i.e., example of conformity to heteronormative expectations).</li>
+<li><code>w1_pol_diff</code>, <code>w1_age_diff</code>, and <code>w1_yrsed_diff</code>: differences between partners politics, age, and years of education.</li>
+<li><code>w1_out_of_birthstate</code>: whether the respondent lives outside their birthstate</li>
+<li><code>w1_moved</code>: whether the couple lives in a different state from where they met</li>
+</ul>
+</div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a good place to save your notebook, render it, and confirm that it looks as you expect.</p>
+</div>
+</div>
+</section>
+<section id="exercise-4" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-4">Exercise 4</h2>
+<p>Now we can begin our machine-learning workflow!</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Split the data into training (80%) and testing (20%) splits. Since we won’t use it for prediction, drop the <code>id</code> column before making these splits. Make sure to stratify the train/test splits to ensure a representative class balance for our predictions.</p>
+</div>
+</div>
+</section>
+<section id="exercise-5" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-5">Exercise 5</h2>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We will build several models and we’ll use k-fold cross-validation to compare them. Set up cross validation with 10 folds.</p>
+</div>
+</div>
+</section>
+<section id="exercise-6" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-6">Exercise 6</h2>
+<p>Let’s start building our first model. Our first model will use all the available features from Wave 1 (2017) to predict breakups in Wave 2 (2020).</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Build a recipe to create a logistic regression model. As part of the pipeline, select only the Wave 1 features as predictors.</p>
+</div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a good place to save your notebook, render it, and confirm that it looks as you expect.</p>
+</div>
+</div>
+</section>
+<section id="exercise-7" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
+<p>If you examine the features we have available for prediction (e.g.&nbsp;see the <code>glimpse()</code> above), you should notice that some of these features seem more like basic demographics that people might happily share or that might otherwise be available, whereas other features are more intimate and personal responses given in the context of this survey.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Examine the dataset and list three examples of each kind of feature.</p>
+</div>
+</div>
+</section>
+<section id="exercise-8" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-8">Exercise 8</h2>
+<p>Let’s start building our second “reduced” model. We’ll build another model that leverages only “demographic” sorts of features from Wave 1. How well can we predict couples’ breakups from the sort of information that might be publicly available or accessible?</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Build a recipe to create another logistic regression model that does not include any sensitive or private features. As part of the pipeline, select only the “public” or “demographic” type features. Use the list of features described in the hint below.</p>
+</div>
+</div>
+</section>
+<section id="exercise-9" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-9">Exercise 9</h2>
+<p>Now it’s time to fit our models in our cross-validation folds and evaluate their performance. ::: {.callout-note icon=“false”} ## Exercise 9</p>
+<p>Fit both models to the 10 cross-validation folds. :::</p>
+</section>
+<section id="exercise-10" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-10">Exercise 10</h2>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compare the accuracy of these two models. What do you make of those findings? Now compare the AUC for the two models, what do you make of these differences?</p>
+</div>
+</div>
+</section>
+<section id="exercise-11" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-11">Exercise 11</h2>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 11
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Generate predictions across the CV folds and create ROC curve plots for both models. Briefly interpret the performance of the two models.</p>
+<p>Then, focusing on the “public” model, briefly consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? What do you think about that?</p>
+</div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a good place to save your notebook, render it, and confirm that it looks as you expect.</p>
+</div>
+</div>
+</section>
+<section id="exercise-12" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-12">Exercise 12</h2>
+<p>So far, we have considered these models from the standpoint of prediction. But, we can also use the models and their predictions to help draw inferences about our data and the nature of the variables they represent in the world.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 12
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>[predict breakups from relationship quality / sex per week / age, setting all other variables at their median or modal values. Make a plot for each and interpret. Keep in mind considerations like how a couple’s sex life might vary with their age and relationship quality. ]</p>
+</div>
+</div>
+</section>
+<section id="exercise-13" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-13">Exercise 13</h2>
+<p>A unique aspect of this dataset is that the second wave was collected during the first year of the COVID-19 pandemic. This allows us to try to use our modeling to ask questions about how experiences during the COVID-19 affected the durability of relationships. We will address this holistically, by creating a third model that includes all the predictors of model 1, along with all of our COVID-19-related predictors.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 13
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Build a pipeline to create a third logistic regression model. This time, do not select out any of the variables in the dataset. Then, fit the model across the cross-validation folds and evaluate its performance relative to model 1. What do you conclude about the effects of COVID-19 pandemic on relationships?</p>
+</div>
+</div>
+</section>
+<section id="exercise-14" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-14">Exercise 14</h2>
+<p>[plot with shelter in place, essential worker status]</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 14
+</div>
+</div>
+<div class="callout-body-container callout-body">
+
+</div>
+</div>
+</section>
+<section id="exercise-15" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-15">Exercise 15</h2>
+<p>Finally, let’s close by training a final model and testing its performance on the test set. Since we are originally more interested in predicting years into the future, let’s use our first model where we predicted 2020 breakups from 2017 data.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 15
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Retrain <code>model1</code> on the full training data set and then evaluate its performance on the test split. Compute accuracy and AUC. In addition, generate a confusion matrix, and an ROC plot.</p>
+</div>
+</div>
+<div class="callout-important callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>This is a good place to save your notebook, render it, and confirm that it looks as you expect.</p>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      let href = ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,240 @@
+---
+title: "BDSR2 Homework template"
+author: "Derek Powell"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this homework are:
+
+-   Learn to use a template to make HW documents for BDSR2
+-   Have something we can copy and paste to get started
+:::
+
+intro to relationships and hcmst dataset
+
+
+
+```{r}
+library(tidyverse)
+hcmst <- read_csv("data/hcmst.csv")
+```
+
+
+Outline
+
+- EDA to check class balance
+- EDA to plot something like relationship quality against proportion broken up
+- Munging to create some new variables, taking note of variable types
+
+- Split into training and test splits (stratifying)
+- Set up 10-fold cv
+- Create model 1 with "public" features
+- Create model 2 with "private" features
+- Evaluate performance
+- Marginal plot of relationship quality / sex frequency from model predictions
+
+- Create new model with COVID-related predictors
+- Is it better? Interpret wrt covid-stressors (if this is lame, just skip this section)
+
+- Finish by closing the loop retraining on all data and predicting on test data 
+
+## Exercise 1
+
+We want to predict which couples will stay together and which will break up. First, let's see how many breakups we have in our dataset.
+
+::: {.callout-note icon="false"}
+## Exercise 1
+
+Examine the balance of the classes for the `w2_breakup` variable.
+:::
+
+
+```{r}
+hcmst %>% 
+  count(w2_brokeup)
+```
+
+## Exercise 2
+
+Let's do some more exploratory data analysis. One variable that seems likely to be highly predictive of whether couples break up is relationship quality. This quality measure is reverse-coded, as shown in the codebook entry below (note: it has been renamed for clarity).
+
+![](../imgs/hcmst-rel-qual-code.png)
+
+
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Make a plot of the **proportion** of couples who broke up by relationship quality. Then, make a plot of the **number** of couples who broke up, plotted by relationship quality. Compare and interpret the two plots. Briefly discuss what this might mean for our ability to predict breakups from just this variable.
+:::
+
+```{r}
+hcmst %>% 
+  group_by(w1_rel_qual) %>% 
+  summarize(prop = mean(w2_brokeup)) %>% 
+  ggplot(aes(x=w1_rel_qual, y = prop)) +
+  geom_point()
+
+hcmst %>% 
+  group_by(w1_rel_qual) %>% 
+  summarize(cnt = sum(w2_brokeup)) %>% 
+  ggplot(aes(x=w1_rel_qual, y = cnt)) +
+  geom_point()
+```
+
+## Exercise 3
+
+Let's zoom back out and look at all the variables present in the dataset. A few notes on the variable name formatting: 
+
+- `id` indicates respondent id number
+- `w1_` indicates wave 1 (2017); `w2_` indicates wave 2 (2020)
+- `*_p_` indicates a value for the respondent's partner (otherwise, for the respondent)
+
+```{r}
+glimpse(hcmst)
+```
+
+All of these (except `id` and `w2_brokeup`) are variables we might use as **features** in our model. In addition, we might want to do some **feature engineering** to create new features that might be more predictive. For instance, demographic for respondents and their partners might be translated into differences between members of the couples. Look at the features present and imagine some new features you might engineer by combining them in different ways. 
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+Create the following new features and add them to the `hcmst` dataset:
+
+- `w1_male_earner`: whether a male partner in the relationship earns more (i.e., example of conformity to heteronormative expectations).
+- `w1_pol_diff`, `w1_age_diff`, and `w1_yrsed_diff`: differences between partners politics, age, and years of education.
+- `w1_out_of_birthstate`: whether the respondent lives outside their birthstate
+- `w1_moved`: whether the couple lives in a different state from where they met
+
+:::
+
+::: callout-important
+This is a good place to save your notebook, render it, and confirm that it looks as you expect.
+:::
+
+## Exercise 4
+
+Now we can begin our machine-learning workflow!
+
+::: {.callout-note icon="false"}
+## Exercise 4
+
+Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `id` column before making these splits. Make sure to stratify the train/test splits to ensure a representative class balance for our predictions.
+:::
+
+## Exercise 5
+::: {.callout-note icon="false"}
+## Exercise 5
+
+We will build several models and we'll use k-fold cross-validation to compare them. Set up cross validation with 10 folds.
+
+:::
+
+## Exercise 6
+
+Let's start building our first model. Our first model will use all the available features from Wave 1 (2017) to predict breakups in Wave 2 (2020).
+
+::: {.callout-note icon="false"}
+## Exercise 6
+Build a recipe to create a logistic regression model. As part of the pipeline, select only the Wave 1 features as predictors.
+:::
+
+::: callout-important
+This is a good place to save your notebook, render it, and confirm that it looks as you expect.
+:::
+
+## Exercise 7
+
+If you examine the features we have available for prediction (e.g. see the `glimpse()` above), you should notice that some of these features seem more like basic demographics that people might happily share or that might otherwise be available, whereas other features are more intimate and personal responses given in the context of this survey. 
+
+::: {.callout-note icon="false"}
+## Exercise 7
+
+Examine the dataset and list three examples of each kind of feature.
+:::
+
+## Exercise 8
+
+Let's start building our second "reduced" model. We'll build another model that leverages only "demographic" sorts of features from Wave 1. How well can we predict couples' breakups from the sort of information that might be publicly available or accessible?
+
+::: {.callout-note icon="false"}
+## Exercise 8
+
+Build a recipe to create another logistic regression model that does not include any sensitive or private features. As part of the pipeline, select only the "public" or "demographic" type features. Use the list of features described in the hint below.
+
+:::
+
+## Exercise 9
+Now it's time to fit our models in our cross-validation folds and evaluate their performance. 
+::: {.callout-note icon="false"}
+## Exercise 9
+
+Fit both models to the 10 cross-validation folds. 
+:::
+
+## Exercise 10
+::: {.callout-note icon="false"}
+## Exercise 10
+
+Compare the accuracy of these two models. What do you make of those findings? Now compare the AUC for the two models, what do you make of these differences? 
+:::
+
+## Exercise 11
+::: {.callout-note icon="false"}
+## Exercise 11
+
+Generate predictions across the CV folds and create ROC curve plots for both models. Briefly interpret the performance of the two models.
+
+Then, focusing on the "public" model, briefly consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? What do you think about that?
+:::
+
+::: callout-important
+This is a good place to save your notebook, render it, and confirm that it looks as you expect.
+:::
+
+## Exercise 12
+
+So far, we have considered these models from the standpoint of prediction. But, we can also use the models and their predictions to help draw inferences about our data and the nature of the variables they represent in the world.
+                                           
+::: {.callout-note icon="false"}
+## Exercise 12
+
+[predict breakups from relationship quality / sex per week / age, setting all other variables at their median or modal values. Make a plot for each and interpret. Keep in mind considerations like how a couple's sex life might vary with their age and relationship quality. ]
+:::
+
+
+## Exercise 13
+
+A unique aspect of this dataset is that the second wave was collected during the first year of the COVID-19 pandemic. This allows us to try to use our modeling to ask questions about how experiences during the COVID-19 affected the durability of relationships. We will address this holistically, by creating a third model that includes all the predictors of model 1, along with all of our COVID-19-related predictors. 
+
+::: {.callout-note icon="false"}
+## Exercise 13
+
+Build a pipeline to create a third logistic regression model. This time, do not select out any of the variables in the dataset. Then, fit the model across the cross-validation folds and evaluate its performance relative to model 1. What do you conclude about the effects of COVID-19 pandemic on relationships?
+:::
+
+## Exercise 14
+
+[plot with shelter in place, essential worker status]
+
+::: {.callout-note icon="false"}
+## Exercise 14
+
+:::
+
+## Exercise 15
+Finally, let's close by training a final model and testing its performance on the test set. Since we are originally more interested in predicting years into the future, let's use our first model where we predicted 2020 breakups from 2017 data.
+
+::: {.callout-note icon="false"}
+## Exercise 15
+
+Retrain `model1` on the full training data set and then evaluate its performance on the test split. Compute accuracy and AUC. In addition, generate a confusion matrix, and an ROC plot.
+:::
+
+
+::: callout-important
+This is a good place to save your notebook, render it, and confirm that it looks as you expect.
+:::

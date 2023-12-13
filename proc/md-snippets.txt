@@ -18,7 +18,7 @@ snippet exercise
 	## Exercise ${1:number}
 	::: {.callout-note icon="false"}
 	## Exercise ${1:number}
-	Copy and paste this template and delete all the boilerplate below.
+	
 	:::
 	
 snippet hint

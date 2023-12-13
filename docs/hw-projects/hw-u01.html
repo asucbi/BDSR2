@@ -8,7 +8,7 @@
 
 <meta name="author" content="Derek Powell">
 
-<title>BDSR2 Homework template</title>
+<title>Homework U01: Who will stay together and who will call it splits?</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -126,7 +126,7 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">BDSR2 Homework template</h1>
+<h1 class="title">Homework U01: Who will stay together and who will call it splits?</h1>
 </div>
 
 
@@ -158,50 +158,20 @@ Learning Objectives
 <div class="callout-body-container callout-body">
 <p>Our learning objectives for this homework are:</p>
 <ul>
-<li>Learn to use a template to make HW documents for BDSR2</li>
-<li>Have something we can copy and paste to get started</li>
+<li>Apply the fundamental machine learning workflow from start to finish</li>
+<li>Use data munging skills to conduct feature engineering for machine learning</li>
+<li>Gain hands-on experience with building and applying logistic regression models</li>
+<li>Use model visualizations to gain insight into the dynamics of romantic relationships</li>
 </ul>
 </div>
 </div>
-<p>intro to relationships and hcmst dataset</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching packages ─────────────────────────────────────── tidyverse 1.3.2 ──
-✔ ggplot2 3.4.1     ✔ purrr   0.3.4
-✔ tibble  3.2.1     ✔ dplyr   1.1.1
-✔ tidyr   1.2.1     ✔ stringr 1.5.0
-✔ readr   2.1.2     ✔ forcats 0.5.2
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()</code></pre>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>hcmst <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/hcmst.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/hcmst.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Rows: 2107 Columns: 38
-── Column specification ────────────────────────────────────────────────────────
-Delimiter: ","
-dbl (38): id, w2_brokeup, w1_age, w1_p_page, w1_attraction, w1_q21a_year, w1...
-
-ℹ Use `spec()` to retrieve the full column specification for this data.
-ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-</div>
-</div>
-<p>Outline</p>
-<ul>
-<li><p>EDA to check class balance</p></li>
-<li><p>EDA to plot something like relationship quality against proportion broken up</p></li>
-<li><p>Munging to create some new variables, taking note of variable types</p></li>
-<li><p>Split into training and test splits (stratifying)</p></li>
-<li><p>Set up 10-fold cv</p></li>
-<li><p>Create model 1 with “public” features</p></li>
-<li><p>Create model 2 with “private” features</p></li>
-<li><p>Evaluate performance</p></li>
-<li><p>Marginal plot of relationship quality / sex frequency from model predictions</p></li>
-<li><p>Create new model with COVID-related predictors</p></li>
-<li><p>Is it better? Interpret wrt covid-stressors (if this is lame, just skip this section)</p></li>
-<li><p>Finish by closing the loop retraining on all data and predicting on test data</p></li>
-</ul>
+<p>Relationships are important!</p>
+<p><img src="../imgs/ambiguous-couple.jpeg" class="img-fluid"></p>
+<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at neque vel auctor. Mauris in imperdiet tellus. Vestibulum tincidunt maximus pretium. Nullam molestie viverra purus, ut viverra mauris. Aliquam pulvinar nec ante eu elementum. Donec at faucibus urna. Cras semper egestas lectus, et vulputate sapien gravida pulvinar. Proin sit amet laoreet est. Sed auctor, mauris in ultricies tristique, justo ipsum pulvinar risus, non tincidunt sem massa id libero. Etiam eget volutpat nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean rhoncus urna efficitur nunc tincidunt tristique. Sed rhoncus erat nec suscipit lobortis. Duis efficitur pellentesque enim ac feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.</p>
 <section id="exercise-1" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
 <p>We want to predict which couples will stay together and which will break up. First, let’s see how many breakups we have in our dataset.</p>
@@ -219,8 +189,8 @@ Exercise 1
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(w2_brokeup)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(w2_brokeup)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 2 × 2
   w2_brokeup     n
@@ -248,22 +218,22 @@ Exercise 2
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">prop =</span> <span class="fu">mean</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> prop)) <span class="sc">+</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">prop =</span> <span class="fu">mean</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> prop)) <span class="sc">+</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
 </div>
 <div class="cell-output-display">
 <p><img src="hw-u01_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">cnt =</span> <span class="fu">sum</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> cnt)) <span class="sc">+</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">cnt =</span> <span class="fu">sum</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> cnt)) <span class="sc">+</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
 </div>
@@ -281,7 +251,7 @@ Exercise 2
 <li><code>*_p_</code> indicates a value for the respondent’s partner (otherwise, for the respondent)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hcmst)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hcmst)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Rows: 2,107
 Columns: 38
@@ -458,8 +428,20 @@ Exercise 8
 </section>
 <section id="exercise-9" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-9">Exercise 9</h2>
-<p>Now it’s time to fit our models in our cross-validation folds and evaluate their performance. ::: {.callout-note icon=“false”} ## Exercise 9</p>
-<p>Fit both models to the 10 cross-validation folds. :::</p>
+<p>Now it’s time to fit our models in our cross-validation folds and evaluate their performance.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fit both models to the 10 cross-validation folds.</p>
+</div>
+</div>
 </section>
 <section id="exercise-10" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-10">Exercise 10</h2>
@@ -473,7 +455,7 @@ Exercise 10
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Compare the accuracy of these two models. What do you make of those findings? Now compare the AUC for the two models, what do you make of these differences?</p>
+<p>Compare the accuracy of these two models. What do you make of those findings? Now compare the AUC for the two models, what do you make of these differences? What explains the difference or similarity?</p>
 </div>
 </div>
 </section>

@@ -48,8 +48,7 @@ select(w2_brokeup, w1_ppage, w1_ppincimp, w1_q19, w1_pphouse, w1_ppmarit, w1_ppm
 
 df_reg <- df %>% 
   select(
-    w2_brokeup, w1_ppage, w1_q9, w1_attraction, w1_q21a_year, w1_q10, w1_q12, w1_q25, w1_q26, w1_partnership_status_cohab, w1_q34, w1_sex_frequency, w1_otherdate_all, w1_same_sex_couple_gender, w1_married, w1_q19, w1_ppincimp, w1_ppwork, w1_partyid7, w1_ppp20072, w1_q17, w1_q16, w1_q10, w1_q12, w1_q32, w1_q26, w1_q25, w1_q23, w1_q4, w1_ppgender, contains("w1_q24_met_through", w2_nonshelter, w2_shelter_combo_months, w2_myhealth, w2_myhealth_why_1, w2_parthealth, w2_parthealth_why_1, w1_subject_yrsed, w1_partner_yrsed)
-  ) %>% 
+    w2_brokeup, w1_ppage, w1_q9, w1_attraction, w1_q21a_year, w1_q10, w1_q12, w1_q25, w1_q26, w1_partnership_status_cohab, w1_q34, w1_sex_frequency, w1_otherdate_all, w1_same_sex_couple_gender, w1_married, w1_q19, w1_ppincimp, w1_ppwork, w1_partyid7, w1_ppp20072, w1_q17, w1_q16, w1_q10, w1_q12, w1_q32, w1_q26, w1_q25, w1_q23, w1_q4, w1_ppgender, contains("w1_q24_met_through"), w2_nonshelter, w2_shelter_combo_months, w2_myhealth, w2_myhealth_why_1, w2_parthealth, w2_parthealth_why_1, w1_subject_yrsed, w1_partner_yrsed) %>% 
   rename(
     w1_gender = w1_ppgender,
     w1_rel_qual = w1_q34,

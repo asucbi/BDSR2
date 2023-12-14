@@ -14,7 +14,7 @@ library(tidyverse)
 ```{r}
 rm(list = ls(all = TRUE))
 
-df = read_csv('/Users/jfalanda/Documents/Courses/BDSII/Content/Labs/Week4/OriginalProcessedData.csv')
+df = read_csv('../../../data/OriginalProcessedData.csv')
 
 colnames(df) <- gsub("~","", colnames(df))
 
@@ -27,6 +27,7 @@ df$Activity = factor(df$Activity)
 ggplot(df, aes(x = Activity, fill = Activity))+geom_bar()
 
 ```
+
 ```{r}
 ggplot(df, aes(x = ACCELEROMETER_X_mean, y = ACCELEROMETER_Y_mean, color = as.factor(Activity))) + geom_point()
 
@@ -36,6 +37,7 @@ ggplot(df, aes(x = ACCELEROMETER_X_mean, y = ACCELEROMETER_Y_mean, color = as.fa
 ggplot(df, aes(x = GRAVITY_X_mean, y = GRAVITY_Y_mean, color = as.factor(Activity))) + geom_point()
 
 ```
+
 ```{r}
 library(Rtsne)
 
@@ -64,31 +66,75 @@ knn_spec <- nearest_neighbor(
 ```
 
 ```{r}
-knn_fit <-
-  workflow() %>%
-    add_formula(Activity ~ GRAVITY_X_mean + GRAVITY_Y_mean) %>%
-    add_model(knn_spec) %>%
-    fit(data = df_train)
-
-# df_fit <-
-#   workflow() %>%
-#     add_formula(Activity ~ ACCELEROMETER_X_mean + ACCELEROMETER_Y_mean) %>%
-#     add_model(knn_spec) %>%
-#     fit(data = df_train)
-
-# df_fit <-
-#   workflow() %>%
-#     add_formula(Activity ~ tsne1 + tsne2) %>%
-#     add_model(knn_spec) %>%
-#     fit(data = df_train)
+knn_wf <- workflow() %>% 
+  add_formula(Activity ~ GRAVITY_X_mean + GRAVITY_Y_mean) %>% 
+  add_model(knn_spec) 
 ```
 
 ```{r}
-df_pred <- augment(knn_fit, new_data = df_test) %>% transform(correct = ifelse(.pred_class == Activity, 1, 0)) %>% 
+knn_fit <-
+  knn_wf %>% 
+  fit(data = df_train)
+
+knn_fit %>% 
+  extract_fit_parsnip()
+```
+
+```{r}
+folds <- vfold_cv(df_train, v = 5)
+
+knn_rs <- fit_resamples(
+  knn_wf,
+  folds,
+  control = control_resamples(save_pred = TRUE)
+)
+
+collect_metrics(knn_rs)
+```
+
+```{r}
+tune_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = tune()
+)
+
+neighbor_grid <- grid_regular(neighbors(), levels = 10)
+
+tune_wf <- workflow() %>%
+  add_formula(Activity ~ GRAVITY_X_mean + GRAVITY_Y_mean) %>%
+  add_model(tune_spec)
+
+tune_rs <- tune_grid(
+  tune_wf,
+  folds,
+  grid = neighbor_grid,
+  control = control_resamples(save_pred = TRUE)
+)
+
+#collect_metrics(tune_rs)
+autoplot(tune_rs)
+```
+```{r}
+chosen_n <- tune_rs %>%
+  select_by_one_std_err(metric = "roc_auc", neighbors)
+
+final_knn <- finalize_workflow(tune_wf, chosen_n)
+
+knn_fit <- fit(final_knn, df_train)
+
+knn_fit %>% 
+  extract_fit_parsnip()
+```
+
+
+```{r}
+knn_pred <- augment(knn_fit, new_data = df_test) %>% transform(correct = ifelse(.pred_class == Activity, 1, 0)) %>%
   relocate(.pred_class, Activity, correct)
 ```
 
 ```{r}
-sum(df_pred$correct)/nrow(df_pred)
+knn_pred %>%                # training set predictions
+  accuracy(truth = Activity, .pred_class)
 ```
 

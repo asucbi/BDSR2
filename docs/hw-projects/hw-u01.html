@@ -104,7 +104,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link active" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#the-data" id="toc-the-data" class="nav-link active" data-scroll-target="#the-data">The data</a></li>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a></li>
   <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
   <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
   <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">Exercise 4</a></li>
@@ -116,9 +117,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#exercise-10" id="toc-exercise-10" class="nav-link" data-scroll-target="#exercise-10">Exercise 10</a></li>
   <li><a href="#exercise-11" id="toc-exercise-11" class="nav-link" data-scroll-target="#exercise-11">Exercise 11</a></li>
   <li><a href="#exercise-12" id="toc-exercise-12" class="nav-link" data-scroll-target="#exercise-12">Exercise 12</a></li>
-  <li><a href="#exercise-13" id="toc-exercise-13" class="nav-link" data-scroll-target="#exercise-13">Exercise 13</a></li>
-  <li><a href="#exercise-14" id="toc-exercise-14" class="nav-link" data-scroll-target="#exercise-14">Exercise 14</a></li>
-  <li><a href="#exercise-15" id="toc-exercise-15" class="nav-link" data-scroll-target="#exercise-15">Exercise 15</a></li>
   </ul>
 </nav>
 </div>
@@ -166,15 +164,21 @@ Learning Objectives
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>hcmst <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/hcmst.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
 </div>
-<p>Relationships are important!</p>
 <p><img src="../imgs/ambiguous-couple.jpeg" class="img-fluid"></p>
-<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at neque vel auctor. Mauris in imperdiet tellus. Vestibulum tincidunt maximus pretium. Nullam molestie viverra purus, ut viverra mauris. Aliquam pulvinar nec ante eu elementum. Donec at faucibus urna. Cras semper egestas lectus, et vulputate sapien gravida pulvinar. Proin sit amet laoreet est. Sed auctor, mauris in ultricies tristique, justo ipsum pulvinar risus, non tincidunt sem massa id libero. Etiam eget volutpat nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean rhoncus urna efficitur nunc tincidunt tristique. Sed rhoncus erat nec suscipit lobortis. Duis efficitur pellentesque enim ac feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.</p>
+<p>Romantic relationships are central to human experience, offering deep connections, companionship, and love. Romantic relationships play a pivotal role in shaping our emotional well-being and overall life satisfaction From the exhilarating rush of falling in love to the profound impact of a break-up, the dynamic emotions, thoughts, and behaviors that characterize romantic relationships hold profound importance in people’s lives, significantly influencing their overall happiness and well-being.</p>
+<p>Research consistently shows that individuals in satisfying romantic partnerships report higher levels of life satisfaction, mental health, and physical well-being.</p>
+<p>However, romantic relationships are not without their challenges. Break-ups, or the dissolution of romantic relationships are major life stressors that can have profound impacts on an individual’s psychological and emotional state. Break-ups can lead to feelings of grief, sadness, anger, and even physical symptoms, akin to mourning the loss of a loved one.</p>
+<p>For many people, finding and maintaining healthy romantic relationships is an essential component of their overall life fulfillment and emotional stability. So what kinds of romantic relationships remain successful? If a break-up is imminent, can it be forseen?</p>
+<p><strong>In this homework, we will use machine learning to predict whether couples will remain together in 2020 based on demographic and survey information collected in 2017.</strong></p>
+<section id="the-data" class="level2">
+<h2 class="anchored" data-anchor-id="the-data">The data</h2>
+<p>The data for this homework comes from Stanford University’s <a href="https://data.stanford.edu/hcmst2017">How Couples Meet and Stay Together (HCMST) study</a>. This survey features a set of 3,510 survey respondents first surveyed in 2017, who were then followed up with in 2020 (2,107 subjects) and in 2022 (1,722) subjects. We will focus on the participants who were involved in a romantic relationship in 2017 and who responded again to questions in 2020.</p>
+</section>
 <section id="exercise-1" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
-<p>We want to predict which couples will stay together and which will break up. First, let’s see how many breakups we have in our dataset.</p>
+<p>We want to predict which couples will stay together and which will break up, so let’s load the data and see how many breakups we have in our dataset.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -185,26 +189,13 @@ Exercise 1
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Examine the balance of the classes for the <code>w2_breakup</code> variable.</p>
-</div>
-</div>
-<div class="hidden">
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(w2_brokeup)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 2
-  w2_brokeup     n
-       &lt;dbl&gt; &lt;int&gt;
-1          0  1920
-2          1   187</code></pre>
-</div>
+<p>First, load the data from <code>data/hcmst.csv</code>. Then, examine the balance of the classes (0 = broken up, 1 = together) coded by the <code>w2_brokeup</code> variable.</p>
 </div>
 </div>
 </section>
 <section id="exercise-2" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
-<p>Let’s do some more exploratory data analysis. One variable that seems likely to be highly predictive of whether couples break up is relationship quality. This quality measure is reverse-coded, as shown in the codebook entry below (note: it has been renamed for clarity).</p>
+<p>Before we make a model, let’s do some more exploratory data analysis. One variable that seems likely to be highly predictive of whether couples break up is relationship quality. This quality measure is reverse-coded, as shown in the codebook entry below (note: it has been renamed for clarity).</p>
 <p><img src="../imgs/hcmst-rel-qual-code.png" class="img-fluid"></p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -219,30 +210,6 @@ Exercise 2
 <p>Make a plot of the <strong>proportion</strong> of couples who broke up by relationship quality. Then, make a plot of the <strong>number</strong> of couples who broke up, plotted by relationship quality. Compare and interpret the two plots. Briefly discuss what this might mean for our ability to predict breakups from just this variable.</p>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">prop =</span> <span class="fu">mean</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> prop)) <span class="sc">+</span></span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="hw-u01_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
-</div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>hcmst <span class="sc">%&gt;%</span> </span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(w1_rel_qual) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">cnt =</span> <span class="fu">sum</span>(w2_brokeup)) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>w1_rel_qual, <span class="at">y =</span> cnt)) <span class="sc">+</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning: Removed 1 rows containing missing values (`geom_point()`).</code></pre>
-</div>
-<div class="cell-output-display">
-<p><img src="hw-u01_files/figure-html/unnamed-chunk-3-2.png" class="img-fluid" width="672"></p>
-</div>
-</div>
 </section>
 <section id="exercise-3" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
@@ -253,51 +220,33 @@ Exercise 2
 <li><code>*_p_</code> indicates a value for the respondent’s partner (otherwise, for the respondent)</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hcmst)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">glimpse</span>(hcmst)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Rows: 2,107
-Columns: 38
-$ id                           &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13…
-$ w2_brokeup                   &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
-$ w1_age                       &lt;dbl&gt; 48, 68, 39, 54, 48, 59, 72, 55, 73, 46, 4…
-$ w1_p_page                    &lt;dbl&gt; 46, 71, 49, 59, 34, 52, 75, 55, 79, 46, 3…
-$ w1_attraction                &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
-$ w1_q21a_year                 &lt;dbl&gt; 2013, 1964, 1999, 1989, 2011, 1993, 1981,…
-$ w1_p_edu                     &lt;dbl&gt; 11, 10, 10, 13, 11, 12, 10, 10, 9, 10, 9,…
-$ w1_p_polparty                &lt;dbl&gt; 1, 3, 7, 4, 2, 2, 7, 1, 6, 2, 4, 3, 7, 5,…
-$ w1_same_hs                   &lt;dbl&gt; 1, 1, 2, 2, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2,…
-$ w1_same_college              &lt;dbl&gt; NA, 1, 2, NA, 2, 2, 2, NA, NA, 1, NA, NA,…
-$ w1_partnership_status_cohab  &lt;dbl&gt; 1, 1, 1, 1, 4, 1, 4, 1, 1, 1, 1, 3, 1, 1,…
-$ w1_rel_qual                  &lt;dbl&gt; 1, 1, 1, 1, NA, 1, NA, 2, 1, 2, 3, 2, 2, …
-$ w1_sex_frequency             &lt;dbl&gt; 3, 5, 3, 4, NA, 5, NA, 3, 5, 5, 5, 2, 5, …
-$ w1_otherdate_all             &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
-$ w1_same_sex_couple_gender    &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
-$ w1_married                   &lt;dbl&gt; 1, 1, 1, 1, 0, 1, 0, 1, 1, 1, 1, 0, 1, 1,…
-$ w1_cohab                     &lt;dbl&gt; 1, 1, 1, 1, NA, 1, NA, 1, 1, 1, 1, 2, 1, …
-$ w1_hh_income                 &lt;dbl&gt; 13, 12, 15, 16, 14, 15, 4, 12, 11, 14, 8,…
-$ w1_employed                  &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 6, 1, 5, 1, 1, 1, 4, 1,…
-$ w1_polparty                  &lt;dbl&gt; 6, 3, 7, 2, 3, 2, 7, 1, 3, 2, 6, 7, 7, 5,…
-$ w1_relig_attend              &lt;dbl&gt; 6, 4, 4, 2, 5, 4, 6, 1, 6, 6, 6, 5, 2, 2,…
-$ w1_times_marrid              &lt;dbl&gt; 3, 1, 1, 1, 3, 2, 2, 1, 3, 2, 2, 2, 1, 1,…
-$ w1_p_race                    &lt;dbl&gt; 7, 7, 5, 3, 0, 0, 0, 0, 0, 0, 0, 2, 0, 5,…
-$ w1_how_met                   &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,…
-$ w1_earned_more               &lt;dbl&gt; 3, 3, 1, 3, 1, 1, 3, 3, 3, 4, 1, 3, 3, 3,…
-$ w1_p_gender                  &lt;dbl&gt; 1, 1, 2, 2, 2, 2, 1, 1, 1, 2, 2, 1, 1, 1,…
-$ w1_gender                    &lt;dbl&gt; 2, 2, 1, 1, 1, 1, 2, 2, 2, 1, 1, 2, 2, 2,…
-$ w1_q24_met_through_family    &lt;dbl&gt; 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,…
-$ w1_q24_met_through_friend    &lt;dbl&gt; 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0,…
-$ w1_q24_met_through_as_nghbrs &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,…
-$ w2_nonshelter                &lt;dbl&gt; NA, 1, 1, 1, NA, NA, 2, 1, NA, 1, 1, NA, …
-$ w2_shelter_combo_months      &lt;dbl&gt; 0.25, 0.00, 0.00, 0.00, 0.75, 0.75, 0.00,…
-$ w2_myhealth                  &lt;dbl&gt; 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,…
-$ w2_myhealth_why_1            &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
-$ w2_parthealth                &lt;dbl&gt; 2, 2, 2, 2, NA, 2, NA, 2, 2, 2, 2, 2, 2, …
-$ w2_parthealth_why_1          &lt;dbl&gt; NA, NA, NA, NA, NA, NA, NA, NA, NA, NA, N…
-$ w1_yrsed                     &lt;dbl&gt; 12, 13, 14, 12, 13, 13, 13, 12, 12, 14, 1…
-$ w1_p_yrsed                   &lt;dbl&gt; 14, 13, 13, 17, 14, 16, 13, 13, 12, 13, 1…</code></pre>
+<pre><code>Rows: 1,716
+Columns: 19
+$ id                      &lt;dbl&gt; 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14,…
+$ w2_brokeup              &lt;dbl&gt; 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0…
+$ w1_age                  &lt;dbl&gt; 48, 68, 39, 54, 59, 55, 73, 46, 43, 57, 54, 61…
+$ w1_p_age                &lt;dbl&gt; 46, 71, 49, 59, 52, 55, 79, 46, 37, 63, 61, 62…
+$ w1_yrsed                &lt;dbl&gt; 12, 13, 14, 12, 13, 12, 12, 14, 14, 13, 12, 13…
+$ w1_p_yrsed              &lt;dbl&gt; 14, 13, 13, 17, 16, 13, 12, 13, 12, 12, 13, 16…
+$ w1_q21a_year            &lt;dbl&gt; 2013, 1964, 1999, 1989, 1993, 1983, 1992, 1986…
+$ w1_polparty             &lt;dbl&gt; 6, 3, 7, 2, 2, 1, 3, 2, 6, 7, 7, 5, 2, 6, 2, 1…
+$ w1_p_polparty           &lt;dbl&gt; 1, 3, 7, 4, 2, 1, 6, 2, 4, 3, 7, 5, 7, 4, 1, 4…
+$ w1_fam_seen_monthly     &lt;dbl&gt; 7, 7, 5, 3, 0, 0, 0, 0, 0, 2, 0, 5, 0, 2, 0, 0…
+$ w1_hh_income            &lt;dbl&gt; 13, 12, 15, 16, 15, 12, 11, 14, 8, 9, 11, 15, …
+$ w1_cohab                &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1…
+$ w1_married              &lt;dbl&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1…
+$ w1_race                 &lt;dbl&gt; 3, 1, 1, 1, 1, 2, 1, 1, 3, 1, 2, 4, 1, 1, 1, 1…
+$ w1_p_race               &lt;dbl&gt; 1, 1, 1, 4, 1, 2, 2, 1, 3, 1, 2, 4, 1, 1, 1, 1…
+$ w1_rel_qual             &lt;dbl&gt; 1, 1, 1, 1, 1, 2, 1, 2, 3, 2, 2, 2, 2, 1, 1, 2…
+$ w1_sex_frequency        &lt;dbl&gt; 3, 5, 3, 4, 5, 3, 5, 5, 5, 2, 5, 5, 5, -1, 5, …
+$ w2_nonshelter           &lt;dbl&gt; -1, 1, 1, 1, -1, 1, -1, 1, 1, -1, -1, 1, 1, 1,…
+$ w2_shelter_combo_months &lt;dbl&gt; 0.25, 0.00, 0.00, 0.00, 0.75, 0.00, 3.00, 0.00…</code></pre>
 </div>
 </div>
-<p>All of these (except <code>id</code> and <code>w2_brokeup</code>) are variables we might use as <strong>features</strong> in our model. In addition, we might want to do some <strong>feature engineering</strong> to create new features that might be more predictive. For instance, demographic for respondents and their partners might be translated into differences between members of the couples. Look at the features present and imagine some new features you might engineer by combining them in different ways.</p>
+<p>All of these (except <code>id</code> and <code>w2_brokeup</code>) are variables we might use as <strong>features</strong> in our model. To make sure they are used appropriately, we need to pay attention to the type of feature they are.</p>
+<p>Some of these features are <strong>continuous</strong> (or at least ordered) and some are categorical (or <strong>discrete</strong>). Look through the list of variables and think about which might be continuous, at least in principle. Then complete the exercise below.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -308,13 +257,23 @@ Exercise 3
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Create the following new features and add them to the <code>hcmst</code> dataset:</p>
-<ul>
-<li><code>w1_male_earner</code>: whether a male partner in the relationship earns more (i.e., example of conformity to heteronormative expectations).</li>
-<li><code>w1_pol_diff</code>, <code>w1_age_diff</code>, and <code>w1_yrsed_diff</code>: differences between partners politics, age, and years of education.</li>
-<li><code>w1_out_of_birthstate</code>: whether the respondent lives outside their birthstate</li>
-<li><code>w1_moved</code>: whether the couple lives in a different state from where they met</li>
-</ul>
+<p>Modify the <code>hcmst</code> dataset to translate discrete, cateogrical predictors into <code>factors</code> and keep continuous variables left as <code>numeric</code>. Expand the hint below to see which variables should be kept <code>numeric</code>.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Hint
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Continuous variables: <code>w1_age</code>, <code>w1_p_age</code>, <code>w1_yrsed</code>, <code>w1_p_yrsed</code>, <code>w1_q21a_year</code>, <code>w1_rel_qual</code>, <code>w1_sex_frequency</code>, <code>w1_polparty</code>, <code>w1_p_polparty</code>, <code>w1_fam_seen_monthly</code>, <code>w1_hh_income</code>, <code>w2_shelter_combo_months</code></p>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="callout-important callout callout-style-default callout-captioned">
@@ -344,7 +303,7 @@ Exercise 4
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Split the data into training (80%) and testing (20%) splits. Since we won’t use it for prediction, drop the <code>id</code> column before making these splits. Make sure to stratify the train/test splits to ensure a representative class balance for our predictions.</p>
+<p>Split the data into training (80%) and testing (20%) splits. Since we won’t use it for prediction, drop the <code>id</code> column before making these splits. Make sure to stratify the train/test splits to ensure a representative class balance for our predictions. Call your training and testing splits <code>train</code> and <code>test</code></p>
 </div>
 </div>
 </section>
@@ -360,7 +319,7 @@ Exercise 5
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>We will build several models and we’ll use k-fold cross-validation to compare them. Set up cross validation with 10 folds.</p>
+<p>We will build several models and we’ll use k-fold cross-validation to compare them. Set up cross validation with 10 folds. Remember, <code>tidymodels</code> calls this “v-fold cross validation”.</p>
 </div>
 </div>
 </section>
@@ -377,7 +336,7 @@ Exercise 6
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Build a recipe to create a logistic regression model. As part of the pipeline, select only the Wave 1 features as predictors.</p>
+<p>Build a workflow to train a logistic regression model. As part of the workflow, create a recipe that selects only the Wave 1 features as predictors (and the <code>w2_brokeup</code> variable to be predicted).</p>
 </div>
 </div>
 <div class="callout-important callout callout-style-default callout-captioned">
@@ -407,7 +366,7 @@ Exercise 7
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Examine the dataset and list three examples of each kind of feature.</p>
+<p>Examine the dataset and list two examples of each kind of feature.</p>
 </div>
 </div>
 </section>
@@ -425,6 +384,22 @@ Exercise 8
 </div>
 <div class="callout-body-container callout-body">
 <p>Build a recipe to create another logistic regression model that does not include any sensitive or private features. As part of the pipeline, select only the “public” or “demographic” type features. Use the list of features described in the hint below.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Hint
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Deselect the variables for relationship quality and sex frequency.</p>
+</div>
+</div>
+</div>
 </div>
 </div>
 </section>
@@ -463,6 +438,7 @@ Exercise 10
 </section>
 <section id="exercise-11" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-11">Exercise 11</h2>
+<p>Finally, let’s close by training a final model and testing its performance on the test set. Typically, we would pick the best model based on its cross validation performance. But here, let’s consider our ability to predict with “public” data.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -473,27 +449,12 @@ Exercise 11
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Generate predictions across the CV folds and create ROC curve plots for both models. Briefly interpret the performance of the two models.</p>
-<p>Then, focusing on the “public” model, briefly consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? What do you think about that?</p>
-</div>
-</div>
-<div class="callout-important callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Important
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>This is a good place to save your notebook, render it, and confirm that it looks as you expect.</p>
+<p>Retrain the model with only “public” features on the full training data set.</p>
 </div>
 </div>
 </section>
 <section id="exercise-12" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-12">Exercise 12</h2>
-<p>So far, we have considered these models from the standpoint of prediction. But, we can also use the models and their predictions to help draw inferences about our data and the nature of the variables they represent in the world.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -504,58 +465,8 @@ Exercise 12
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>[predict breakups from relationship quality / sex per week / age, setting all other variables at their median or modal values. Make a plot for each and interpret. Keep in mind considerations like how a couple’s sex life might vary with their age and relationship quality. ]</p>
-</div>
-</div>
-</section>
-<section id="exercise-13" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-13">Exercise 13</h2>
-<p>A unique aspect of this dataset is that the second wave was collected during the first year of the COVID-19 pandemic. This allows us to try to use our modeling to ask questions about how experiences during the COVID-19 affected the durability of relationships. We will address this holistically, by creating a third model that includes all the predictors of model 1, along with all of our COVID-19-related predictors.</p>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 13
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Build a pipeline to create a third logistic regression model. This time, do not select out any of the variables in the dataset. Then, fit the model across the cross-validation folds and evaluate its performance relative to model 1. What do you conclude about the effects of COVID-19 pandemic on relationships?</p>
-</div>
-</div>
-</section>
-<section id="exercise-14" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-14">Exercise 14</h2>
-<p>[plot with shelter in place, essential worker status]</p>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 14
-</div>
-</div>
-<div class="callout-body-container callout-body">
-
-</div>
-</div>
-</section>
-<section id="exercise-15" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-15">Exercise 15</h2>
-<p>Finally, let’s close by training a final model and testing its performance on the test set. Since we are originally more interested in predicting years into the future, let’s use our first model where we predicted 2020 breakups from 2017 data.</p>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 15
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Retrain <code>model1</code> on the full training data set and then evaluate its performance on the test split. Compute accuracy and AUC. In addition, generate a confusion matrix, and an ROC plot.</p>
+<p>Use the final model to generate predictions for the testing data (accuracy and AUC) and create a confusion matrix to show the proportions of true and false positive and negative cases. Examine at the help of <code>?metrics</code> for guidance on computing AUC (and use <code>.pred_0</code> as the class probability variable).</p>
+<p>Consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? Write a paragraph or so on your thoughts.</p>
 </div>
 </div>
 <div class="callout-important callout callout-style-default callout-captioned">

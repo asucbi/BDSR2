@@ -17,36 +17,45 @@ Our learning objectives for this homework are:
 :::
 
 ```{r}
+#| echo: false
 #| message: false
 library(tidyverse)
+library(tidymodels)
+
 hcmst <- read_csv("data/hcmst.csv")
+
 ```
-Relationships are important!
 
 ![](../imgs/ambiguous-couple.jpeg)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at neque vel auctor. Mauris in imperdiet tellus. Vestibulum tincidunt maximus pretium. Nullam molestie viverra purus, ut viverra mauris. Aliquam pulvinar nec ante eu elementum. Donec at faucibus urna. Cras semper egestas lectus, et vulputate sapien gravida pulvinar. Proin sit amet laoreet est. Sed auctor, mauris in ultricies tristique, justo ipsum pulvinar risus, non tincidunt sem massa id libero. Etiam eget volutpat nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean rhoncus urna efficitur nunc tincidunt tristique. Sed rhoncus erat nec suscipit lobortis. Duis efficitur pellentesque enim ac feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
+Romantic relationships are central to human experience, offering deep connections, companionship, and love. Romantic relationships play a pivotal role in shaping our emotional well-being and overall life satisfaction From the exhilarating rush of falling in love to the profound impact of a break-up, the dynamic emotions, thoughts, and behaviors that characterize romantic relationships hold profound importance in people's lives, significantly influencing their overall happiness and well-being.
+
+Research consistently shows that individuals in satisfying romantic partnerships report higher levels of life satisfaction, mental health, and physical well-being.
+
+However, romantic relationships are not without their challenges. Break-ups, or the dissolution of romantic relationships are major life stressors that can have profound impacts on an individual's psychological and emotional state. Break-ups can lead to feelings of grief, sadness, anger, and even physical symptoms, akin to mourning the loss of a loved one.
+
+For many people, finding and maintaining healthy romantic relationships is an essential component of their overall life fulfillment and emotional stability. So what kinds of romantic relationships remain successful? If a break-up is imminent, can it be forseen?
+
+**In this homework, we will use machine learning to predict whether couples will remain together in 2020 based on demographic and survey information collected in 2017.**
+
+## The data
+
+The data for this homework comes from Stanford University's [How Couples Meet and Stay Together (HCMST) study](https://data.stanford.edu/hcmst2017). This survey features a set of 3,510 survey respondents first surveyed in 2017, who were then followed up with in 2020 (2,107 subjects) and in 2022 (1,722) subjects. We will focus on the participants who were involved in a romantic relationship in 2017 and who responded again to questions in 2020.
 
 ## Exercise 1
 
-We want to predict which couples will stay together and which will break up. First, let's see how many breakups we have in our dataset.
+We want to predict which couples will stay together and which will break up, so let's load the data and see how many breakups we have in our dataset.
 
 ::: {.callout-note icon="false"}
 ## Exercise 1
 
-Examine the balance of the classes for the `w2_breakup` variable.
+First, load the data from `data/hcmst.csv`. Then, examine the balance of the classes (0 = broken up, 1 = together) coded by the `w2_brokeup` variable.
 :::
 
-::: {.hidden}
-```{r}
-hcmst %>% 
-  count(w2_brokeup)
-```
-:::
 
 ## Exercise 2
 
-Let's do some more exploratory data analysis. One variable that seems likely to be highly predictive of whether couples break up is relationship quality. This quality measure is reverse-coded, as shown in the codebook entry below (note: it has been renamed for clarity).
+Before we make a model, let's do some more exploratory data analysis. One variable that seems likely to be highly predictive of whether couples break up is relationship quality. This quality measure is reverse-coded, as shown in the codebook entry below (note: it has been renamed for clarity).
 
 ![](../imgs/hcmst-rel-qual-code.png)
 
@@ -56,19 +65,6 @@ Let's do some more exploratory data analysis. One variable that seems likely to 
 Make a plot of the **proportion** of couples who broke up by relationship quality. Then, make a plot of the **number** of couples who broke up, plotted by relationship quality. Compare and interpret the two plots. Briefly discuss what this might mean for our ability to predict breakups from just this variable.
 :::
 
-```{r}
-hcmst %>% 
-  group_by(w1_rel_qual) %>% 
-  summarize(prop = mean(w2_brokeup)) %>% 
-  ggplot(aes(x=w1_rel_qual, y = prop)) +
-  geom_point()
-
-hcmst %>% 
-  group_by(w1_rel_qual) %>% 
-  summarize(cnt = sum(w2_brokeup)) %>% 
-  ggplot(aes(x=w1_rel_qual, y = cnt)) +
-  geom_point()
-```
 
 ## Exercise 3
 
@@ -82,22 +78,26 @@ Let's zoom back out and look at all the variables present in the dataset. A few 
 glimpse(hcmst)
 ```
 
-All of these (except `id` and `w2_brokeup`) are variables we might use as **features** in our model. In addition, we might want to do some **feature engineering** to create new features that might be more predictive. For instance, demographic for respondents and their partners might be translated into differences between members of the couples. Look at the features present and imagine some new features you might engineer by combining them in different ways.
+All of these (except `id` and `w2_brokeup`) are variables we might use as **features** in our model. To make sure they are used appropriately, we need to pay attention to the type of feature they are. 
+
+Some of these features are **continuous** (or at least ordered) and some are categorical (or **discrete**). Look through the list of variables and think about which might be continuous, at least in principle. Then complete the exercise below. 
 
 ::: {.callout-note icon="false"}
 ## Exercise 3
 
-Create the following new features and add them to the `hcmst` dataset:
+Modify the `hcmst` dataset to translate discrete, cateogrical predictors into `factors` and keep continuous variables left as `numeric`. Expand the hint below to see which variables should be kept `numeric`.
 
--   `w1_male_earner`: whether a male partner in the relationship earns more (i.e., example of conformity to heteronormative expectations).
--   `w1_pol_diff`, `w1_age_diff`, and `w1_yrsed_diff`: differences between partners politics, age, and years of education.
--   `w1_out_of_birthstate`: whether the respondent lives outside their birthstate
--   `w1_moved`: whether the couple lives in a different state from where they met
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+Continuous variables: `w1_age`, `w1_p_age`, `w1_yrsed`, `w1_p_yrsed`, `w1_q21a_year`, `w1_rel_qual`, `w1_sex_frequency`, `w1_polparty`, `w1_p_polparty`, `w1_fam_seen_monthly`, `w1_hh_income`, `w2_shelter_combo_months`
+:::
+
 :::
 
 ::: callout-important
 This is a good place to save your notebook, render it, and confirm that it looks as you expect.
 :::
+
 
 ## Exercise 4
 
@@ -106,15 +106,17 @@ Now we can begin our machine-learning workflow!
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
-Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `id` column before making these splits. Make sure to stratify the train/test splits to ensure a representative class balance for our predictions.
+Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `id` column before making these splits. Make sure to stratify the train/test splits to ensure a representative class balance for our predictions. Call your training and testing splits `train` and `test`
 :::
+
+
 
 ## Exercise 5
 
 ::: {.callout-note icon="false"}
 ## Exercise 5
 
-We will build several models and we'll use k-fold cross-validation to compare them. Set up cross validation with 10 folds.
+We will build several models and we'll use k-fold cross-validation to compare them. Set up cross validation with 10 folds. Remember, `tidymodels` calls this "v-fold cross validation".
 :::
 
 ## Exercise 6
@@ -124,8 +126,9 @@ Let's start building our first model. Our first model will use all the available
 ::: {.callout-note icon="false"}
 ## Exercise 6
 
-Build a recipe to create a logistic regression model. As part of the pipeline, select only the Wave 1 features as predictors.
+Build a workflow to train a logistic regression model. As part of the workflow, create a recipe that selects only the Wave 1 features as predictors (and the `w2_brokeup` variable to be predicted).
 :::
+
 
 ::: callout-important
 This is a good place to save your notebook, render it, and confirm that it looks as you expect.
@@ -138,7 +141,7 @@ If you examine the features we have available for prediction (e.g. see the `glim
 ::: {.callout-note icon="false"}
 ## Exercise 7
 
-Examine the dataset and list three examples of each kind of feature.
+Examine the dataset and list two examples of each kind of feature.
 :::
 
 ## Exercise 8
@@ -149,7 +152,14 @@ Let's start building our second "reduced" model. We'll build another model that 
 ## Exercise 8
 
 Build a recipe to create another logistic regression model that does not include any sensitive or private features. As part of the pipeline, select only the "public" or "demographic" type features. Use the list of features described in the hint below.
+
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+Deselect the variables for relationship quality and sex frequency.
 :::
+
+:::
+
 
 ## Exercise 9
 
@@ -161,6 +171,7 @@ Now it's time to fit our models in our cross-validation folds and evaluate their
 Fit both models to the 10 cross-validation folds.
 :::
 
+
 ## Exercise 10
 
 ::: {.callout-note icon="false"}
@@ -169,57 +180,29 @@ Fit both models to the 10 cross-validation folds.
 Compare the accuracy of these two models. What do you make of those findings? Now compare the AUC for the two models, what do you make of these differences? What explains the difference or similarity?
 :::
 
+
+
 ## Exercise 11
+
+Finally, let's close by training a final model and testing its performance on the test set. Typically, we would pick the best model based on its cross validation performance. But here, let's consider our ability to predict with "public" data. 
 
 ::: {.callout-note icon="false"}
 ## Exercise 11
 
-Generate predictions across the CV folds and create ROC curve plots for both models. Briefly interpret the performance of the two models.
-
-Then, focusing on the "public" model, briefly consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? What do you think about that?
-:::
-
-::: callout-important
-This is a good place to save your notebook, render it, and confirm that it looks as you expect.
+Retrain the model with only "public" features on the full training data set.
 :::
 
 ## Exercise 12
 
-So far, we have considered these models from the standpoint of prediction. But, we can also use the models and their predictions to help draw inferences about our data and the nature of the variables they represent in the world.
-
 ::: {.callout-note icon="false"}
 ## Exercise 12
 
-\[predict breakups from relationship quality / sex per week / age, setting all other variables at their median or modal values. Make a plot for each and interpret. Keep in mind considerations like how a couple's sex life might vary with their age and relationship quality. \]
+Use the final model to generate predictions for the testing data (accuracy and AUC) and create a confusion matrix to show the proportions of true and false positive and negative cases. Examine at the help of `?metrics` for guidance on computing AUC (and use `.pred_0` as the class probability variable).
+
+Consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? Write a paragraph or so on your thoughts.
 :::
 
-## Exercise 13
 
-A unique aspect of this dataset is that the second wave was collected during the first year of the COVID-19 pandemic. This allows us to try to use our modeling to ask questions about how experiences during the COVID-19 affected the durability of relationships. We will address this holistically, by creating a third model that includes all the predictors of model 1, along with all of our COVID-19-related predictors.
-
-::: {.callout-note icon="false"}
-## Exercise 13
-
-Build a pipeline to create a third logistic regression model. This time, do not select out any of the variables in the dataset. Then, fit the model across the cross-validation folds and evaluate its performance relative to model 1. What do you conclude about the effects of COVID-19 pandemic on relationships?
-:::
-
-## Exercise 14
-
-\[plot with shelter in place, essential worker status\]
-
-::: {.callout-note icon="false"}
-## Exercise 14
-:::
-
-## Exercise 15
-
-Finally, let's close by training a final model and testing its performance on the test set. Since we are originally more interested in predicting years into the future, let's use our first model where we predicted 2020 breakups from 2017 data.
-
-::: {.callout-note icon="false"}
-## Exercise 15
-
-Retrain `model1` on the full training data set and then evaluate its performance on the test split. Compute accuracy and AUC. In addition, generate a confusion matrix, and an ROC plot.
-:::
 
 ::: callout-important
 This is a good place to save your notebook, render it, and confirm that it looks as you expect.

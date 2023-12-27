@@ -61,3 +61,15 @@ snippet layout
 	::: {layout-nrow={1:rows}}
 	
 	:::
+	
+snippet think
+	::: {.callout-note icon="false"}
+	## Think about it ...
+	
+	:::
+	
+snippet hidden
+	::: {.hidden}
+	
+	:::
+

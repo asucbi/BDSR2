@@ -37,10 +37,12 @@ We want to predict which couples will stay together and which will break up. Fir
 Examine the balance of the classes for the `w2_breakup` variable.
 :::
 
+::: {.hidden}
 ```{r}
 hcmst %>% 
   count(w2_brokeup)
 ```
+:::
 
 ## Exercise 2
 

@@ -31,7 +31,7 @@ rm(`HCMST small public version 2.2`)
 
 ```{r, process-data}
 
-c_vars <- c("w1_ppage", "w1_q9", "w1_q16", "w1_q21a_year", "w1_q21b_year", "w1_q21c_year", "w1_q24_length", "w1_age_when_met", "w1_time_from_met_to_rel", "w1_time_from_rel_to_cohab", "w1_q34", "change_in_rel_quality_w1w2", "w1_outness_timing_all", "w1_relate_duration_in2017_years", "w2_brokeup")
+c_vars <- c("w1_ppage", "w1_q9", "w1_q16", "w1_q21a_year", "w1_q21b_year", "w1_q21c_year", "w1_q24_length", "w1_age_when_met", "w1_time_from_met_to_rel", "w1_time_from_rel_to_cohab", "w1_q34", "change_in_rel_quality_w1w2", "w1_outness_timing_all", "w1_relate_duration_in2017_years")
 
 df <- hcmst %>% 
   as_tibble() %>% 
@@ -39,8 +39,9 @@ df <- hcmst %>%
     w2_brokeup = if_else(w2_relationship_end==1 | w2_relationship_end==2, 1, 0)
   ) %>% 
   drop_na(w2_brokeup) %>% 
-select(w2_brokeup, w1_ppage, w1_ppincimp, w1_q19, w1_pphouse, w1_ppmarit, w1_ppmsacat, w1_ppreg9, w1_pprent, contains("w1_PPT"), w1_PPT18OV, w1_partnership_status_cohab, w1_sex_frequency, w1_otherdate_all, w1_how_many_all, w1_same_sex_couple_gender, w1_q6b, w1_q9, w1_q10, w1_q11, w1_q12, w1_q14, w1_q15a7, w1_q16, w1_q17, w1_attraction, w1_q19, w1_q20, w1_q21a_year, w1_q21b_year, w1_q21c_year, w1_q21d_year, w1_identity_all, w1_outness_all, w1_outness_timing_all, contains("w1_q24_"), w1_q25, w1_q26, w1_q27, w1_friend_connect_1_all, w1_friend_connect_2_all, w1_friend_connect_3_all, w1_q32, w1_q34, w1_married, w1_relate_duration_in2017_years, w1_age_when_met, w1_time_from_met_to_rel, w1_time_from_rel_to_cohab, w1_subject_race, w1_interracial_5cat, w1_partner_yrsed, w1_subject_yrsed, change_in_rel_quality_w1w2, w1_ppp20072, 
-       w2_roommates, w1_q24_met_as_through_cowork, w1_q23, contains("w1_q24"), w1_q19, w1_ppwork, w1_partyid7, w1_q4, w1_ppgender, w2_nonshelter, w2_shelter_combo_months, w2_myhealth, w2_myhealth_why_1, w2_parthealth, w2_parthealth_why_1, w1_subject_yrsed, w1_partner_yrsed) %>% 
+  filter(w1_partnership_status < 3) %>% 
+select(w2_brokeup, w1_ppage, w1_ppincimp, w1_q19, w1_pphouse, w1_ppmarit, w1_ppmsacat, w1_ppreg9, w1_pprent, contains("w1_PPT"), w1_PPT18OV, w1_partnership_status_cohab, w1_sex_frequency, w1_otherdate_all, w1_how_many_all, w1_same_sex_couple_gender, w1_q6b, w1_q9, w1_q10, w1_q11, w1_q12, w1_q14, w1_q15a2, w1_q15a5, w1_q16, w1_q17, w1_attraction, w1_q19, w1_q20, w1_q21a_year, w1_q21b_year, w1_q21c_year, w1_q21d_year, w1_identity_all, w1_outness_all, w1_outness_timing_all, contains("w1_q24_"), w1_q25, w1_q26, w1_q27, w1_friend_connect_1_all, w1_friend_connect_2_all, w1_friend_connect_3_all, w1_q32, w1_q34, w1_married, w1_relate_duration_in2017_years, w1_age_when_met, w1_time_from_met_to_rel, w1_time_from_rel_to_cohab, w1_subject_race, w1_interracial_5cat, w1_partner_yrsed, w1_subject_yrsed, change_in_rel_quality_w1w2, w1_ppp20072, 
+       w2_roommates, w1_q24_met_as_through_cowork, w1_q23, contains("w1_q24"), w1_q19, w1_ppwork, w1_partyid7, w1_q4, w1_ppgender, w2_nonshelter, w2_shelter_combo_months, w2_myhealth, w2_myhealth_why_1, w2_parthealth, w2_parthealth_why_1, w1_subject_yrsed, w1_partner_yrsed, w1_q6b) %>% 
   # replace(is.na(.), -99) %>% 
   mutate_at(
     vars(-c_vars), factor
@@ -48,7 +49,7 @@ select(w2_brokeup, w1_ppage, w1_ppincimp, w1_q19, w1_pphouse, w1_ppmarit, w1_ppm
 
 df_reg <- df %>% 
   select(
-    w2_brokeup, w1_ppage, w1_q9, w1_attraction, w1_q21a_year, w1_q10, w1_q12, w1_q25, w1_q26, w1_partnership_status_cohab, w1_q34, w1_sex_frequency, w1_otherdate_all, w1_same_sex_couple_gender, w1_married, w1_q19, w1_ppincimp, w1_ppwork, w1_partyid7, w1_ppp20072, w1_q17, w1_q16, w1_q10, w1_q12, w1_q32, w1_q26, w1_q25, w1_q23, w1_q4, w1_ppgender, contains("w1_q24_met_through"), w2_nonshelter, w2_shelter_combo_months, w2_myhealth, w2_myhealth_why_1, w2_parthealth, w2_parthealth_why_1, w1_subject_yrsed, w1_partner_yrsed) %>% 
+    w2_brokeup, w1_ppage, w1_q9, w1_attraction, w1_q21a_year, w1_q10, w1_q12, w1_q25, w1_q26, w1_partnership_status_cohab, w1_q34, w1_sex_frequency, w1_otherdate_all, w1_same_sex_couple_gender, w1_married, w1_q19, w1_ppincimp, w1_ppwork, w1_partyid7, w1_ppp20072, w1_q17, w1_q16, w1_q10, w1_q12, w1_q32, w1_q26, w1_q25, w1_q23, w1_q4, w1_ppgender, contains("w1_q24_met_through"), w2_nonshelter, w2_shelter_combo_months, w2_myhealth, w2_myhealth_why_1, w2_parthealth, w2_parthealth_why_1, w1_subject_yrsed, w1_partner_yrsed, w1_subject_race, w1_q6b) %>% 
   rename(
     w1_gender = w1_ppgender,
     w1_rel_qual = w1_q34,
@@ -60,9 +61,10 @@ df_reg <- df %>%
     w1_times_marrid = w1_q17,
     w1_fam_seen_monthly = w1_q16,
     w1_age = w1_ppage,
+    w1_race = w1_subject_race,
     w1_p_gender = w1_q4,
-    w1_p_page = w1_q9,
-    w1_p_race = w1_q16,
+    w1_p_age = w1_q9,
+    w1_p_race = w1_q6b,
     w1_p_edu = w1_q10,
     w1_p_polparty = w1_q12,
     w1_how_met = w1_q32,
@@ -73,7 +75,32 @@ df_reg <- df %>%
     w1_p_yrsed = w1_partner_yrsed
   ) %>% 
   mutate(id = 1:n()) %>% 
-  relocate(id)
+  relocate(id) %>% 
+  mutate(w2_nonshelter = ifelse(is.na(w2_nonshelter), -1, w2_nonshelter)) %>% 
+  select(
+    -w1_p_edu,
+  ) %>% 
+  select(
+    id,
+    w2_brokeup,
+    w1_age,
+    w1_p_age,
+    w1_yrsed,
+    w1_p_yrsed,
+    w1_q21a_year,
+    w1_polparty,
+    w1_p_polparty,
+    w1_fam_seen_monthly,
+    w1_hh_income,
+    w1_cohab,
+    w1_married,
+    w1_race,
+    w1_p_race,
+    w1_rel_qual,
+    w1_sex_frequency,
+    w2_nonshelter, 
+    w2_shelter_combo_months
+  )
 
 
 write_csv(df_reg, "data/hcmst.csv")
@@ -87,6 +114,8 @@ write_csv(df_reg, "data/hcmst.csv")
 ## Split
 
 ```{r}
+
+
 set.seed(123)
 samps <- rbernoulli(nrow(df_reg), .8)
 
@@ -102,7 +131,7 @@ test <- df_reg %>%
 ## Modeling
 
 ```{r}
-fit <- glm(w2_brokeup ~ ., data = train, family="binomial")
+fit <- glm(w2_brokeup ~ ., data = train %>% select(contains("w1_"), w2_brokeup), family="binomial")
 
 1 - mean(train$w2_brokeup - if_else(fitted(fit) > .5, 1, 0))
 1 - mean(test$w2_brokeup - if_else(predict(fit, newdata = test, type = "response") > .5, 1, 0))

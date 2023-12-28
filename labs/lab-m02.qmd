@@ -23,7 +23,7 @@ American regional dialects illustrate the diverse cultural, historical, and soci
 
 ![](../imgs/nyt-dialect-ex.png)
 
-The 10 years ago, the New York Times published the "NYT Dialect Quiz" that asks a series of questions about your use of American english, and from that predicts the location you live and/or grew up. Most of the questions used in the quiz are based on those in the Harvard Dialect Survey, a linguistics project begun in 2002 by Bert Vaux and Scott Golder.
+About 10 years ago, the New York Times published the "NYT Dialect Quiz." The quiz asks a series of questions about your use of American English, and from that predicts the location you live and/or grew up. Most of the questions used in the quiz are based on those in the Harvard Dialect Survey, a linguistics project begun in 2002 by Bert Vaux and Scott Golder.
 
 In this lab, we will build our own predictive model using a subset of the original data from the Harvard Dialect Survey. Our model will output the probability a respondent is from a given state based on the answers to 20 questions about their manner of speaking. 
 
@@ -47,6 +47,8 @@ Then, we'll load in our data.
 
 ```{r}
 # read the other dataset in
+
+survey <- read_csv("data/dialect-survey.csv")
 ```
 
 
@@ -60,23 +62,6 @@ Before we start modeling, let's do some exploratory data analysis on the HDS dat
 Make a map for one item color coding each state by the most common answer.
 :::
 
-:::{.hidden}
-```{r}
-hds %>%
-  filter(item == "pecan") %>%
-  group_by(state) %>%
-  filter(ans_prop == max(ans_prop)) %>%
-  left_join(map_data("state"), by = c("state"="region")) %>% 
-  ggplot(aes(x=long, y = lat, group = group, fill = ans_text, alpha = ans_prop)) +
-  geom_polygon(color = "black") +
-  coord_quickmap() +
-  scale_fill_viridis_d(option = "viridis", guide = "legend") +
-  theme_void() +
-  scale_alpha_continuous() +
-  theme(legend.position = "bottom", legend.direction = "vertical") +
-  labs(fill = "Answer", alpha = "Answer prop.")
-```
-:::
 
 ## Exercise 2
 
@@ -103,15 +88,7 @@ To fix this, we can use a series of joins, including a new type of join you have
 Fix the problem as described in the explanation above. You can overwrite the `hds` dataset when you've got the solution.
 :::
 
-:::{.hidden}
-```{r}
-hds <- hds %>% 
-  distinct(item, ans_ind, ans_text) %>% 
-  cross_join(hds %>% distinct(state)) %>% 
-  left_join(hds)
-```
 
-:::
 
 ## Exercise 4
 
@@ -131,12 +108,14 @@ We can normalize any set of values to sum to one by dividing each by the sum of 
 $$x'_i = \frac{x_i}{\sum_i x_i}$$
 :::
 
+
 ::: {.callout-note icon="false"}
 ## Exercise 4
 There is no 100% principled way to do this. If we had more training and validation data, we might treat the degree of smoothing as a **hyperparameter** we could tune (more on that in later modules). For now, find the minimum observed `ans_prop` and replace the `NA` values with a value 1/10 as large. Then, renormalize the probabilities of the answers to ensure they sum to one for each question and state pair.
 
 You can again overwrite the `hds` dataset when you've got the solution.
 :::
+
 
 ## Exercise 5
 
@@ -145,6 +124,31 @@ Let's grab out one respondent from our validation survey data to experiment on a
 ::: {.callout-note icon="false"}
 ## Exercise 5
 Implement the basic model as shown in lecture to generate predicted probabilities for all 50 states for this one respondent's data. Print the first few lines of  the tibble of predictions.
+:::
+
+::: {.hidden}
+```{r}
+## code borrowed from lecture here
+
+s <- survey %>% 
+  filter(name == "anon166") %>% 
+  select(-state)# replace with me later
+
+res <- left_join(s, hds, by = c("item_num", "ans_ind")) %>% 
+  group_by(state) %>% 
+  summarize(
+    likeli = prod(ans_prop)
+    ) %>%
+  mutate(
+    prior = 1/n(),
+    pdata = sum(likeli*prior),
+    posterior = likeli*prior/pdata
+  )
+
+res
+
+```
+
 :::
 
 ## Exercise 6
@@ -170,6 +174,7 @@ As this makes clearer, the probability of the data $P(d)$ is just the probabilit
 Modify model code to skip explicitly calculating the probability of the data (`pdata` in the lecture code) and instead simply normalize the `likeli*prior` values.
 :::
 
+
 ## Exercise 7
 
 ::: callout-tip
@@ -191,11 +196,13 @@ Further modify the code to perform the computations in log-space. Confirm that t
 :::
 
 
+
 ## Exercise 8
 ::: {.callout-note icon="false"}
 ## Exercise 8
 Make a map of predictions for your own data and see if it makes sense. Did our model predict where you grew up? Where you have lived?
 :::
+
 
 
 ## Exercise 9
@@ -210,8 +217,10 @@ Let's do three things:
 2. Rewrite this code to output only the top predicted state and probability.
 3. Wrap this process up into a function that we can call on to output this for arbitrary data.
 
-Your function should take the following form `nb_predict(input_data)` and should output a tibble with one row per participant. The column `id` should indicate the participant's id, `.pred` should indicate the predicted state, and `.prob` should indicate the probability associated with that state.
+Your function should take the following form `nb_predict(input_data)` and should output a tibble with one row per participant. You can assume that the input data will take the same format (incl. variable names) as the `survey` data. The column `name` should indicate the participant's name, `.pred` should indicate the predicted state, and `.prob` should indicate the probability associated with that state.
 :::
+
+
 
 ## Exercise 10
 
@@ -220,16 +229,44 @@ Your function should take the following form `nb_predict(input_data)` and should
 Compare your predictions to the actual observed values in our survey data. Compute an accuracy metric and compare to chance accuracy (briefly describe).
 :::
 
+
+
+## Exercise 11
+
+Are you impressed by the accuracy score for our model? If not, consider whether guessing the exact state someone is from is really a fair test. If we think about American dialects, many are more regional rather than state-specific, and people have different personal backgrounds that could influence their dialect. For instance, a Wisconsin dialect (and accent) is in many ways similar to a Minnesotan dialect. So if the model guesses "Minnesota" for someone from Wisconsin, is it entirely wrong?
+
+In multi-class classification tasks it is common to measure accuracy in terms of "top-$n$" accuracy. That is, whether the correct class was in the top $n$ most probable classes identified by the model (e.g. top 5, top 10, etc.). This can sometimes offer a more realistic or "fair" assessment.
+
+::: {.callout-note icon="false"}
+## Exercise 11
+
+Write a new function `nb_predict_topN(input_data, N)` that takes an additional argument `N` and outputs the top N classes and their probabilities. The tibble output by the function should include a `.rank` variable indicating the rank of the guess in terms of posterior probability.
+
+Use your new function to compute the top-5 accuracy of the model.
+
+:::
+
 ## BONUS exercise
 
 So far, we have assumed a **uniform prior** over classes (states), calculated as `1/n()`. But we might be able to do better with an **informative prior**. 
 
-One approach would be to estimate a prior empirically from our training dataset---we could use the proportion of respondents from each state as the prior probability a new datapoint would come from that state. Alternatively, in this context, we might recognize that our new survey is not as representative as the training data, and instead is very location-biased, since I administered it to people at ASU. So, we might form a prior based on distance from Arizona. Or, we might combine these ideas.
+One approach would be to estimate a prior empirically from our training dataset---we could use the proportion of respondents from each state as the prior probability a new datapoint would come from that state. Alternatively, in this context, we might suspect that our new survey is not as representative as the training data, and instead might be location-biased, if it was administered primarily to people at ASU. So, we might form a prior based on distance from Arizona. Or, we might combine these ideas.
 
 Let's keep things relatively simple while experimenting with this a bit by forming a prior based on the population of U.S. states. 
 
 ::: {.callout-note icon="false"}
-## Exercise 11 (bonus)
-Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Join that to the original `hds` data and modify your code and functions as needed to include that probability as the prior when making predictions. Rerun the calculations from exercises 8 and 10. Compare what you find with the uniform vs uninformative prior.
+## Exercise 12 (bonus)
+Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Modify your code for `nb_predict_topN` as needed to include that probability as the prior when making predictions. Then, rerun the calculations from exercises 10 and 11 and compare what you find with the uniform vs informative prior.
 :::
+
+
+# Wrapping up
+
+When you are finished, knit your Quarto document to a PDF file.
+
+::: {.callout-important icon="false"}
+**MAKE SURE YOU LOOK OVER THIS FILE CAREFULLY BEFORE SUBMITTING**
+:::
+
+When you are sure it looks good, submit it on Canvas in the appropriate assignment page.
 

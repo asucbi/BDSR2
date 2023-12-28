@@ -1,7 +1,7 @@
 ---
 title: "Module 1 Lab: Election Forcasting"
 author: "Derek Powell"
-bibliography: references.bib
+bibliography: ../references.bib
 editor: source
 ---
 
@@ -38,40 +38,14 @@ We're going to start by predicting election results in 2018 from the results the
 
 Before we can really begin that though, we need to do some ... drum roll please ...
 
-\[![Say the line Bart](imgs/say-the-line-bart.jpg)\]
+\[![Say the line Bart](../imgs/say-the-line-bart.jpg)\]
 
 ## Exercise 1
 
-Our first step will be to set up our data so we can build our models. For each district, we will try to predict the share of votes won by the democratic House candidate. The first and most important predictor will be the democratic vote share from the prior election. Another helpful predictor could be whether or not the candidate is an incumbent.
-
-In American politics, there is a well-known incumbeny advantage---incumbents tend to be favored in elections. There are lots of reasons for this, but at very least they have automatic name recognition and the station of the office with which to represent themselves. And, if things are generally going reasonably well, they have the baseline credibility of having the keys to the Capitol without burning it down.
+Our first step will be to set up our data so we can build our models. For each district, we will try to predict the share of votes won by the democratic House candidate. The first and most important predictor will be the democratic vote share from the prior election(s).
 
 ::: {.callout-note icon="false"}
 ## Exercise 1
-
-Take the `df` data, add a variable called `incumbent` that indicate whether the candidate is an incumbent or not.
-
-::: {.callout-note icon="false" collapse="true"}
-## Hint
-
-There is more than one way to do this, but you will likely want to make use of `group_by()` and a function that might be new called `lag()`. The help can help!
-:::
-:::
-
-```{r}
-df <- congress %>% 
-  arrange(year) %>% 
-  group_by(candidate) %>% 
-  mutate(
-    incumbent = if_else(lag(winner)==1, 1, 0, missing=0),
-    incumbent = if_else(year==2014, NA, incumbent)
-    )
-```
-
-## Exercise 2
-
-::: {.callout-note icon="false"}
-## Exercise 2
 
 Now, do some further data munging of the sort we learned last semester.
 
@@ -80,28 +54,12 @@ Now, do some further data munging of the sort we learned last semester.
 3.  Replace `NA` values for vote proportion and incumbency with zero---if there's not value it's because no one ran and therefore they got zero votes.
 :::
 
-```{r}
-df <- df %>% 
-  ungroup() %>% 
-  filter(party %in% c("D","R")) %>%
-  group_by(year, district) %>% 
-  select(year, state, district, party, prop, incumbent) %>%
-  pivot_wider(
-    id_cols = c(state, district), 
-    names_from = c(party, year), 
-    values_from = c(prop, incumbent), 
-    values_fn = max
-    ) %>% 
-  replace(is.na(.), 0) %>% 
-  ungroup()
-  
-```
 
 ::: callout-warning
 Make sure your `df` is not grouped to avoid unexpected behavior later as you split and add recipes.
 :::
 
-## Exercise 3
+## Exercise 2
 
 With our data ready in our `df` tibble, we can start building a model! Before we do that though, we need to split our data into training and testing splits. We might think more deeply about this in the future, but for now we can use the `tidymodels` default of 75% training 25% testing split.
 
@@ -112,90 +70,48 @@ set.seed(1234)
 ```
 
 ::: {.callout-note icon="false"}
-## Exercise 3
+## Exercise 2
 
 Using `tidymodels`, split the data into training and testing splits called `train` and `test`.
 :::
 
-```{r}
-df_split <- initial_split(df)
-df_split
-```
-
-```{r}
-train <- training(df_split)
-test <- testing(df_split)
-```
 
 Now we'll build our model specification and modeling workflow.
 
+## Exercise 3
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+Create a model specification for linear regression and call it `linear_spec`. Then, create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it `lin_wflow1`.
+:::
+
+
+
 ## Exercise 4
 
 ::: {.callout-note icon="false"}
 ## Exercise 4
-
-Create a model specification for linear regression and call it `linear_spec`.
-:::
-
-```{r}
-linear_spec <- linear_reg()
-```
-
-## Exercise 5
-
-::: {.callout-note icon="false"}
-## Exercise 5
-
-Create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it `lin_wflow1`.
-:::
-
-```{r}
-lin_wflow1 <- workflow(prop_D_2018 ~ prop_D_2016) %>% 
-  add_model(linear_spec)
-  
-```
-
-## Exercise 6
-
-::: {.callout-note icon="false"}
-## Exercise 6
 
 Now fit the model to the `train` data (finally!). Call this `lin_fit1`.
 :::
 
-```{r}
-lin_fit1 <- lin_wflow1 %>% 
-  fit(data = train)
-```
+## Exercise 5
 
-## Exercise 7
-
-Now check the fit on the training data. We will focus on two ways of examining model fit. First, we'll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). SEcond, we'll plot plotting the predicted values against the actual observed values.
+Now check the fit on the training data. We will focus on two ways of examining model fit. First, we'll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). Second, we'll plot plotting the predicted values against the actual observed values.
 
 ::: {.callout-note icon="false"}
-## Exercise 7
+## Exercise 5
 
 Compute predictive metrics for the model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
 :::
 
-```{r}
-lin_fit1 %>% 
-  augment(train) %>% 
-  metrics(prop_D_2018, .pred)
-
-lin_fit1 %>% 
-  augment(train) %>% 
-  ggplot(aes(x = .pred, y = prop_D_2018)) +
-  geom_point() +
-  theme(aspect.ratio = 1)
-```
-
-## Exercise 8
+## Exercise 6
 
 By looking at the predictions against the actual election results, we can see our model's performane is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the "cloud" of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?
 
 ::: {.callout-note icon="false"}
-## Exercise 8
+## Exercise 6
 
 Let's inspect the model's coefficients and see if they offer any clues. Use the `tidy()` function from the `broom` package. What does the intercept represent? Can you see that reflected on the plot above anywhere? Think about this a bit before moving on to the next exercise to see if you can come up with a theory for what is happening. When you've thought it through, you can expand the explanation below.
 
@@ -208,16 +124,12 @@ But whenever a candidate actually runs, they do so because they expect to get at
 :::
 :::
 
-```{r}
-tidy(lin_fit1)
-```
-
-## Exercise 9
+## Exercise 7
 
 We'd like to add a predictor to our dataset to account for this in our model. But, if we are going to add a predictor we will need to add it to our train and test splits. A better way to manage this kind of "feature engineering" is to use a **recipe**.
 
 ::: {.callout-note icon="false"}
-## Exercise 9
+## Exercise 7
 
 Rather than adding a formula to our workflow, instead we'll create a recipe and add that to the workflow. Create a recipe `rec2` that uses a `step_mutate()` to add a recipe step creating a new variable called `prior_uncontested` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. Remember, now the formula goes in the recipe rather than directly into the workflow. The tip below should help.
 
@@ -230,162 +142,75 @@ We can use a `.` in our formula to refer to all other variables. So if we set ou
 If we don't actually want to use all predictors, we can use the function `step_select(..., skip = TRUE)` to select only the subset we want (and to skip this step when predicting from an already-fit model).
 :::
 
-```{r}
-
-rec <- recipe(prop_D_2018 ~ ., train) %>% 
-  step_select(prop_D_2018, prop_D_2016, skip=TRUE) %>%
-  step_mutate(prior_uncontested = if_else(prop_D_2016 == 0, 1, 0)) 
-
-lin_wflow2 <- workflow() %>% 
-  add_recipe(rec) %>% 
-  add_model(linear_spec)
-
-lin_fit2 <- fit(lin_wflow2, data = train)
-```
-
-## Exercise 10
+## Exercise 8
 
 Now let's examine the fit of our new model and compare it to the previous one.
 
 ::: {.callout-note icon="false"}
-## Exercise 10
+## Exercise 8
 
 Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
 
 Have the metrics improved? Focusing on the plot, what do you notice has changed? Does that make sense?
 :::
 
-```{r}
-lin_fit2 %>% 
-  augment(train) %>% 
-  metrics(prop_D_2018, .pred)
-
-lin_fit2 %>% 
-  augment(train) %>% 
-  ggplot(aes(x = .pred, y = prop_D_2018)) +
-  geom_point() +
-  theme(aspect.ratio = 1)
-```
-
-## Exercise 11
+## Exercise 9
 
 Now let's try creating some new model specifications that use more predictors. We'll add everything we legitimately can, so all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent.
 
 ::: {.callout-note icon="false"}
-## Exercise 11
+## Exercise 9
 
 Create a new recipe, workflow specification, and fitted model using all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent. Call the relevant workflow, recipe, and models number 3 (e.g. `lin_fit3`).
 :::
 
-```{r}
-
-rec3 <- recipe(prop_D_2018 ~ ., train) %>% 
-  step_select(prop_D_2018, prop_D_2016, prop_D_2014, incumbent_D_2016, incumbent_D_2018, skip = TRUE) %>%
-  step_mutate(prior_uncontested = if_else(prop_D_2016 == 0, 1, 0)) 
-
-lin_wflow3 <- workflow() %>% 
-  add_recipe(rec3) %>% 
-  add_model(linear_spec)
-
-lin_fit3 <- lin_wflow3 %>% 
-  fit(data = train)
-```
-
-## Exercise 12
+## Exercise 10
 
 ::: {.callout-note icon="false"}
-## Exercise 12
+## Exercise 10
 
-Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
+Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot the predicted values against the actual observed values.
 
 Have the metrics improved? Which of the three models we've fit seems best?
 :::
 
-```{r}
-lin_fit3 %>% 
-  augment(train) %>% 
-  metrics(prop_D_2018, .pred)
 
-lin_fit3 %>% 
-  augment(train) %>% 
-  ggplot(aes(x = .pred, y = prop_D_2018)) +
-  geom_point() +
-  theme(aspect.ratio = 1)
-```
-
-## Exercise 13
+## Exercise 11
 
 ::: {.callout-note icon="false"}
-## Exercise 13
+## Exercise 11
 
 Now compute the metrics for each of the models when predicting the `test` data. How do the metrics compare? Which of the three models seems best?
 
 If the metrics are different, why is that?
 :::
 
-```{r}
-lin_fit1 %>% 
-  augment(test) %>% 
-  metrics(prop_D_2018, .pred)
 
-lin_fit2 %>% 
-  augment(test) %>% 
-  metrics(prop_D_2018, .pred)
-
-lin_fit3 %>% 
-  augment(test) %>% 
-  metrics(prop_D_2018, .pred)
-```
-
-## Exercise 14
+## Exercise 12
 
 But wait, how would we actually use data or a model like this? Let's take ourselves back to 2019---the federal government was shutting down, Felicity Huffman was in prison, "Old Town Road" was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data.
 
 To reuse our model, we will cheat and rename our variables so that the model can generate predictions for 2020 using the 2018 data in place of the 2016 data and the 2016 data in place of the 2014 data.
 
 ::: {.callout-note icon="false"}
-## Exercise 14
+## Exercise 12
 
 Create a new dataset `test2020` based off of `test` where variables are constructed like so:
 
 -   `*_D_2018` --\> `_D_2016`
 -   `*_D_2016` --\> `_D_2014`
--   `incumbent_D_2020` --\> `incumbent_D_2018`
 :::
 
-```{r}
-test2020 <-  test %>% 
-  mutate(
-    prop_D_2014 = prop_D_2016,
-    prop_D_2016 = prop_D_2018,
-    incumbent_D_2016 = incumbent_D_2018,
-    incumbent_D_2018 = incumbent_D_2020
-  )
-```
-
-## Exercise 15
+## Exercise 13
 
 ::: {.callout-note icon="false"}
-## Exercise 15
+## Exercise 13
 
 Now compute the metrics against the real election results in 2020. How well would such a model do?
 
 Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating predictions this way.
 :::
 
-```{r}
-lin_fit1 %>% 
-  augment(test2020) %>% 
-  metrics(prop_D_2020, .pred)
-
-lin_fit2 %>% 
-  augment(test2020) %>% 
-  metrics(prop_D_2020, .pred)
-
-lin_fit3 %>% 
-  augment(test2020) %>% 
-  metrics(prop_D_2020, .pred)
-```
 
 # Wrapping up
 

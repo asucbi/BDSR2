@@ -121,8 +121,6 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
   <li><a href="#exercise-11" id="toc-exercise-11" class="nav-link" data-scroll-target="#exercise-11">Exercise 11</a></li>
   <li><a href="#exercise-12" id="toc-exercise-12" class="nav-link" data-scroll-target="#exercise-12">Exercise 12</a></li>
   <li><a href="#exercise-13" id="toc-exercise-13" class="nav-link" data-scroll-target="#exercise-13">Exercise 13</a></li>
-  <li><a href="#exercise-14" id="toc-exercise-14" class="nav-link" data-scroll-target="#exercise-14">Exercise 14</a></li>
-  <li><a href="#exercise-15" id="toc-exercise-15" class="nav-link" data-scroll-target="#exercise-15">Exercise 15</a></li>
   </ul></li>
   <li><a href="#wrapping-up" id="toc-wrapping-up" class="nav-link" data-scroll-target="#wrapping-up">Wrapping up</a></li>
   </ul>
@@ -182,7 +180,7 @@ Learning Objectives
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(broom)</span>
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>congress <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"../data/congress.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>congress <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/congress.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercises" class="level1">
@@ -192,8 +190,7 @@ Learning Objectives
 <p>[<img src="../imgs/say-the-line-bart.jpg" class="img-fluid" alt="Say the line Bart">]</p>
 <section id="exercise-1" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-1">Exercise 1</h2>
-<p>Our first step will be to set up our data so we can build our models. For each district, we will try to predict the share of votes won by the democratic House candidate. The first and most important predictor will be the democratic vote share from the prior election. Another helpful predictor could be whether or not the candidate is an incumbent.</p>
-<p>In American politics, there is a well-known incumbeny advantage—incumbents tend to be favored in elections. There are lots of reasons for this, but at very least they have automatic name recognition and the station of the office with which to represent themselves. And, if things are generally going reasonably well, they have the baseline credibility of having the keys to the Capitol without burning it down.</p>
+<p>Our first step will be to set up our data so we can build our models. For each district, we will try to predict the share of votes won by the democratic House candidate. The first and most important predictor will be the democratic vote share from the prior election(s).</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -204,47 +201,6 @@ Exercise 1
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Take the <code>df</code> data, add a variable called <code>incumbent</code> that indicate whether the candidate is an incumbent or not.</p>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Hint
-</div>
-<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
-</div>
-<div id="callout-2" class="callout-2-contents callout-collapse collapse">
-<div class="callout-body-container callout-body">
-<p>There is more than one way to do this, but you will likely want to make use of <code>group_by()</code> and a function that might be new called <code>lag()</code>. The help can help!</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> congress <span class="sc">%&gt;%</span> </span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(year) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(candidate) <span class="sc">%&gt;%</span> </span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">incumbent =</span> <span class="fu">if_else</span>(<span class="fu">lag</span>(winner)<span class="sc">==</span><span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="at">missing=</span><span class="dv">0</span>),</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">incumbent =</span> <span class="fu">if_else</span>(year<span class="sc">==</span><span class="dv">2014</span>, <span class="cn">NA</span>, incumbent)</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="exercise-2" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 2
-</div>
-</div>
-<div class="callout-body-container callout-body">
 <p>Now, do some further data munging of the sort we learned last semester.</p>
 <ol type="1">
 <li>Filter <code>df</code> to include only the rows for Democrat and Republican candidates</li>
@@ -252,21 +208,6 @@ Exercise 2
 <li>Replace <code>NA</code> values for vote proportion and incumbency with zero—if there’s not value it’s because no one ran and therefore they got zero votes.</li>
 </ol>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> df <span class="sc">%&gt;%</span> </span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(party <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"D"</span>,<span class="st">"R"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(year, district) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(year, state, district, party, prop, incumbent) <span class="sc">%&gt;%</span></span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols =</span> <span class="fu">c</span>(state, district), </span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from =</span> <span class="fu">c</span>(party, year), </span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(prop, incumbent), </span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_fn =</span> max</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">replace</span>(<span class="fu">is.na</span>(.), <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="callout-warning callout callout-style-default callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -282,13 +223,30 @@ Warning
 </div>
 </div>
 </section>
-<section id="exercise-3" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
+<section id="exercise-2" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
 <p>With our data ready in our <code>df</code> tibble, we can start building a model! Before we do that though, we need to split our data into training and testing splits. We might think more deeply about this in the future, but for now we can use the <code>tidymodels</code> default of 75% training 25% testing split.</p>
 <p>Before splitting your data, set your random seed so that your results will match the answer key.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Using <code>tidymodels</code>, split the data into training and testing splits called <code>train</code> and <code>test</code>.</p>
+</div>
+</div>
+<p>Now we’ll build our model specification and modeling workflow.</p>
+</section>
+<section id="exercise-3" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -299,22 +257,9 @@ Exercise 3
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Using <code>tidymodels</code>, split the data into training and testing splits called <code>train</code> and <code>test</code>.</p>
+<p>Create a model specification for linear regression and call it <code>linear_spec</code>. Then, create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it <code>lin_wflow1</code>.</p>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>df_split <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(df)</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>df_split</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>&lt;Training/Testing/Total&gt;
-&lt;335/112/447&gt;</code></pre>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>train <span class="ot">&lt;-</span> <span class="fu">training</span>(df_split)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>test <span class="ot">&lt;-</span> <span class="fu">testing</span>(df_split)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-<p>Now we’ll build our model specification and modeling workflow.</p>
 </section>
 <section id="exercise-4" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-4">Exercise 4</h2>
@@ -328,15 +273,13 @@ Exercise 4
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Create a model specification for linear regression and call it <code>linear_spec</code>.</p>
+<p>Now fit the model to the <code>train</code> data (finally!). Call this <code>lin_fit1</code>.</p>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>linear_spec <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercise-5" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-5">Exercise 5</h2>
+<p>Now check the fit on the training data. We will focus on two ways of examining model fit. First, we’ll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). Second, we’ll plot plotting the predicted values against the actual observed values.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -347,16 +290,13 @@ Exercise 5
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Create a workflow for our model with the appropriate formula to predict the proportion of democratic votes in 2018 from the proportion in 2016. Call it <code>lin_wflow1</code>.</p>
+<p>Compute predictive metrics for the model on our training data using <code>metrics()</code>. Then, plot plotting the predicted values against the actual observed values.</p>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>lin_wflow1 <span class="ot">&lt;-</span> <span class="fu">workflow</span>(prop_D_2018 <span class="sc">~</span> prop_D_2016) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(linear_spec)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercise-6" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-6">Exercise 6</h2>
+<p>By looking at the predictions against the actual election results, we can see our model’s performane is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the “cloud” of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -367,68 +307,9 @@ Exercise 6
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Now fit the model to the <code>train</code> data (finally!). Call this <code>lin_fit1</code>.</p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>lin_fit1 <span class="ot">&lt;-</span> lin_wflow1 <span class="sc">%&gt;%</span> </span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="exercise-7" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
-<p>Now check the fit on the training data. We will focus on two ways of examining model fit. First, we’ll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). SEcond, we’ll plot plotting the predicted values against the actual observed values.</p>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 7
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Compute predictive metrics for the model on our training data using <code>metrics()</code>. Then, plot plotting the predicted values against the actual observed values.</p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>lin_fit1 <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(train) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2018, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      0.153 
-2 rsq     standard      0.569 
-3 mae     standard      0.0888</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>lin_fit1 <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(train) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .pred, <span class="at">y =</span> prop_D_2018)) <span class="sc">+</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="lab-m01_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
-</div>
-</div>
-</section>
-<section id="exercise-8" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-8">Exercise 8</h2>
-<p>By looking at the predictions against the actual election results, we can see our model’s performane is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the “cloud” of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?</p>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 8
-</div>
-</div>
-<div class="callout-body-container callout-body">
 <p>Let’s inspect the model’s coefficients and see if they offer any clues. Use the <code>tidy()</code> function from the <code>broom</code> package. What does the intercept represent? Can you see that reflected on the plot above anywhere? Think about this a bit before moving on to the next exercise to see if you can come up with a theory for what is happening. When you’ve thought it through, you can expand the explanation below.</p>
 <div class="callout-warning callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-11-contents" aria-controls="callout-11" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-8-contents" aria-controls="callout-8" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
 <i class="callout-icon no-icon"></i>
 </div>
@@ -437,7 +318,7 @@ Explanation
 </div>
 <div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
 </div>
-<div id="callout-11" class="callout-11-contents callout-collapse collapse">
+<div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
 <p>Of course the intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot—so that’s a clue there are actually data points in our data with a proportion of zero. These are <em>uncontested</em> elections where there was no Democratic party candidate.</p>
 <p>But whenever a candidate actually runs, they do so because they expect to get at least some share of the vote—more than 21% at least.</p>
@@ -446,19 +327,9 @@ Explanation
 </div>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(lin_fit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 5
-  term        estimate std.error statistic  p.value
-  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
-1 (Intercept)    0.194    0.0170      11.4 1.00e-25
-2 prop_D_2016    0.696    0.0332      21.0 7.74e-63</code></pre>
-</div>
-</div>
 </section>
-<section id="exercise-9" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-9">Exercise 9</h2>
+<section id="exercise-7" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
 <p>We’d like to add a predictor to our dataset to account for this in our model. But, if we are going to add a predictor we will need to add it to our train and test splits. A better way to manage this kind of “feature engineering” is to use a <strong>recipe</strong>.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -466,7 +337,7 @@ Explanation
 <i class="callout-icon no-icon"></i>
 </div>
 <div class="callout-caption-container flex-fill">
-Exercise 9
+Exercise 7
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -488,21 +359,44 @@ Tip
 <p>If we don’t actually want to use all predictors, we can use the function <code>step_select(..., skip = TRUE)</code> to select only the subset we want (and to skip this step when predicting from an already-fit model).</p>
 </div>
 </div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(prop_D_2018 <span class="sc">~</span> ., train) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_select</span>(prop_D_2018, prop_D_2016, <span class="at">skip=</span><span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">prior_uncontested =</span> <span class="fu">if_else</span>(prop_D_2016 <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)) </span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>lin_wflow2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span> </span>
-<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(linear_spec)</span>
-<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>lin_fit2 <span class="ot">&lt;-</span> <span class="fu">fit</span>(lin_wflow2, <span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="exercise-8" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-8">Exercise 8</h2>
+<p>Now let’s examine the fit of our new model and compare it to the previous one.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Compute predictive metrics for the new model on our training data using <code>metrics()</code>. Then, plot plotting the predicted values against the actual observed values.</p>
+<p>Have the metrics improved? Focusing on the plot, what do you notice has changed? Does that make sense?</p>
+</div>
+</div>
+</section>
+<section id="exercise-9" class="level2">
+<h2 class="anchored" data-anchor-id="exercise-9">Exercise 9</h2>
+<p>Now let’s try creating some new model specifications that use more predictors. We’ll add everything we legitimately can, so all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent.</p>
+<div class="callout-note callout callout-style-default no-icon callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Exercise 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Create a new recipe, workflow specification, and fitted model using all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent. Call the relevant workflow, recipe, and models number 3 (e.g.&nbsp;<code>lin_fit3</code>).</p>
+</div>
 </div>
 </section>
 <section id="exercise-10" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-10">Exercise 10</h2>
-<p>Now let’s examine the fit of our new model and compare it to the previous one.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -513,35 +407,13 @@ Exercise 10
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Compute predictive metrics for the new model on our training data using <code>metrics()</code>. Then, plot plotting the predicted values against the actual observed values.</p>
-<p>Have the metrics improved? Focusing on the plot, what do you notice has changed? Does that make sense?</p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>lin_fit2 <span class="sc">%&gt;%</span> </span>
-<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(train) <span class="sc">%&gt;%</span> </span>
-<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2018, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      0.149 
-2 rsq     standard      0.588 
-3 mae     standard      0.0837</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>lin_fit2 <span class="sc">%&gt;%</span> </span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(train) <span class="sc">%&gt;%</span> </span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .pred, <span class="at">y =</span> prop_D_2018)) <span class="sc">+</span></span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="lab-m01_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid" width="672"></p>
+<p>Compute predictive metrics for the new model on our training data using <code>metrics()</code>. Then, plot the predicted values against the actual observed values.</p>
+<p>Have the metrics improved? Which of the three models we’ve fit seems best?</p>
 </div>
 </div>
 </section>
 <section id="exercise-11" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-11">Exercise 11</h2>
-<p>Now let’s try creating some new model specifications that use more predictors. We’ll add everything we legitimately can, so all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -552,24 +424,15 @@ Exercise 11
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Create a new recipe, workflow specification, and fitted model using all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent. Call the relevant workflow, recipe, and models number 3 (e.g.&nbsp;<code>lin_fit3</code>).</p>
+<p>Now compute the metrics for each of the models when predicting the <code>test</code> data. How do the metrics compare? Which of the three models seems best?</p>
+<p>If the metrics are different, why is that?</p>
 </div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>rec3 <span class="ot">&lt;-</span> <span class="fu">recipe</span>(prop_D_2018 <span class="sc">~</span> ., train) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_select</span>(prop_D_2018, prop_D_2016, prop_D_2014, incumbent_D_2016, incumbent_D_2018, <span class="at">skip =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">step_mutate</span>(<span class="at">prior_uncontested =</span> <span class="fu">if_else</span>(prop_D_2016 <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)) </span>
-<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>lin_wflow3 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec3) <span class="sc">%&gt;%</span> </span>
-<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(linear_spec)</span>
-<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>lin_fit3 <span class="ot">&lt;-</span> lin_wflow3 <span class="sc">%&gt;%</span> </span>
-<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="exercise-12" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-12">Exercise 12</h2>
+<p>But wait, how would we actually use data or a model like this? Let’s take ourselves back to 2019—the federal government was shutting down, Felicity Huffman was in prison, “Old Town Road” was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data.</p>
+<p>To reuse our model, we will cheat and rename our variables so that the model can generate predictions for 2020 using the 2018 data in place of the 2016 data and the 2016 data in place of the 2014 data.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -580,29 +443,11 @@ Exercise 12
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Compute predictive metrics for the new model on our training data using <code>metrics()</code>. Then, plot plotting the predicted values against the actual observed values.</p>
-<p>Have the metrics improved? Which of the three models we’ve fit seems best?</p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>lin_fit3 <span class="sc">%&gt;%</span> </span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(train) <span class="sc">%&gt;%</span> </span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2018, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      0.132 
-2 rsq     standard      0.677 
-3 mae     standard      0.0898</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>lin_fit3 <span class="sc">%&gt;%</span> </span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(train) <span class="sc">%&gt;%</span> </span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> .pred, <span class="at">y =</span> prop_D_2018)) <span class="sc">+</span></span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio =</span> <span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<p><img src="lab-m01_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid" width="672"></p>
+<p>Create a new dataset <code>test2020</code> based off of <code>test</code> where variables are constructed like so:</p>
+<ul>
+<li><code>*_D_2018</code> –&gt; <code>_D_2016</code></li>
+<li><code>*_D_2016</code> –&gt; <code>_D_2014</code></li>
+</ul>
 </div>
 </div>
 </section>
@@ -618,127 +463,8 @@ Exercise 13
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Now compute the metrics for each of the models when predicting the <code>test</code> data. How do the metrics compare? Which of the three models seems best?</p>
-<p>If the metrics are different, why is that?</p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>lin_fit1 <span class="sc">%&gt;%</span> </span>
-<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
-<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2018, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      0.166 
-2 rsq     standard      0.479 
-3 mae     standard      0.0995</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>lin_fit2 <span class="sc">%&gt;%</span> </span>
-<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
-<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2018, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      0.156 
-2 rsq     standard      0.537 
-3 mae     standard      0.0890</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>lin_fit3 <span class="sc">%&gt;%</span> </span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2018, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard      0.138 
-2 rsq     standard      0.635 
-3 mae     standard      0.0896</code></pre>
-</div>
-</div>
-</section>
-<section id="exercise-14" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-14">Exercise 14</h2>
-<p>But wait, how would we actually use data or a model like this? Let’s take ourselves back to 2019—the federal government was shutting down, Felicity Huffman was in prison, “Old Town Road” was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data.</p>
-<p>To reuse our model, we will cheat and rename our variables so that the model can generate predictions for 2020 using the 2018 data in place of the 2016 data and the 2016 data in place of the 2014 data.</p>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 14
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Create a new dataset <code>test2020</code> based off of <code>test</code> where variables are constructed like so:</p>
-<ul>
-<li><code>*_D_2018</code> –&gt; <code>_D_2016</code></li>
-<li><code>*_D_2016</code> –&gt; <code>_D_2014</code></li>
-<li><code>incumbent_D_2020</code> –&gt; <code>incumbent_D_2018</code></li>
-</ul>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>test2020 <span class="ot">&lt;-</span>  test <span class="sc">%&gt;%</span> </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">prop_D_2014 =</span> prop_D_2016,</span>
-<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">prop_D_2016 =</span> prop_D_2018,</span>
-<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">incumbent_D_2016 =</span> incumbent_D_2018,</span>
-<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">incumbent_D_2018 =</span> incumbent_D_2020</span>
-<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="exercise-15" class="level2">
-<h2 class="anchored" data-anchor-id="exercise-15">Exercise 15</h2>
-<div class="callout-note callout callout-style-default no-icon callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon no-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Exercise 15
-</div>
-</div>
-<div class="callout-body-container callout-body">
 <p>Now compute the metrics against the real election results in 2020. How well would such a model do?</p>
 <p>Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating predictions this way.</p>
-</div>
-</div>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>lin_fit1 <span class="sc">%&gt;%</span> </span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(test2020) <span class="sc">%&gt;%</span> </span>
-<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2020, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard       0.182
-2 rsq     standard       0.569
-3 mae     standard       0.113</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>lin_fit2 <span class="sc">%&gt;%</span> </span>
-<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(test2020) <span class="sc">%&gt;%</span> </span>
-<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2020, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard       0.179
-2 rsq     standard       0.584
-3 mae     standard       0.107</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>lin_fit3 <span class="sc">%&gt;%</span> </span>
-<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(test2020) <span class="sc">%&gt;%</span> </span>
-<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(prop_D_2020, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 3 × 3
-  .metric .estimator .estimate
-  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
-1 rmse    standard       0.160
-2 rsq     standard       0.666
-3 mae     standard       0.112</code></pre>
 </div>
 </div>
 </section>

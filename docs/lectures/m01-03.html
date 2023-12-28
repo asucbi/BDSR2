@@ -86,25 +86,6 @@
     code span.va { color: #111111; } /* Variable */
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
-    div.csl-bib-body { }
-    div.csl-entry {
-      clear: both;
-    }
-    .hanging div.csl-entry {
-      margin-left:2em;
-      text-indent:-2em;
-    }
-    div.csl-left-margin {
-      min-width:2em;
-      float:left;
-    }
-    div.csl-right-inline {
-      margin-left:2em;
-      padding-left:1em;
-    }
-    div.csl-indent {
-      margin-left: 2em;
-    }
   </style>
   <link rel="stylesheet" href="m01-03_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link rel="stylesheet" href="style.css">
@@ -396,9 +377,6 @@
       margin-right: 0; 
     }
   </style>
-  <script src="m01-03_files/libs/quarto-diagram/mermaid.min.js"></script>
-  <script src="m01-03_files/libs/quarto-diagram/mermaid-init.js"></script>
-  <link href="m01-03_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -412,17 +390,38 @@
 <section id="machine-learning-the-basic-idea" class="slide level2">
 <h2>Machine learning: The basic idea</h2>
 <div class="center">
-<div class="cell" data-reveal="true" data-fig-width="9.5">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-1">flowchart LR
-  A[(Data)] -- used to make --&gt; B[Model] -- used to make --&gt; C{{Predictions}}
-</pre>
-<div id="mermaid-tooltip-1" class="mermaidTooltip">
-
+<svg viewbox="0 0 525.09375 70.79945373535156" height="123" aria-labelledby="chart-title-mermaid-1703783088844 chart-desc-mermaid-1703783088844" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="912" id="mermaid-figure-1" style=" display: block; margin: auto auto auto auto">
+<title id="chart-title-mermaid-1703783088844">
+</title>
+<desc id="chart-desc-mermaid-1703783088844"></desc>
+<style>#mermaid-figure-1 {font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-figure-1 .error-icon{fill:#552222;}#mermaid-figure-1 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-1 .edge-thickness-normal{stroke-width:2px;}#mermaid-figure-1 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-1 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-1 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-1 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-1 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-1 .marker.cross{stroke:#333333;}#mermaid-figure-1 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-1 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-1 .cluster-label text{fill:#333;}#mermaid-figure-1 .cluster-label span{color:#333;}#mermaid-figure-1 .label text,#mermaid-figure-1 span{fill:#333;color:#333;}#mermaid-figure-1 .node rect,#mermaid-figure-1 .node circle,#mermaid-figure-1 .node ellipse,#mermaid-figure-1 .node polygon,#mermaid-figure-1 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-1 .node .label{text-align:center;}#mermaid-figure-1 .node.clickable{cursor:pointer;}#mermaid-figure-1 .arrowheadPath{fill:#333333;}#mermaid-figure-1 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-1 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-1 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-figure-1 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-figure-1 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-1 .cluster text{fill:#333;}#mermaid-figure-1 .cluster span{color:#333;}#mermaid-figure-1 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-1 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style>
+<g transform="translate(0, 0.0000019073486328125)"><marker orient="auto" markerheight="12" markerwidth="12" markerunits="userSpaceOnUse" refy="5" refx="9" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-pointEnd"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker><marker orient="auto" markerheight="12" markerwidth="12" markerunits="userSpaceOnUse" refy="5" refx="0" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-pointStart"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 5 L 10 10 L 10 0 z"></path></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5" refx="11" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-circleEnd"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5" refx="-1" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-circleStart"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5.2" refx="12" viewbox="0 0 11 11" class="marker cross flowchart" id="flowchart-crossEnd"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5.2" refx="-1" viewbox="0 0 11 11" class="marker cross flowchart" id="flowchart-crossStart"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-B" id="L-A-B-0" d="M55.96875,35.39972686767578L68.12890625,35.39972686767578C80.2890625,35.39972686767578,104.609375,35.39972686767578,128.9296875,35.39972686767578C153.25,35.39972686767578,177.5703125,35.39972686767578,189.73046875,35.39972686767578L201.890625,35.39972686767578"></path><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-B LE-C" id="L-B-C-0" d="M259.1875,35.39972686767578L271.34765625,35.39972686767578C283.5078125,35.39972686767578,307.828125,35.39972686767578,332.2317708333333,35.48306020100912C356.6354166666667,35.566393534342446,381.1223958333333,35.73306020100912,393.3658854166667,35.816393534342446L405.609375,35.89972686767578"></path></g><g class="edgeLabels"><g transform="translate(128.9296875, 35.39972686767578)" class="edgeLabel"><g transform="translate(-47.9609375, -9.5)" class="label"><foreignobject height="19" width="95.921875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="edgeLabel">used to make</span>
 </div>
-<p></p>
+</foreignobject></g></g><g transform="translate(332.1484375, 35.39972686767578)" class="edgeLabel"><g transform="translate(-47.9609375, -9.5)" class="label"><foreignobject height="19" width="95.921875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="edgeLabel">used to make</span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g transform="translate(31.984375, 35.39972686767578)" id="flowchart-A-3" class="node default default"><path transform="translate(-23.984375,-27.399728997289973)" d="M 0,6.933152664859982 a 23.984375,6.933152664859982 0,0,0 47.96875 0 a 23.984375,6.933152664859982 0,0,0 -47.96875 0 l 0,40.93315266485998 a 23.984375,6.933152664859982 0,0,0 47.96875 0 l 0,-40.93315266485998" style=""></path><g transform="translate(-16.484375, -9.5)" style="" class="label"><foreignobject height="19" width="32.96875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">Data</span>
+</div>
+</foreignobject></g></g><g transform="translate(230.5390625, 35.39972686767578)" id="flowchart-B-4" class="node default default"><rect height="34" width="57.296875" y="-17" x="-28.6484375" ry="0" rx="0" style="" class="basic label-container"></rect><g transform="translate(-21.1484375, -9.5)" style="" class="label"><foreignobject height="19" width="42.296875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">Model</span>
+</div>
+</foreignobject></g></g><g transform="translate(461.1015625, 35.39972686767578)" id="flowchart-C-5" class="node default default"><polygon style="" transform="translate(-55.9921875,17)" class="label-container" points="8.5,0 103.484375,0 111.984375,-17 103.484375,-34 8.5,-34 0,-17"></polygon><g transform="translate(-39.9921875, -9.5)" style="" class="label"><foreignobject height="19" width="79.984375">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">Predictions</span>
+</div>
+</foreignobject></g></g></g></g></g>
+</svg>
+</p>
 </div>
 </div>
 </div>
@@ -455,23 +454,18 @@
 </div>
 </div>
 <p>Using some for <strong>Training</strong> and some for <strong>Testing</strong>:</p>
-<div class="cell" data-reveal="true">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-2">%%{init: {"flowchart": {"htmlLabels": false}} }%%
-graph LR
-  d[(Data)] --&gt; split([Split]) --&gt; trainSplit[(Training)]
-  split --&gt; testSplit[(Testing)]
-  trainSplit --&gt; model[Model]
-  model --&gt; val{{Final Validation}}
-  testSplit  ---&gt; val
-  
-</pre>
-<div id="mermaid-tooltip-2" class="mermaidTooltip">
-
-</div>
-<p></p>
+<svg viewbox="0 -0.000003814697265625 623.234375 199.39797973632812" height="199" aria-labelledby="chart-title-mermaid-1703783089743 chart-desc-mermaid-1703783089743" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="623" id="mermaid-figure-5" style=" display: block; margin: auto auto auto auto">
+<title id="chart-title-mermaid-1703783089743">
+</title>
+<desc id="chart-desc-mermaid-1703783089743"></desc>
+<style>#mermaid-figure-5 {font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-figure-5 .error-icon{fill:#552222;}#mermaid-figure-5 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-5 .edge-thickness-normal{stroke-width:2px;}#mermaid-figure-5 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-5 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-5 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-5 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-5 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-5 .marker.cross{stroke:#333333;}#mermaid-figure-5 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-5 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-5 .cluster-label text{fill:#333;}#mermaid-figure-5 .cluster-label span{color:#333;}#mermaid-figure-5 .label text,#mermaid-figure-5 span{fill:#333;color:#333;}#mermaid-figure-5 .node rect,#mermaid-figure-5 .node circle,#mermaid-figure-5 .node ellipse,#mermaid-figure-5 .node polygon,#mermaid-figure-5 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-5 .node .label{text-align:center;}#mermaid-figure-5 .node.clickable{cursor:pointer;}#mermaid-figure-5 .arrowheadPath{fill:#333333;}#mermaid-figure-5 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-5 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-5 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-figure-5 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-figure-5 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-5 .cluster text{fill:#333;}#mermaid-figure-5 .cluster span{color:#333;}#mermaid-figure-5 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-5 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style>
+<g><g class="output"><g class="clusters"></g><g class="edgePaths"><g style="opacity: 1;" id="L-d-split" class="edgePath LS-d LE-split"><path style="fill:none" marker-end="url(#mermaid-figure-5-arrowhead26)" d="M60.96875,100.07217025756836L65.13541666666667,100.07217025756836C69.30208333333333,100.07217025756836,77.63541666666667,100.07217025756836,85.96875,100.07217025756836C94.30208333333333,100.07217025756836,102.63541666666667,100.07217025756836,106.80208333333333,100.07217025756836L110.96875,100.07217025756836" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-5-arrowhead26"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-split-trainSplit" class="edgePath LS-split LE-trainSplit"><path style="fill:none" marker-end="url(#mermaid-figure-5-arrowhead27)" d="M160.35012101848994,80.82217025756836L166.59645501540828,74.3055871327718C172.84278901232665,67.78900400797527,185.33545700616332,54.755837758382164,195.74845766974832,48.23925463358561C206.16145833333334,41.72267150878906,214.49479166666666,41.72267150878906,218.66145833333334,41.72267150878906L222.828125,41.72267150878906" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-5-arrowhead27"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-split-testSplit" class="edgePath LS-split LE-testSplit"><path style="fill:none" marker-end="url(#mermaid-figure-5-arrowhead28)" d="M160.35012101848994,119.32217025756836L166.59645501540828,125.83875338236491C172.84278901232665,132.35533650716147,185.33545700616332,145.38850275675455,196.28100975308166,151.90508588155112C207.2265625,158.42166900634766,216.625,158.42166900634766,221.32421875,158.42166900634766L226.0234375,158.42166900634766" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-5-arrowhead28"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-trainSplit-model" class="edgePath LS-trainSplit LE-model"><path style="fill:none" marker-end="url(#mermaid-figure-5-arrowhead29)" d="M301.390625,41.72267150878906L305.5572916666667,41.72267150878906C309.7239583333333,41.72267150878906,318.0572916666667,41.72267150878906,326.390625,41.72267150878906C334.7239583333333,41.72267150878906,343.0572916666667,41.72267150878906,347.2239583333333,41.72267150878906L351.390625,41.72267150878906" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-5-arrowhead29"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-model-val" class="edgePath LS-model LE-val"><path style="fill:none" marker-end="url(#mermaid-figure-5-arrowhead30)" d="M413.6875,41.72267150878906L417.8541666666667,41.72267150878906C422.0208333333333,41.72267150878906,430.3541666666667,41.72267150878906,445.8587360515318,48.322587966918945C461.363305436397,54.92250442504883,484.039110872794,68.1223373413086,495.3770135909925,74.72225379943848L506.714916309191,81.32217025756836" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-5-arrowhead30"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-testSplit-val" class="edgePath LS-testSplit LE-val"><path style="fill:none" marker-end="url(#mermaid-figure-5-arrowhead31)" d="M298.1953125,158.42166900634766L302.89453125,158.42166900634766C307.59375,158.42166900634766,316.9921875,158.42166900634766,331.0494791666667,158.42166900634766C345.1067708333333,158.42166900634766,363.8229166666667,158.42166900634766,382.5390625,158.42166900634766C401.2552083333333,158.42166900634766,419.9713541666667,158.42166900634766,440.6673298015318,151.98841921488443C461.363305436397,145.55516942342123,484.039110872794,132.68866984049478,495.3770135909925,126.25542004903157L506.714916309191,119.82217025756836" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-5-arrowhead31"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g></g><g class="edgeLabels"><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><text><tspan x="1" dy="1em" space="preserve"></tspan></text></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><text><tspan x="1" dy="1em" space="preserve"></tspan></text></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><text><tspan x="1" dy="1em" space="preserve"></tspan></text></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><text><tspan x="1" dy="1em" space="preserve"></tspan></text></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><text><tspan x="1" dy="1em" space="preserve"></tspan></text></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><text><tspan x="1" dy="1em" space="preserve"></tspan></text></g></g></g><g class="nodes"><g style="opacity: 1;" transform="translate(34.484375,100.07217025756836)" id="flowchart-d-11" class="node default"><path class="label-container" transform="translate(-26.484375,-30.41110623353819)" d="M 0,7.4407374890254605 a 26.484375,7.4407374890254605 0,0,0 52.96875 0 a 26.484375,7.4407374890254605 0,0,0 -52.96875 0 l 0,45.94073748902546 a 26.484375,7.4407374890254605 0,0,0 52.96875 0 l 0,-45.94073748902546"></path><g transform="translate(0,0)" class="label"><g transform="translate(-16.484375,-9.25)"><text style=""><tspan x="1" dy="1em" space="preserve">Data</tspan></text></g></g></g><g style="opacity: 1;" transform="translate(141.8984375,100.07217025756836)" id="flowchart-split-12" class="node default"><rect class="label-container" height="38.5" width="61.859375" y="-19.25" x="-30.9296875" ry="19.25" rx="19.25"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-16.1171875,-9.25)"><text style=""><tspan x="1" dy="1em" space="preserve">Split</tspan></text></g></g></g><g style="opacity: 1;" transform="translate(262.109375,41.72267150878906)" id="flowchart-trainSplit-13" class="node default"><path class="label-container" transform="translate(-39.28125,-33.72267424009825)" d="M 0,9.648449493398834 a 39.28125,9.648449493398834 0,0,0 78.5625 0 a 39.28125,9.648449493398834 0,0,0 -78.5625 0 l 0,48.148449493398836 a 39.28125,9.648449493398834 0,0,0 78.5625 0 l 0,-48.148449493398836"></path><g transform="translate(0,0)" class="label"><g transform="translate(-29.28125,-9.25)"><text style=""><tspan x="1" dy="1em" space="preserve">Training</tspan></text></g></g></g><g style="opacity: 1;" transform="translate(262.109375,158.42166900634766)" id="flowchart-testSplit-15" class="node default"><path class="label-container" transform="translate(-36.0859375,-32.97632538235993)" d="M 0,9.150883588239957 a 36.0859375,9.150883588239957 0,0,0 72.171875 0 a 36.0859375,9.150883588239957 0,0,0 -72.171875 0 l 0,47.65088358823996 a 36.0859375,9.150883588239957 0,0,0 72.171875 0 l 0,-47.65088358823996"></path><g transform="translate(0,0)" class="label"><g transform="translate(-26.0859375,-9.25)"><text style=""><tspan x="1" dy="1em" space="preserve">Testing</tspan></text></g></g></g><g style="opacity: 1;" transform="translate(382.5390625,41.72267150878906)" id="flowchart-model-17" class="node default"><rect class="label-container" height="38.5" width="62.296875" y="-19.25" x="-31.1484375" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-21.1484375,-9.25)"><text style=""><tspan x="1" dy="1em" space="preserve">Model</tspan></text></g></g></g><g style="opacity: 1;" transform="translate(539.4609375,100.07217025756836)" id="flowchart-val-19" class="node default"><polygon class="label-container" transform="translate(-75.7734375,19.25)" points="9.625,0 141.921875,0 151.546875,-19.25 141.921875,-38.5 9.625,-38.5 0,-19.25"></polygon><g transform="translate(0,0)" class="label"><g transform="translate(-56.1484375,-9.25)"><text style=""><tspan x="1" dy="1em" space="preserve">Final Validation</tspan></text></g></g></g></g></g></g>
+</svg>
+</p>
 </div>
 </div>
 </div>
@@ -488,21 +482,74 @@ graph LR
 <p>Whatever data we use to pick the model won’t be new data!</p>
 </div>
 </div><div class="column" style="width:50%;">
-<div class="cell" data-reveal="true">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-3">%%| fig-width: 4.5
-graph LR
-  trainSplit[(Training)] --&gt; m1[Model 1] &amp; m2[Model 2] &amp; m3[...] &amp; m4[Model j]
-  
-  m1 &amp; m2 &amp; m3 &amp; m4 --&gt; sel{{Model selection}}
-
-</pre>
-<div id="mermaid-tooltip-3" class="mermaidTooltip">
-
+<svg viewbox="0 0 421.5 322" height="330" aria-labelledby="chart-title-mermaid-1703783089537 chart-desc-mermaid-1703783089537" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="432" id="mermaid-figure-4" style=" display: block; margin: auto auto auto auto">
+<title id="chart-title-mermaid-1703783089537">
+</title>
+<desc id="chart-desc-mermaid-1703783089537"></desc>
+<style>#mermaid-figure-4 {font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-figure-4 .error-icon{fill:#552222;}#mermaid-figure-4 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-4 .edge-thickness-normal{stroke-width:2px;}#mermaid-figure-4 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-4 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-4 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-4 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-4 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-4 .marker.cross{stroke:#333333;}#mermaid-figure-4 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-4 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-4 .cluster-label text{fill:#333;}#mermaid-figure-4 .cluster-label span{color:#333;}#mermaid-figure-4 .label text,#mermaid-figure-4 span{fill:#333;color:#333;}#mermaid-figure-4 .node rect,#mermaid-figure-4 .node circle,#mermaid-figure-4 .node ellipse,#mermaid-figure-4 .node polygon,#mermaid-figure-4 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-4 .node .label{text-align:center;}#mermaid-figure-4 .node.clickable{cursor:pointer;}#mermaid-figure-4 .arrowheadPath{fill:#333333;}#mermaid-figure-4 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-4 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-4 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-figure-4 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-figure-4 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-4 .cluster text{fill:#333;}#mermaid-figure-4 .cluster span{color:#333;}#mermaid-figure-4 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-4 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style>
+<g><g class="output"><g class="clusters"></g><g class="edgePaths"><g style="opacity: 1;" id="L-trainSplit-m1" class="edgePath LS-trainSplit LE-m1"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead18)" d="M63.63934580842208,127.9037416119054L71.62653817368506,111.16978467658784C79.61373053894805,94.43582774127026,95.58811526947403,60.96791387063513,107.74197430140369,44.233956935317565C119.89583333333333,27.5,128.22916666666666,27.5,132.39583333333334,27.5L136.5625,27.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead18"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-trainSplit-m2" class="edgePath LS-trainSplit LE-m2"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead19)" d="M86.5625,143.4552069071081L90.72916666666667,138.9626724225901C94.89583333333333,134.47013793807207,103.22916666666667,125.48506896903604,111.5625,120.992534484518C119.89583333333333,116.5,128.22916666666666,116.5,132.39583333333334,116.5L136.5625,116.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead19"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-trainSplit-m3" class="edgePath LS-trainSplit LE-m3"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead20)" d="M86.5625,178.5447930928919L90.72916666666667,183.0373275774099C94.89583333333333,187.52986206192793,103.22916666666667,196.514931030964,114.72005208333333,201.00746551548198C126.2109375,205.5,140.859375,205.5,148.18359375,205.5L155.5078125,205.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead20"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-trainSplit-m4" class="edgePath LS-trainSplit LE-m4"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead21)" d="M63.63934580842208,194.0962583880946L71.62653817368506,210.83021532341218C79.61373053894805,227.56417225872974,95.58811526947403,261.03208612936487,107.95291180140369,277.76604306468244C120.31770833333333,294.5,129.07291666666666,294.5,133.45052083333334,294.5L137.828125,294.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead21"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m1-sel" class="edgePath LS-m1 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead22)" d="M212.078125,27.5L216.24479166666666,27.5C220.41145833333334,27.5,228.74479166666666,27.5,247.32818352059925,46.583333333333336C265.9115753745318,65.66666666666667,294.7450257490637,103.83333333333333,309.1617509363296,122.91666666666667L323.5784761235955,142" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead22"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m2-sel" class="edgePath LS-m2 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead23)" d="M212.078125,116.5L216.24479166666666,116.5C220.41145833333334,116.5,228.74479166666666,116.5,242.4246547284644,120.75C256.10451779026215,125,275.13091058052436,133.5,284.6441069756554,137.75L294.1573033707865,142" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead23"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m3-sel" class="edgePath LS-m3 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead24)" d="M193.1328125,205.5L200.45703125,205.5C207.78125,205.5,222.4296875,205.5,239.26710264513108,201.41666666666666C256.10451779026215,197.33333333333334,275.13091058052436,189.16666666666666,284.6441069756554,185.08333333333334L294.1573033707865,181" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead24"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m4-sel" class="edgePath LS-m4 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-4-arrowhead25)" d="M210.8125,294.5L215.19010416666666,294.5C219.56770833333334,294.5,228.32291666666666,294.5,247.11724602059925,275.5833333333333C265.9115753745318,256.6666666666667,294.7450257490637,218.83333333333334,309.1617509363296,199.91666666666666L323.5784761235955,181" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-4-arrowhead25"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g></g><g class="edgeLabels"><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-trainSplit-m1" class="edgeLabel L-LS-trainSplit' L-LE-m1" style=""></span>
 </div>
-<p></p>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-trainSplit-m2" class="edgeLabel L-LS-trainSplit' L-LE-m2" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-trainSplit-m3" class="edgeLabel L-LS-trainSplit' L-LE-m3" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-trainSplit-m4" class="edgeLabel L-LS-trainSplit' L-LE-m4" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m1-sel" class="edgeLabel L-LS-m1' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m2-sel" class="edgeLabel L-LS-m2' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m3-sel" class="edgeLabel L-LS-m3' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m4-sel" class="edgeLabel L-LS-m4' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g style="opacity: 1;" transform="translate(47.28125,161)" id="flowchart-trainSplit-10" class="node default"><path class="label-container" transform="translate(-39.28125,-33.97267424009825)" d="M 0,9.648449493398834 a 39.28125,9.648449493398834 0,0,0 78.5625 0 a 39.28125,9.648449493398834 0,0,0 -78.5625 0 l 0,48.648449493398836 a 39.28125,9.648449493398834 0,0,0 78.5625 0 l 0,-48.648449493398836"></path><g transform="translate(0,0)" class="label"><g transform="translate(-29.28125,-9.5)"><foreignobject height="19" width="58.5625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Training
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(174.3203125,27.5)" id="flowchart-m1-11" class="node default"><rect class="label-container" height="39" width="75.515625" y="-19.5" x="-37.7578125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-27.7578125,-9.5)"><foreignobject height="19" width="55.515625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model 1
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(174.3203125,116.5)" id="flowchart-m2-12" class="node default"><rect class="label-container" height="39" width="75.515625" y="-19.5" x="-37.7578125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-27.7578125,-9.5)"><foreignobject height="19" width="55.515625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model 2
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(174.3203125,205.5)" id="flowchart-m3-13" class="node default"><rect class="label-container" height="39" width="37.625" y="-19.5" x="-18.8125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-8.8125,-9.5)"><foreignobject height="19" width="17.625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+…
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(174.3203125,294.5)" id="flowchart-m4-14" class="node default"><rect class="label-container" height="39" width="72.984375" y="-19.5" x="-36.4921875" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-26.4921875,-9.5)"><foreignobject height="19" width="52.984375">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model j
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(337.7890625,161)" id="flowchart-sel-19" class="node default"><polygon class="label-container" transform="translate(-75.7109375,19.5)" points="9.75,0 141.671875,0 151.421875,-19.5 141.671875,-39 9.75,-39 0,-19.5"></polygon><g transform="translate(0,0)" class="label"><g transform="translate(-55.9609375,-9.5)"><foreignobject height="19" width="111.921875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model selection
+</div>
+</foreignobject></g></g></g></g></g></g>
+</svg>
+</p>
 </div>
 </div>
 </div>
@@ -547,58 +594,220 @@ graph LR
 <img data-src="m01-03_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
 <section id="cross-validation-workflow" class="slide level2">
 <h2>Cross Validation workflow</h2>
-<div class="cell" data-reveal="true">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-4">
-graph LR
-  trainSplit[(Training)] --&gt; resamp([Resampling])
-  resamp --&gt; m1 &amp; m2 &amp; m3 &amp; m4
-  
-  subgraph K-folds
-  m1[Model 1] &amp; m2[Model 2] &amp; m3[...] &amp; m4[Model j]
-  end
-
-  m1 &amp; m2 &amp; m3 &amp; m4 --&gt; sel{{Model selection}}
-
-</pre>
-<div id="mermaid-tooltip-4" class="mermaidTooltip">
-
+<svg viewbox="0 0 632.421875 392" height="392" aria-labelledby="chart-title-mermaid-1703783089319 chart-desc-mermaid-1703783089319" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="632" id="mermaid-figure-3" style=" display: block; margin: auto auto auto auto">
+<title id="chart-title-mermaid-1703783089319">
+</title>
+<desc id="chart-desc-mermaid-1703783089319"></desc>
+<style>#mermaid-figure-3 {font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-figure-3 .error-icon{fill:#552222;}#mermaid-figure-3 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-3 .edge-thickness-normal{stroke-width:2px;}#mermaid-figure-3 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-3 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-3 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-3 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-3 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-3 .marker.cross{stroke:#333333;}#mermaid-figure-3 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-3 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-3 .cluster-label text{fill:#333;}#mermaid-figure-3 .cluster-label span{color:#333;}#mermaid-figure-3 .label text,#mermaid-figure-3 span{fill:#333;color:#333;}#mermaid-figure-3 .node rect,#mermaid-figure-3 .node circle,#mermaid-figure-3 .node ellipse,#mermaid-figure-3 .node polygon,#mermaid-figure-3 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-3 .node .label{text-align:center;}#mermaid-figure-3 .node.clickable{cursor:pointer;}#mermaid-figure-3 .arrowheadPath{fill:#333333;}#mermaid-figure-3 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-3 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-3 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-figure-3 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-figure-3 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-3 .cluster text{fill:#333;}#mermaid-figure-3 .cluster span{color:#333;}#mermaid-figure-3 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-3 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style>
+<g><g class="output"><g class="clusters"><g style="opacity: 1;" transform="translate(360.2421875,196)" id="flowchart-K-folds-32" class="cluster"><rect y="-188" x="-62.7578125" height="376" width="125.515625"></rect><g id="mermaid-1703783089319Text" transform="translate(0, -174)" class="label"><g transform="translate(-24.8515625,-9.5)"><foreignobject height="19" width="49.703125">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+K-folds
 </div>
-<p></p>
+</foreignobject></g></g></g></g><g class="edgePaths"><g style="opacity: 1;" id="L-trainSplit-resamp" class="edgePath LS-trainSplit LE-resamp"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead43)" d="M86.5625,196L90.72916666666667,196C94.89583333333333,196,103.22916666666667,196,111.5625,196C119.89583333333333,196,128.22916666666666,196,132.39583333333334,196L136.5625,196" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead43"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m1" class="edgePath LS-resamp LE-m1"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead44)" d="M203.77615870786516,176.5L215.22752808988764,157.5C226.67889747191012,138.5,249.58163623595507,100.5,265.1996722846442,81.5C280.8177083333333,62.5,289.1510416666667,62.5,297.484375,62.5C305.8177083333333,62.5,314.1510416666667,62.5,318.3177083333333,62.5L322.484375,62.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead44"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m2" class="edgePath LS-resamp LE-m2"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead45)" d="M227.28160112359552,176.5L234.81539676966293,172.33333333333334C242.34919241573036,168.16666666666666,257.41678370786514,159.83333333333334,269.1172460205992,155.66666666666666C280.8177083333333,151.5,289.1510416666667,151.5,297.484375,151.5C305.8177083333333,151.5,314.1510416666667,151.5,318.3177083333333,151.5L322.484375,151.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead45"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m3" class="edgePath LS-resamp LE-m3"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead46)" d="M227.28160112359552,215.5L234.81539676966293,219.66666666666666C242.34919241573036,223.83333333333334,257.41678370786514,232.16666666666666,269.1172460205992,236.33333333333334C280.8177083333333,240.5,289.1510416666667,240.5,300.6419270833333,240.5C312.1328125,240.5,326.78125,240.5,334.10546875,240.5L341.4296875,240.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead46"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m4" class="edgePath LS-resamp LE-m4"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead47)" d="M203.77615870786516,215.5L215.22752808988764,234.5C226.67889747191012,253.5,249.58163623595507,291.5,265.1996722846442,310.5C280.8177083333333,329.5,289.1510416666667,329.5,297.6953125,329.5C306.2395833333333,329.5,314.9947916666667,329.5,319.3723958333333,329.5L323.75,329.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead47"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m1-sel" class="edgePath LS-m1 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead48)" d="M398,62.5L402.1666666666667,62.5C406.3333333333333,62.5,414.6666666666667,62.5,423,62.5C431.3333333333333,62.5,439.6666666666667,62.5,458.2500585205992,81.58333333333333C476.8334503745318,100.66666666666667,505.66690074906364,138.83333333333334,520.0836259363296,157.91666666666666L534.5003511235955,177" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead48"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m2-sel" class="edgePath LS-m2 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead49)" d="M398,151.5L402.1666666666667,151.5C406.3333333333333,151.5,414.6666666666667,151.5,423,151.5C431.3333333333333,151.5,439.6666666666667,151.5,453.3465297284644,155.75C467.02639279026215,160,486.05278558052436,168.5,495.5659819756554,172.75L505.0791783707865,177" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead49"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m3-sel" class="edgePath LS-m3 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead50)" d="M379.0546875,240.5L386.37890625,240.5C393.703125,240.5,408.3515625,240.5,419.8424479166667,240.5C431.3333333333333,240.5,439.6666666666667,240.5,453.3465297284644,236.41666666666666C467.02639279026215,232.33333333333334,486.05278558052436,224.16666666666666,495.5659819756554,220.08333333333334L505.0791783707865,216" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead50"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m4-sel" class="edgePath LS-m4 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-3-arrowhead51)" d="M396.734375,329.5L401.1119791666667,329.5C405.4895833333333,329.5,414.2447916666667,329.5,422.7890625,329.5C431.3333333333333,329.5,439.6666666666667,329.5,458.2500585205992,310.5833333333333C476.8334503745318,291.6666666666667,505.66690074906364,253.83333333333334,520.0836259363296,234.91666666666666L534.5003511235955,216" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-3-arrowhead51"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g></g><g class="edgeLabels"><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-trainSplit-resamp" class="edgeLabel L-LS-trainSplit' L-LE-resamp" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m1" class="edgeLabel L-LS-resamp' L-LE-m1" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m2" class="edgeLabel L-LS-resamp' L-LE-m2" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m3" class="edgeLabel L-LS-resamp' L-LE-m3" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m4" class="edgeLabel L-LS-resamp' L-LE-m4" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m1-sel" class="edgeLabel L-LS-m1' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m2-sel" class="edgeLabel L-LS-m2' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m3-sel" class="edgeLabel L-LS-m3' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m4-sel" class="edgeLabel L-LS-m4' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g style="opacity: 1;" transform="translate(360.2421875,62.5)" id="flowchart-m1-19" class="node default"><rect class="label-container" height="39" width="75.515625" y="-19.5" x="-37.7578125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-27.7578125,-9.5)"><foreignobject height="19" width="55.515625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model 1
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(360.2421875,151.5)" id="flowchart-m2-20" class="node default"><rect class="label-container" height="39" width="75.515625" y="-19.5" x="-37.7578125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-27.7578125,-9.5)"><foreignobject height="19" width="55.515625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model 2
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(360.2421875,240.5)" id="flowchart-m3-21" class="node default"><rect class="label-container" height="39" width="37.625" y="-19.5" x="-18.8125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-8.8125,-9.5)"><foreignobject height="19" width="17.625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+…
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(360.2421875,329.5)" id="flowchart-m4-22" class="node default"><rect class="label-container" height="39" width="72.984375" y="-19.5" x="-36.4921875" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-26.4921875,-9.5)"><foreignobject height="19" width="52.984375">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model j
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(47.28125,196)" id="flowchart-trainSplit-16" class="node default"><path class="label-container" transform="translate(-39.28125,-33.97267424009825)" d="M 0,9.648449493398834 a 39.28125,9.648449493398834 0,0,0 78.5625 0 a 39.28125,9.648449493398834 0,0,0 -78.5625 0 l 0,48.648449493398836 a 39.28125,9.648449493398834 0,0,0 78.5625 0 l 0,-48.648449493398836"></path><g transform="translate(0,0)" class="label"><g transform="translate(-29.28125,-9.5)"><foreignobject height="19" width="58.5625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Training
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(192.0234375,196)" id="flowchart-resamp-17" class="node default"><rect class="label-container" height="39" width="110.921875" y="-19.5" x="-55.4609375" ry="19.5" rx="19.5"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-40.5859375,-9.5)"><foreignobject height="19" width="81.171875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Resampling
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(548.7109375,196)" id="flowchart-sel-31" class="node default"><polygon class="label-container" transform="translate(-75.7109375,19.5)" points="9.75,0 141.671875,0 151.421875,-19.5 141.671875,-39 9.75,-39 0,-19.5"></polygon><g transform="translate(0,0)" class="label"><g transform="translate(-55.9609375,-9.5)"><foreignobject height="19" width="111.921875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model selection
+</div>
+</foreignobject></g></g></g></g></g></g>
+</svg>
+</p>
 </div>
 </div>
 </div>
 </section>
 <section id="the-overall-machine-learning-workflow" class="slide level2">
 <h2>The overall machine learning workflow</h2>
-<div class="cell" data-reveal="true" data-fig-width="9.5">
+<div class="cell">
 <div class="cell-output-display">
 <div>
 <p>
-</p><pre class="mermaid" data-tooltip-selector="#mermaid-tooltip-5">graph LR
-  d[(Data)] --&gt; split([Split]) --&gt; trainSplit[(Training)]
-  split --&gt; testSplit[(Testing)]
-  trainSplit --&gt; resamp([Resampling])
-  resamp --&gt; m1 &amp; m2 &amp; m3 &amp; m4
-  
-  subgraph K-folds
-  m1[Model 1] &amp; m2[Model 2] &amp; m3[...] &amp; m4[Model j]
-  end
-
-  m1 &amp; m2 &amp; m3 &amp; m4 --&gt; sel{{Model selection}}
-  sel --&gt; final[Final Model]
-  trainSplit --&gt; final
-  final --&gt; val{{Final Validation}}
-  testSplit ------&gt; val
-  
-  
-</pre>
-<div id="mermaid-tooltip-5" class="mermaidTooltip">
-
+<svg viewbox="0 0 1201.125 513.8258056640625" height="390" aria-labelledby="chart-title-mermaid-1703783089078 chart-desc-mermaid-1703783089078" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="912" id="mermaid-figure-2" style=" display: block; margin: auto auto auto auto">
+<title id="chart-title-mermaid-1703783089078">
+</title>
+<desc id="chart-desc-mermaid-1703783089078"></desc>
+<style>#mermaid-figure-2 {font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-figure-2 .error-icon{fill:#552222;}#mermaid-figure-2 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-2 .edge-thickness-normal{stroke-width:2px;}#mermaid-figure-2 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-2 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-2 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-2 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-2 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-2 .marker.cross{stroke:#333333;}#mermaid-figure-2 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-2 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-2 .cluster-label text{fill:#333;}#mermaid-figure-2 .cluster-label span{color:#333;}#mermaid-figure-2 .label text,#mermaid-figure-2 span{fill:#333;color:#333;}#mermaid-figure-2 .node rect,#mermaid-figure-2 .node circle,#mermaid-figure-2 .node ellipse,#mermaid-figure-2 .node polygon,#mermaid-figure-2 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-2 .node .label{text-align:center;}#mermaid-figure-2 .node.clickable{cursor:pointer;}#mermaid-figure-2 .arrowheadPath{fill:#333333;}#mermaid-figure-2 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-2 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-2 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-figure-2 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-figure-2 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-2 .cluster text{fill:#333;}#mermaid-figure-2 .cluster span{color:#333;}#mermaid-figure-2 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-2 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style>
+<g><g class="output"><g class="clusters"><g style="opacity: 1;" transform="translate(575.1953125,196)" id="flowchart-K-folds-58" class="cluster"><rect y="-188" x="-62.7578125" height="376" width="125.515625"></rect><g id="mermaid-1703783089078Text" transform="translate(0, -174)" class="label"><g transform="translate(-24.8515625,-9.5)"><foreignobject height="19" width="49.703125">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+K-folds
 </div>
-<p></p>
+</foreignobject></g></g></g></g><g class="edgePaths"><g style="opacity: 1;" id="L-d-split" class="edgePath LS-d LE-split"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead84)" d="M60.96875,336.3494987487793L65.13541666666667,336.3494987487793C69.30208333333333,336.3494987487793,77.63541666666667,336.3494987487793,85.96875,336.3494987487793C94.30208333333333,336.3494987487793,102.63541666666667,336.3494987487793,106.80208333333333,336.3494987487793L110.96875,336.3494987487793" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead84"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-split-trainSplit" class="edgePath LS-split LE-trainSplit"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead85)" d="M160.5933094411123,316.8494987487793L166.8199453675936,310.33291562398273C173.04658129407485,303.8163324991862,185.49985314703744,290.7831662495931,195.8931557401854,284.26658312479657C206.28645833333334,277.75,214.61979166666666,277.75,218.78645833333334,277.75L222.953125,277.75" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead85"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-split-testSplit" class="edgePath LS-split LE-testSplit"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead86)" d="M149.97449827981652,355.8494987487793L157.97093606651376,375.3078320821126C165.967373853211,394.766165415446,181.96024942660551,433.6828320821126,194.65590596330276,453.141165415446C207.3515625,472.5994987487793,216.75,472.5994987487793,221.44921875,472.5994987487793L226.1484375,472.5994987487793" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead86"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-trainSplit-resamp" class="edgePath LS-trainSplit LE-resamp"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead87)" d="M288.94759567797365,246.3518669107812L295.2089338983114,237.95988909231767C301.4702721186491,229.56791127385415,313.99294855932453,212.78395563692706,324.42095344632895,204.39197781846352C334.8489583333333,196,343.1822916666667,196,347.3489583333333,196L351.515625,196" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead87"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m1" class="edgePath LS-resamp LE-m1"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead88)" d="M418.7292837078652,176.5L430.1806530898877,157.5C441.63202247191015,138.5,464.5347612359551,100.5,480.15279728464424,81.5C495.7708333333333,62.5,504.1041666666667,62.5,512.4375,62.5C520.7708333333334,62.5,529.1041666666666,62.5,533.2708333333334,62.5L537.4375,62.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead88"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m2" class="edgePath LS-resamp LE-m2"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead89)" d="M442.2347261235955,176.5L449.768521769663,172.33333333333334C457.30231741573033,168.16666666666666,472.36990870786514,159.83333333333334,484.0703710205992,155.66666666666666C495.7708333333333,151.5,504.1041666666667,151.5,512.4375,151.5C520.7708333333334,151.5,529.1041666666666,151.5,533.2708333333334,151.5L537.4375,151.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead89"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m3" class="edgePath LS-resamp LE-m3"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead90)" d="M442.2347261235955,215.5L449.768521769663,219.66666666666666C457.30231741573033,223.83333333333334,472.36990870786514,232.16666666666666,484.0703710205992,236.33333333333334C495.7708333333333,240.5,504.1041666666667,240.5,515.5950520833334,240.5C527.0859375,240.5,541.734375,240.5,549.05859375,240.5L556.3828125,240.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead90"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-resamp-m4" class="edgePath LS-resamp LE-m4"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead91)" d="M418.7292837078652,215.5L430.1806530898877,234.5C441.63202247191015,253.5,464.5347612359551,291.5,480.15279728464424,310.5C495.7708333333333,329.5,504.1041666666667,329.5,512.6484375,329.5C521.1927083333334,329.5,529.9479166666666,329.5,534.3255208333334,329.5L538.703125,329.5" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead91"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m1-sel" class="edgePath LS-m1 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead92)" d="M612.953125,62.5L617.1197916666666,62.5C621.2864583333334,62.5,629.6197916666666,62.5,637.953125,62.5C646.2864583333334,62.5,654.6197916666666,62.5,673.2031835205993,81.58333333333333C691.7865753745318,100.66666666666667,720.6200257490636,138.83333333333334,735.0367509363296,157.91666666666666L749.4534761235955,177" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead92"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m2-sel" class="edgePath LS-m2 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead93)" d="M612.953125,151.5L617.1197916666666,151.5C621.2864583333334,151.5,629.6197916666666,151.5,637.953125,151.5C646.2864583333334,151.5,654.6197916666666,151.5,668.2996547284644,155.75C681.9795177902621,160,701.0059105805243,168.5,710.5191069756555,172.75L720.0323033707865,177" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead93"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m3-sel" class="edgePath LS-m3 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead94)" d="M594.0078125,240.5L601.33203125,240.5C608.65625,240.5,623.3046875,240.5,634.7955729166666,240.5C646.2864583333334,240.5,654.6197916666666,240.5,668.2996547284644,236.41666666666666C681.9795177902621,232.33333333333334,701.0059105805243,224.16666666666666,710.5191069756555,220.08333333333334L720.0323033707865,216" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead94"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-m4-sel" class="edgePath LS-m4 LE-sel"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead95)" d="M611.6875,329.5L616.0651041666666,329.5C620.4427083333334,329.5,629.1979166666666,329.5,637.7421875,329.5C646.2864583333334,329.5,654.6197916666666,329.5,673.2031835205993,310.5833333333333C691.7865753745318,291.6666666666667,720.6200257490636,253.83333333333334,735.0367509363296,234.91666666666666L749.4534761235955,216" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead95"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-sel-final" class="edgePath LS-sel LE-final"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead96)" d="M839.875,196.5L843.9583333333334,196.41666666666666C848.0416666666666,196.33333333333334,856.2083333333334,196.16666666666666,869.9339521215596,206.45833333333334C883.6595709097859,216.75,902.9441418195719,237.5,912.5864272744648,247.875L922.2287127293578,258.25" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead96"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-trainSplit-final" class="edgePath LS-trainSplit LE-final"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead97)" d="M279.53184660732154,310.7368559496787L287.36247633943464,326.28071329139897C295.1931060715477,341.8245706331192,310.85436553577387,372.9122853165596,332.0951515178869,388.4561426582798C353.3359375,404,380.15625,404,406.9765625,404C433.796875,404,460.6171875,404,478.1940104166667,404C495.7708333333333,404,504.1041666666667,404,518.73046875,404C533.3567708333334,404,554.2760416666666,404,575.1953125,404C596.1145833333334,404,617.0338541666666,404,631.66015625,404C646.2864583333334,404,654.6197916666666,404,675.5716145833334,404C696.5234375,404,730.09375,404,763.6640625,404C797.234375,404,830.8046875,404,858.2967718646864,386.2083333333333C885.7888562293729,368.4166666666667,907.2027124587459,332.8333333333333,917.9096405734323,315.0416666666667L928.6165686881188,297.25" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead97"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-final-val" class="edgePath LS-final LE-val"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead98)" d="M991.328125,277.75L995.4947916666666,277.75C999.6614583333334,277.75,1007.9947916666666,277.75,1023.4652469464918,284.3499164581299C1038.9357022263168,290.94983291625977,1061.5432794526334,304.14966583251953,1072.847068065792,310.7495822906494L1084.1508566789503,317.3494987487793" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead98"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g><g style="opacity: 1;" id="L-testSplit-val" class="edgePath LS-testSplit LE-val"><path style="fill:none" marker-end="url(#mermaid-figure-2-arrowhead99)" d="M298.3203125,472.5994987487793L303.01953125,472.5994987487793C307.71875,472.5994987487793,317.1171875,472.5994987487793,335.2265625,472.5994987487793C353.3359375,472.5994987487793,380.15625,472.5994987487793,406.9765625,472.5994987487793C433.796875,472.5994987487793,460.6171875,472.5994987487793,478.1940104166667,472.5994987487793C495.7708333333333,472.5994987487793,504.1041666666667,472.5994987487793,518.73046875,472.5994987487793C533.3567708333334,472.5994987487793,554.2760416666666,472.5994987487793,575.1953125,472.5994987487793C596.1145833333334,472.5994987487793,617.0338541666666,472.5994987487793,631.66015625,472.5994987487793C646.2864583333334,472.5994987487793,654.6197916666666,472.5994987487793,675.5716145833334,472.5994987487793C696.5234375,472.5994987487793,730.09375,472.5994987487793,763.6640625,472.5994987487793C797.234375,472.5994987487793,830.8046875,472.5994987487793,860.2526041666666,472.5994987487793C889.7005208333334,472.5994987487793,915.0260416666666,472.5994987487793,940.3515625,472.5994987487793C965.6770833333334,472.5994987487793,991.0026041666666,472.5994987487793,1018.1583524464831,453.2244987487793C1045.3141007262996,433.8494987487793,1074.3000764525993,395.0994987487793,1088.7930643157492,375.7244987487793L1103.2860521788991,356.3494987487793" class="path"></path><defs><marker orient="auto" markerheight="6" markerwidth="8" markerunits="strokeWidth" refy="5" refx="9" viewbox="0 0 10 10" id="mermaid-figure-2-arrowhead99"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowheadPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker></defs></g></g><g class="edgeLabels"><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-d-split" class="edgeLabel L-LS-d' L-LE-split" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-split-trainSplit" class="edgeLabel L-LS-split' L-LE-trainSplit" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-split-testSplit" class="edgeLabel L-LS-split' L-LE-testSplit" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-trainSplit-resamp" class="edgeLabel L-LS-trainSplit' L-LE-resamp" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m1" class="edgeLabel L-LS-resamp' L-LE-m1" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m2" class="edgeLabel L-LS-resamp' L-LE-m2" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m3" class="edgeLabel L-LS-resamp' L-LE-m3" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-resamp-m4" class="edgeLabel L-LS-resamp' L-LE-m4" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m1-sel" class="edgeLabel L-LS-m1' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m2-sel" class="edgeLabel L-LS-m2' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m3-sel" class="edgeLabel L-LS-m3' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-m4-sel" class="edgeLabel L-LS-m4' L-LE-sel" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-sel-final" class="edgeLabel L-LS-sel' L-LE-final" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-trainSplit-final" class="edgeLabel L-LS-trainSplit' L-LE-final" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-final-val" class="edgeLabel L-LS-final' L-LE-val" style=""></span>
+</div>
+</foreignobject></g></g><g style="opacity: 1;" transform="" class="edgeLabel"><g class="label" transform="translate(0,0)"><rect height="0" width="0" ry="0" rx="0"></rect><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span id="L-L-testSplit-val" class="edgeLabel L-LS-testSplit' L-LE-val" style=""></span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g style="opacity: 1;" transform="translate(575.1953125,62.5)" id="flowchart-m1-37" class="node default"><rect class="label-container" height="39" width="75.515625" y="-19.5" x="-37.7578125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-27.7578125,-9.5)"><foreignobject height="19" width="55.515625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model 1
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(575.1953125,151.5)" id="flowchart-m2-38" class="node default"><rect class="label-container" height="39" width="75.515625" y="-19.5" x="-37.7578125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-27.7578125,-9.5)"><foreignobject height="19" width="55.515625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model 2
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(575.1953125,240.5)" id="flowchart-m3-39" class="node default"><rect class="label-container" height="39" width="37.625" y="-19.5" x="-18.8125" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-8.8125,-9.5)"><foreignobject height="19" width="17.625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+…
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(575.1953125,329.5)" id="flowchart-m4-40" class="node default"><rect class="label-container" height="39" width="72.984375" y="-19.5" x="-36.4921875" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-26.4921875,-9.5)"><foreignobject height="19" width="52.984375">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model j
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(34.484375,336.3494987487793)" id="flowchart-d-29" class="node default"><path class="label-container" transform="translate(-26.484375,-30.66110623353819)" d="M 0,7.4407374890254605 a 26.484375,7.4407374890254605 0,0,0 52.96875 0 a 26.484375,7.4407374890254605 0,0,0 -52.96875 0 l 0,46.44073748902546 a 26.484375,7.4407374890254605 0,0,0 52.96875 0 l 0,-46.44073748902546"></path><g transform="translate(0,0)" class="label"><g transform="translate(-16.484375,-9.5)"><foreignobject height="19" width="32.96875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Data
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(141.9609375,336.3494987487793)" id="flowchart-split-30" class="node default"><rect class="label-container" height="39" width="61.984375" y="-19.5" x="-30.9921875" ry="19.5" rx="19.5"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-16.1171875,-9.5)"><foreignobject height="19" width="32.234375">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Split
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(262.234375,277.75)" id="flowchart-trainSplit-31" class="node default"><path class="label-container" transform="translate(-39.28125,-33.97267424009825)" d="M 0,9.648449493398834 a 39.28125,9.648449493398834 0,0,0 78.5625 0 a 39.28125,9.648449493398834 0,0,0 -78.5625 0 l 0,48.648449493398836 a 39.28125,9.648449493398834 0,0,0 78.5625 0 l 0,-48.648449493398836"></path><g transform="translate(0,0)" class="label"><g transform="translate(-29.28125,-9.5)"><foreignobject height="19" width="58.5625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Training
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(262.234375,472.5994987487793)" id="flowchart-testSplit-33" class="node default"><path class="label-container" transform="translate(-36.0859375,-33.22632538235993)" d="M 0,9.150883588239957 a 36.0859375,9.150883588239957 0,0,0 72.171875 0 a 36.0859375,9.150883588239957 0,0,0 -72.171875 0 l 0,48.15088358823996 a 36.0859375,9.150883588239957 0,0,0 72.171875 0 l 0,-48.15088358823996"></path><g transform="translate(0,0)" class="label"><g transform="translate(-26.0859375,-9.5)"><foreignobject height="19" width="52.171875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Testing
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(406.9765625,196)" id="flowchart-resamp-35" class="node default"><rect class="label-container" height="39" width="110.921875" y="-19.5" x="-55.4609375" ry="19.5" rx="19.5"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-40.5859375,-9.5)"><foreignobject height="19" width="81.171875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Resampling
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(763.6640625,196)" id="flowchart-sel-49" class="node default"><polygon class="label-container" transform="translate(-75.7109375,19.5)" points="9.75,0 141.671875,0 151.421875,-19.5 141.671875,-39 9.75,-39 0,-19.5"></polygon><g transform="translate(0,0)" class="label"><g transform="translate(-55.9609375,-9.5)"><foreignobject height="19" width="111.921875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Model selection
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(940.3515625,277.75)" id="flowchart-final-51" class="node default"><rect class="label-container" height="39" width="101.953125" y="-19.5" x="-50.9765625" ry="0" rx="0"></rect><g transform="translate(0,0)" class="label"><g transform="translate(-40.9765625,-9.5)"><foreignobject height="19" width="81.953125">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Final Model
+</div>
+</foreignobject></g></g></g><g style="opacity: 1;" transform="translate(1117.2265625,336.3494987487793)" id="flowchart-val-55" class="node default"><polygon class="label-container" transform="translate(-75.8984375,19.5)" points="9.75,0 142.046875,0 151.796875,-19.5 142.046875,-39 9.75,-39 0,-19.5"></polygon><g transform="translate(0,0)" class="label"><g transform="translate(-56.1484375,-9.5)"><foreignobject height="19" width="112.296875">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+Final Validation
+</div>
+</foreignobject></g></g></g></g></g></g>
+</svg>
+</p>
 </div>
 </div>
 </div>
@@ -639,145 +848,114 @@ graph LR
 <h1>Implementing the workflow in <code>tidymodels</code></h1>
 
 </section>
-<section id="a-case-study-taxi-tips" class="slide level2">
-<h2>A case study: Taxi tips</h2>
+<section id="a-case-study-bikesharing" class="slide level2">
+<h2>A case study: Bikesharing</h2>
+<blockquote>
+<p>Capital Bikeshare is metro DC’s bikeshare service, with 4,500 bikes and 500+ stations across 7 jurisdictions: Washington, DC.; Arlington, VA; Alexandria, VA; Montgomery, MD; Prince George’s County, MD; Fairfax County, VA; and the City of Falls Church, VA. Designed for quick trips with convenience in mind, it’s a fun and affordable way to get around.</p>
+</blockquote>
+<p>We will consider a dataset that includes the total number of Capital Bikeshare rides from 500 separate days.</p>
 </section>
 <section id="splitting-data-into-training-and-testing-splits" class="slide level2">
 <h2>Splitting data into training and testing splits</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-3"><a href="#cb1-3"></a></span>
+<span id="cb1-4"><a href="#cb1-4"></a>bikes <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/bikes.csv"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a><span class="fu">set.seed</span>(<span class="dv">2356</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>splits <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(bikes, <span class="at">prop =</span> .<span class="dv">8</span>, <span class="at">strata =</span> month)</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a>train <span class="ot">&lt;-</span> <span class="fu">training</span>(splits)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>test <span class="ot">&lt;-</span> <span class="fu">testing</span>(splits)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="setting-up-cross-validation" class="slide level2">
 <h2>Setting up Cross Validation</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train, <span class="at">v =</span> <span class="dv">5</span>)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>folds</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>#  5-fold cross-validation 
+# A tibble: 5 × 2
+  splits           id   
+  &lt;list&gt;           &lt;chr&gt;
+1 &lt;split [318/80]&gt; Fold1
+2 &lt;split [318/80]&gt; Fold2
+3 &lt;split [318/80]&gt; Fold3
+4 &lt;split [319/79]&gt; Fold4
+5 &lt;split [319/79]&gt; Fold5</code></pre>
+</div>
+</div>
+</section>
+<section id="creating-models" class="slide level2">
+<h2>Creating models</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>lin_model <span class="ot">&lt;-</span> <span class="fu">linear_reg</span>()</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a>m1 <span class="ot">&lt;-</span> <span class="fu">workflow</span>(rides <span class="sc">~</span> temp_feel) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-4"><a href="#cb4-4"></a>  <span class="fu">add_model</span>(lin_model)</span>
+<span id="cb4-5"><a href="#cb4-5"></a></span>
+<span id="cb4-6"><a href="#cb4-6"></a>m2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>(rides <span class="sc">~</span> temp_feel <span class="sc">+</span> humidity <span class="sc">+</span> windspeed <span class="sc">+</span> day_of_week <span class="sc">+</span> holiday <span class="sc">+</span> weather_cat) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-7"><a href="#cb4-7"></a>  <span class="fu">add_model</span>(lin_model)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="fitting-models-and-selecting-the-best" class="slide level2">
 <h2>Fitting models and selecting the best</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>fit1 <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(m1, folds)</span>
+<span id="cb5-2"><a href="#cb5-2"></a>fit2 <span class="ot">&lt;-</span> <span class="fu">fit_resamples</span>(m2, folds)</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="fu">collect_metrics</span>(fit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator     mean     n std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;         &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 rmse    standard   1264.        5 44.8    Preprocessor1_Model1
+2 rsq     standard      0.358     5  0.0341 Preprocessor1_Model1</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">collect_metrics</span>(fit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 6
+  .metric .estimator     mean     n std_err .config             
+  &lt;chr&gt;   &lt;chr&gt;         &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt; &lt;chr&gt;               
+1 rmse    standard   1138.        4  2.25   Preprocessor1_Model1
+2 rsq     standard      0.513     4  0.0231 Preprocessor1_Model1</code></pre>
+</div>
+</div>
 </section>
 <section id="validating-on-the-test-data" class="slide level2">
 <h2>Validating on the test data</h2>
-</section>
-<section id="bullets" class="slide level2">
-<h2>Bullets</h2>
-<p>When you click the <strong>Render</strong> button a document will be generated that includes:</p>
-<ul>
-<li>Content authored with markdown</li>
-<li>Output from executable code</li>
-</ul>
-</section>
-<section id="code" class="slide level2">
-<h2>Code</h2>
-<p>When you click the <strong>Render</strong> button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>preds <span class="ot">&lt;-</span> <span class="fu">fit</span>(m2, train) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-2"><a href="#cb9-2"></a>  <span class="fu">augment</span>(test)</span>
+<span id="cb9-3"><a href="#cb9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4"></a>preds <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="fu">metrics</span>(rides, .pred)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 2</code></pre>
+<pre><code># A tibble: 3 × 3
+  .metric .estimator .estimate
+  &lt;chr&gt;   &lt;chr&gt;          &lt;dbl&gt;
+1 rmse    standard    1153.   
+2 rsq     standard       0.462
+3 mae     standard     997.   </code></pre>
 </div>
 </div>
 </section>
-<section id="column-formatting" class="slide level2">
-<h2>Column formatting</h2>
-<p>Machine learning can be applied to tackle many different kinds of problems, including:</p>
-<div class="columns">
-<div class="column" style="width:50%;">
-<p><strong>Supervised learning</strong></p>
-<ul>
-<li>Prediction</li>
-<li>Classification</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><strong>Unsupervised learning</strong></p>
-<ul>
-<li>Clustering</li>
-</ul>
+<section id="visualizing-the-results" class="slide level2">
+<h2>Visualizing the results</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>preds <span class="sc">%&gt;%</span> </span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x=</span>.pred, <span class="at">y =</span> rides)) <span class="sc">+</span></span>
+<span id="cb11-3"><a href="#cb11-3"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb11-4"><a href="#cb11-4"></a>  <span class="fu">theme</span>(<span class="at">aspect.ratio=</span><span class="dv">1</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
 </div>
-</div>
-</section>
-<section id="figure-layouts" class="slide level2">
-<h2>Figure Layouts</h2>
-<div class="columns v-center-container">
-<div class="column" style="width:50%;">
-<p>Machine learning can be applied to many different kinds of data, including:</p>
-<ul>
-<li>text</li>
-<li>audio</li>
-<li>images</li>
-<li>video</li>
-<li>tabular data (e.g.&nbsp;survey data)</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<div class="quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/audio-spectrogram.png"></p>
-<p></p><figcaption>Audio</figcaption><p></p>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/MnistExamplesWikipedia.png"></p>
-<p></p><figcaption>Images</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/bigdatawordcloud.jpeg"></p>
-<p></p><figcaption>Text</figcaption><p></p>
-</figure>
-</div>
-</div>
-<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/tabulardata.png"></p>
-<p></p><figcaption>Tabular</figcaption><p></p>
-</figure>
-</div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</section>
-<section id="css" class="slide level2">
-<h2>CSS</h2>
-<p>See <code>style.css</code> for custom formatting options.</p>
-</section>
-<section id="other-formatting" class="slide level2">
-<h2>Other formatting</h2>
-<div class="callout callout-tip callout-captioned callout-style-default">
-<div class="callout-body">
-<div class="callout-caption">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<p><strong>Tip</strong></p>
-</div>
-<div class="callout-content">
-<p>Callouts work the same as for non-presentation documents. I don’t think margin notes can be used though.</p>
-</div>
-</div>
-</div>
-</section>
-<section id="citations" class="slide level2">
-<h2>Citations</h2>
-<p>You can use pandoc citation style to add citations. Let’s use the convention: <code>[@author1.author2YEAR]</code> and <code>[@author.etalYEAR]</code> A bibliography is automatically created.</p>
-<p>I’ve started off the references with our main text <span class="citation" data-cites="gareth.etal2014">(<a href="#/ref-gareth.etal2014" role="doc-biblioref" onclick="return false;">James et al. 2014</a>)</span>.</p>
-</section>
-<section class="slide level2 smaller scrollable">
+<img data-src="m01-03_files/figure-revealjs/unnamed-chunk-15-1.png" width="960" class="r-stretch"></section>
+<section class="slide level2">
 
 <div class="footer footer-default">
 
-</div>
-<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
-<div id="ref-gareth.etal2014" class="csl-entry" role="doc-biblioentry">
-James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in r</em>. Springer Publishing Company, Incorporated.
-</div>
 </div>
 </section></section>
     </div>

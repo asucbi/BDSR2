@@ -149,15 +149,13 @@ Implement the basic model as shown in lecture to generate predicted probabilitie
 
 ## Exercise 6
 
-
-
 Great! Now we are going to make this code a bit simpler. Think back to Bayes' Rule and recall that we called the the $P(d)$ term the "normalization" term and that we sometimes went so far as to leave it out and express Bayes Rule as the proportionality:
 
 $$P(h|d) \propto P(d|h)P(h)$$
 It turns out we can often ignore this term when thinking about probabilities, as we can skip computing it directly and simply normalize the values computed from the expression above. 
 
 ::: column-margin
-This is only true exactly as I'm showing it here in the case of discrete probability distributions. Things are a bit different in the case of continuous probability distributions.
+This is only true exactly as I'm showing it here in the case of discrete probability distributions. Things are a bit different in the case of continuous probability distributions as there is no longer a finite number of realizations of $h$.
 :::
 
 As is often the case, the right notation makes this clear:

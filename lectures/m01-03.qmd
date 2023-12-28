@@ -8,22 +8,15 @@ bibliography: ../references.bib
 ---
 ```{r}
 #| include: false
-
-# todo: try to get mermaids renderd out as svg so they will be less buggy
-# but of course this is buggy
-# use:
-# %%| mermaid-format: svg
-
-
 library(tidyverse)
 ```
-
 
 ## Machine learning: The basic idea 
 
 ::: {.center}
 ```{mermaid}
 %%| fig-width: 9.5
+%%| mermaid-format: svg
 flowchart LR
   A[(Data)] -- used to make --> B[Model] -- used to make --> C{{Predictions}}
 ```
@@ -79,7 +72,7 @@ tibble(
 Using some for **Training** and some for **Testing**:
 
 ```{mermaid}
-
+%%| mermaid-format: svg
 %%{init: {"flowchart": {"htmlLabels": false}} }%%
 graph LR
   d[(Data)] --> split([Split]) --> trainSplit[(Training)]
@@ -110,7 +103,7 @@ Whatever data we use to pick the model won't be new data!
 
 
 ```{mermaid}
-
+%%| mermaid-format: svg
 %%| fig-width: 4.5
 graph LR
   trainSplit[(Training)] --> m1[Model 1] & m2[Model 2] & m3[...] & m4[Model j]
@@ -275,7 +268,7 @@ expand_grid(
 ## Cross Validation workflow
 
 ```{mermaid}
-
+%%| mermaid-format: svg
 
 graph LR
   trainSplit[(Training)] --> resamp([Resampling])
@@ -293,7 +286,7 @@ graph LR
 
 ```{mermaid}
 %%| fig-width: 9.5
-
+%%| mermaid-format: svg
 graph LR
   d[(Data)] --> split([Split]) --> trainSplit[(Training)]
   split --> testSplit[(Testing)]
@@ -352,109 +345,87 @@ graph LR
 
 # Implementing the workflow in `tidymodels`
 
-## A case study: Taxi tips
+## A case study: Bikesharing
+
+> Capital Bikeshare is metro DC's bikeshare service, with 4,500 bikes and 500+ stations across 7 jurisdictions: Washington, DC.; Arlington, VA; Alexandria, VA; Montgomery, MD; Prince George's County, MD; Fairfax County, VA; and the City of Falls Church, VA. Designed for quick trips with convenience in mind, it’s a fun and affordable way to get around.
+
+We will consider a dataset that includes the total number of Capital Bikeshare rides from 500 separate days.
 
 ## Splitting data into training and testing splits
 
+```{r}
+#| message: false
+#| echo: true
+library(tidyverse)
+library(tidymodels)
+
+bikes <- read_csv("data/bikes.csv")
+
+set.seed(2356)
+splits <- initial_split(bikes, prop = .8, strata = month)
+
+train <- training(splits)
+test <- testing(splits)
+```
+
 ## Setting up Cross Validation
 
-## Fitting models and selecting the best
+```{r}
+#| message: false
+#| echo: true
+folds <- vfold_cv(train, v = 5)
+folds
+```
 
-## Validating on the test data
+## Creating models
 
+```{r}
+#| message: false
+#| echo: true
+lin_model <- linear_reg()
 
+m1 <- workflow(rides ~ temp_feel) %>% 
+  add_model(lin_model)
 
----
-
-## Bullets
-
-When you click the **Render** button a document will be generated that includes:
-
--   Content authored with markdown
--   Output from executable code
-
-## Code
-
-When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
-
-```{r echo=TRUE}
-1 + 1
+m2 <- workflow(rides ~ temp_feel + humidity + windspeed + day_of_week + holiday + weather_cat) %>% 
+  add_model(lin_model)
 ```
 
 
-## Column formatting
+## Fitting models and selecting the best
 
-Machine learning can be applied to tackle many different kinds of problems, including:
+```{r}
+#| message: false
+#| echo: true
+fit1 <- fit_resamples(m1, folds)
+fit2 <- fit_resamples(m2, folds)
 
-:::: {.columns}
-
-::: {.column width="50%"}
-
-**Supervised learning**
-
-- Prediction
-- Classification
-
-:::
-
-::: {.column width="50%"}
+collect_metrics(fit1)
+collect_metrics(fit2)
+```
 
 
-**Unsupervised learning**
+## Validating on the test data
 
-- Clustering
+```{r}
+#| message: false
+#| echo: true
+preds <- fit(m2, train) %>% 
+  augment(test)
 
-:::
+preds %>% 
+  metrics(rides, .pred)
+```
+## Visualizing the results
 
-::::
+```{r}
+#| message: false
+#| echo: true
+preds %>% 
+  ggplot(aes(x=.pred, y = rides)) +
+  geom_point() +
+  theme(aspect.ratio=1)
+```
 
-
-## Figure Layouts
-
-:::: {.columns .v-center-container}
-
-::: {.column width="50%"}
-Machine learning can be applied to many different kinds of data, including:
-
-- text
-- audio
-- images
-- video
-- tabular data (e.g. survey data)
-:::
-
-::: {.column width="50%"}
-
-::: {layout-nrow=2}
-
-![Audio](../imgs/audio-spectrogram.png)
-
-![Images](../imgs/MnistExamplesWikipedia.png)
-
-![Text](../imgs/bigdatawordcloud.jpeg)
-
-![Tabular](../imgs/tabulardata.png)
-
-:::
-
-:::
-
-::::
-
-## CSS
-
-See `style.css` for custom formatting options.
-
-## Other formatting
-
-::: callout-tip
-Callouts work the same as for non-presentation documents. I don't think margin notes can be used though.
-:::
-
-## Citations
-
-You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
-
-I've started off the references with our main text [@gareth.etal2014]. 
 
 ---

@@ -26,6 +26,9 @@ dfsim <- tibble(
 )
 ```
 
+## Regression
+
+**Regression** techniques aim to predict **continuous** quantities (e.g. height, income, test performance, response time, etc.)
 
 ## Models as functions
 

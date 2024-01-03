@@ -1,5 +1,5 @@
 library(tidyverse)
-hds <- read_csv("../../data/hds.csv")
+hds <- read_csv("data/hds.csv") # create appropriate HDS data first
 
 set.seed(123)
 
@@ -36,4 +36,4 @@ res <- all %>%
   select(name, state, item,  item_num, ans_ind, ans_text)
 
 
-write_csv(res, "../../data/dialect-survey.csv")
+write_csv(res, "data/dialect-survey.csv")

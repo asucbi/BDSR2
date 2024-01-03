@@ -17,14 +17,15 @@ Our learning objectives for this homework are:
 :::
 
 ```{r}
-#| echo: false
 #| message: false
 library(tidyverse)
 library(tidymodels)
 
-hcmst <- read_csv("data/hcmst.csv")
+hcmst <- read_csv("data/hcmst.csv") %>% 
+  filter(w1_q21b_year < 2018)
 
 ```
+Relationships are important!
 
 ![](../imgs/ambiguous-couple.jpeg)
 
@@ -42,16 +43,16 @@ For many people, finding and maintaining healthy romantic relationships is an es
 
 The data for this homework comes from Stanford University's [How Couples Meet and Stay Together (HCMST) study](https://data.stanford.edu/hcmst2017). This survey features a set of 3,510 survey respondents first surveyed in 2017, who were then followed up with in 2020 (2,107 subjects) and in 2022 (1,722) subjects. We will focus on the participants who were involved in a romantic relationship in 2017 and who responded again to questions in 2020.
 
+
 ## Exercise 1
 
-We want to predict which couples will stay together and which will break up, so let's load the data and see how many breakups we have in our dataset.
+We want to predict which couples will stay together and which will break up. First, let's see how many breakups we have in our dataset.
 
 ::: {.callout-note icon="false"}
 ## Exercise 1
 
 First, load the data from `data/hcmst.csv`. Then, examine the balance of the classes (0 = broken up, 1 = together) coded by the `w2_brokeup` variable.
 :::
-
 
 ## Exercise 2
 
@@ -89,14 +90,14 @@ Modify the `hcmst` dataset to translate discrete, cateogrical predictors into `f
 
 ::: {.callout-note icon="false" collapse="true"}
 ## Hint
-Continuous variables: `w1_age`, `w1_p_age`, `w1_yrsed`, `w1_p_yrsed`, `w1_q21a_year`, `w1_rel_qual`, `w1_sex_frequency`, `w1_polparty`, `w1_p_polparty`, `w1_fam_seen_monthly`, `w1_hh_income`, `w2_shelter_combo_months`
+Continuous variables: `w1_age`, `w1_p_age`, `w1_yrsed`, `w1_p_yrsed`, `w1_q21b_year`, `w1_rel_qual`, `w1_sex_frequency`, `w1_polparty`, `w1_p_polparty`, `w1_fam_seen_monthly`, `w1_hh_income`, `w2_shelter_combo_months`
 :::
-
 :::
 
 ::: callout-important
 This is a good place to save your notebook, render it, and confirm that it looks as you expect.
 :::
+
 
 
 ## Exercise 4
@@ -106,9 +107,8 @@ Now we can begin our machine-learning workflow!
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
-Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `id` column before making these splits. Make sure to stratify the train/test splits to ensure a representative class balance for our predictions. Call your training and testing splits `train` and `test`
+Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `id` column before making these splits. Make sure to stratify the train/test splits by our outcome to ensure a representative class balance for our predictions. Call your training and testing splits `train` and `test`
 :::
-
 
 
 ## Exercise 5
@@ -126,9 +126,8 @@ Let's start building our first model. Our first model will use all the available
 ::: {.callout-note icon="false"}
 ## Exercise 6
 
-Build a workflow to train a logistic regression model. As part of the workflow, create a recipe that selects only the Wave 1 features as predictors (and the `w2_brokeup` variable to be predicted).
+Build a workflow to train a logistic regression model. As part of the workflow, create a recipe that selects only the Wave 1 features as predictors.
 :::
-
 
 ::: callout-important
 This is a good place to save your notebook, render it, and confirm that it looks as you expect.
@@ -136,74 +135,76 @@ This is a good place to save your notebook, render it, and confirm that it looks
 
 ## Exercise 7
 
-If you examine the features we have available for prediction (e.g. see the `glimpse()` above), you should notice that some of these features seem more like basic demographics that people might happily share or that might otherwise be available, whereas other features are more intimate and personal responses given in the context of this survey.
+Now let's fit our model in our cross-validation folds and evaluate its performance.
 
 ::: {.callout-note icon="false"}
 ## Exercise 7
 
-Examine the dataset and list two examples of each kind of feature.
+Fit the model to the 10 cross-validation folds and examine its performance with the `collect_metrics()` function.
 :::
+
 
 ## Exercise 8
 
-Let's start building our second "reduced" model. We'll build another model that leverages only "demographic" sorts of features from Wave 1. How well can we predict couples' breakups from the sort of information that might be publicly available or accessible?
+Consider what you should make of the accuracy score you observe in light of the balance of broken-up and together couples you calculated in Exercise 1. 
 
 ::: {.callout-note icon="false"}
 ## Exercise 8
 
-Build a recipe to create another logistic regression model that does not include any sensitive or private features. As part of the pipeline, select only the "public" or "demographic" type features. Use the list of features described in the hint below.
-
-::: {.callout-note icon="false" collapse="true"}
-## Hint
-Deselect the variables for relationship quality and sex frequency.
+Calculate the expected accuracy of a "classifier" that operates by guessing based on the overall probability of break-ups. How does such a "null" model compare to our model in terms of accuracy?
 :::
-
-:::
-
 
 ## Exercise 9
 
-Now it's time to fit our models in our cross-validation folds and evaluate their performance.
+To better evaluate our model, we need to employ a metric other than simple accuracy. One option for evaluating classifiers in cases with unbalanced outcome classes is **Balanced Accuracy**. 
+
+Balanced accuracy is the average of the model's true positive rate (TPR) and its true negative rate (TNR). Unlike simple accuracy, it is "balanced" because it gives equal weight to positive and negative cases.
 
 ::: {.callout-note icon="false"}
 ## Exercise 9
 
-Fit both models to the 10 cross-validation folds.
-:::
+Retrain the model passing `metric_set(accuracy, bal_accuracy)` to the `metrics` argument of `fit_resamples` to calculate accuracy and balanced accuracy.
 
+What kind of balanced accuracy could we expect from our "null" classifier? How does this compare?
+:::
 
 ## Exercise 10
 
+Finally, let's close by training a final model and testing its performance on the test set. Typically, we would train multiple models and pick the best based on its cross validation performance. But here, let's consider our ability to predict to future cases with our one model.
+
 ::: {.callout-note icon="false"}
 ## Exercise 10
 
-Compare the accuracy of these two models. What do you make of those findings? Now compare the AUC for the two models, what do you make of these differences? What explains the difference or similarity?
+Retrain the model on the full training data set. Then, use the final model to generate predictions for the testing data.
 :::
 
-
-
 ## Exercise 11
-
-Finally, let's close by training a final model and testing its performance on the test set. Typically, we would pick the best model based on its cross validation performance. But here, let's consider our ability to predict with "public" data. 
 
 ::: {.callout-note icon="false"}
 ## Exercise 11
 
-Retrain the model with only "public" features on the full training data set.
+Using these predictions and the true observed values, calculate the final model's accuracy, true positive rate, true negative rate, and balanced accuracy on the testing set. 
+
+If the model predicts a couple will breakup, what is the expected probability that they actually do? If we compare two couples, one the model predicts will break up and another it predicts will stay together, how many times more likely should we believe it is that couple predicted to break up will do so?
+
+
 :::
 
 ## Exercise 12
-
 ::: {.callout-note icon="false"}
 ## Exercise 12
 
-Use the final model to generate predictions for the testing data (accuracy and AUC) and create a confusion matrix to show the proportions of true and false positive and negative cases. Examine at the help of `?metrics` for guidance on computing AUC (and use `.pred_0` as the class probability variable).
+Having made these calculations, consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? Write a paragraph or so on your thoughts.
 
-Consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? Write a paragraph or so on your thoughts.
 :::
 
 
+# Wrapping up
 
-::: callout-important
-This is a good place to save your notebook, render it, and confirm that it looks as you expect.
+When you are finished, knit your Quarto document to a PDF file.
+
+::: {.callout-important icon="false"}
+**MAKE SURE YOU LOOK OVER THIS FILE CAREFULLY BEFORE SUBMITTING**
 :::
+
+When you are sure it looks good, submit it on Canvas in the appropriate assignment page.

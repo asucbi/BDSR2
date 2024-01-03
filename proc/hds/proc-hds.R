@@ -2,7 +2,7 @@ library(tidyverse)
 
 
 make_state_df <- function(fname){
-  x <- scan(paste0("harvard dialect survey/", fname), what = "", sep = "\n")
+  x <- scan(paste0("proc/hds/harvard dialect survey/", fname), what = "", sep = "\n")
   items <- c()
   opts <- c()
   
@@ -36,7 +36,7 @@ make_state_df <- function(fname){
     mutate(state = str_sub(fname, 1, -5))
 }
 
-fnames <- list.files("harvard dialect survey/")
+fnames <- list.files("proc/hds/harvard dialect survey/")
 
 full_data <- bind_rows(map(fnames, make_state_df))
 
@@ -53,4 +53,27 @@ full_data <- full_data %>%
   select(state, item_num, item, ans_ind, ans_text, ans_prop) %>% 
   mutate(state = str_to_lower(states[state]))
 
-write_csv(full_data, "../../data/hds.csv")
+# question_nums <- c(1, 2, 4, 7, 9, 10, 15, 28, 27, 47, 65, 36, 14, 58, 75, 73, 52, 76, 26, 45)
+
+
+question_nums <- full_data %>% 
+  group_by(item_num, ans_ind) %>% 
+  mutate(
+    avg_prop = mean(ans_prop, na.rm=T),
+    prop_diff = ans_prop - avg_prop
+    ) %>% 
+  group_by(item_num) %>% 
+  summarize(
+    SD = sd(prop_diff, na.rm=T) # a lil hacky
+  ) %>% 
+  arrange(desc(SD)) %>% 
+  head(20) %>% 
+  pull(item_num)
+  
+
+out <- full_data %>% 
+  filter(item_num %in% question_nums)
+
+write_csv(out, "data/hds.csv")
+
+

@@ -185,15 +185,15 @@ Learning Objectives
 <span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(hds)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 6 × 6
-  state   item_num item  ans_ind ans_text                                ans_p…¹
-  &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;                                     &lt;dbl&gt;
-1 alabama        1 aunt  a       "[] as in \"ah\""                        0.0373
-2 alabama        1 aunt  b       "[] as in \"ant\""                       0.842 
-3 alabama        1 aunt  c       "[] as in \"caught\""                    0.0124
-4 alabama        1 aunt  d       "I have the same vowel in \"ah\", \"ca…  0.0124
-5 alabama        1 aunt  e       "I pronounce it the same as \"ain't\""   0.0456
-6 alabama        1 aunt  f       "I use [/] when referring to the gener…  0.0249
-# … with abbreviated variable name ¹​ans_prop</code></pre>
+  state   item_num item                                  ans_ind ans_t…¹ ans_p…²
+  &lt;chr&gt;      &lt;dbl&gt; &lt;chr&gt;                                 &lt;chr&gt;   &lt;chr&gt;     &lt;dbl&gt;
+1 alabama        4 "caramel"                             a       "with …  0.208 
+2 alabama        4 "caramel"                             b       "with …  0.656 
+3 alabama        4 "caramel"                             c       "I use…  0.116 
+4 alabama        4 "caramel"                             e       "other"  0.0207
+5 alabama        5 "the vowel in the second syllable of… a       "[i:] …  0.261 
+6 alabama        5 "the vowel in the second syllable of… b       "[] as…  0.647 
+# … with abbreviated variable names ¹​ans_text, ²​ans_prop</code></pre>
 </div>
 </div>
 <p>Then, we’ll load in our data.</p>
@@ -202,7 +202,7 @@ Learning Objectives
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>survey <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/dialect-survey.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
-<pre><code>Rows: 60016 Columns: 6
+<pre><code>Rows: 9920 Columns: 6
 ── Column specification ────────────────────────────────────────────────────────
 Delimiter: ","
 chr (5): name, state, item, ans_ind, ans_text
@@ -232,7 +232,7 @@ Exercise 1
 </section>
 <section id="exercise-2" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-2">Exercise 2</h2>
-<p>Hopefully this is kind of fun, but let’s also do some even more basic EDA. If we look, there are 28695 rows in the dataset, which with 50 states would give 573.9 rows per state. Does that make sense?</p>
+<p>Hopefully this is kind of fun, but let’s also do some even more basic EDA. If we look, there are 4530 rows in the dataset, which with 50 states would give 90.6 rows per state. Does that make sense?</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -353,18 +353,18 @@ Exercise 5
 <span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>res</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 48 × 5
-   state         likeli  prior    pdata posterior
-   &lt;chr&gt;          &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;
- 1 alabama     1.03e-66 0.0208 1.15e-48  1.85e-20
- 2 arizona     1.08e-51 0.0208 1.15e-48  1.95e- 5
- 3 arkansas    9.45e-65 0.0208 1.15e-48  1.71e-18
- 4 california  2.95e-56 0.0208 1.15e-48  5.32e-10
- 5 colorado    2.35e-52 0.0208 1.15e-48  4.24e- 6
- 6 connecticut 1.13e-64 0.0208 1.15e-48  2.03e-18
- 7 delaware    3.21e-48 0.0208 1.15e-48  5.79e- 2
- 8 florida     2.84e-57 0.0208 1.15e-48  5.12e-11
- 9 georgia     6.54e-62 0.0208 1.15e-48  1.18e-15
-10 idaho       1.10e-51 0.0208 1.15e-48  1.99e- 5
+   state         likeli  prior         pdata   posterior
+   &lt;chr&gt;          &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;       &lt;dbl&gt;
+ 1 alabama     5.62e-13 0.0208 0.00000000797 0.00000147 
+ 2 arizona     2.41e- 8 0.0208 0.00000000797 0.0631     
+ 3 arkansas    2.82e-12 0.0208 0.00000000797 0.00000736 
+ 4 california  1.63e-10 0.0208 0.00000000797 0.000427   
+ 5 colorado    4.88e-12 0.0208 0.00000000797 0.0000127  
+ 6 connecticut 5.98e-10 0.0208 0.00000000797 0.00156    
+ 7 delaware    1.28e- 8 0.0208 0.00000000797 0.0335     
+ 8 florida     5.78e-11 0.0208 0.00000000797 0.000151   
+ 9 georgia     1.23e-13 0.0208 0.00000000797 0.000000321
+10 idaho       7.89e-11 0.0208 0.00000000797 0.000206   
 # … with 38 more rows</code></pre>
 </div>
 </div>

@@ -1,0 +1,108 @@
+---
+title: "The Logistic Function"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## Logistic Function
+
+The **Logistic** function smooshes continuous values in the range $[-\infty, \infty]$ to fall between zero and 1.
+
+< plot of logistic function >
+
+## Working backwards
+
+To understand how it works, we'll work backwards to consider how we might expand probabilities from zero to one onto the range $[-\infty, \infty]$
+
+Then see how the logistic function does just the opposite of that.
+
+## Odds
+
+:::: {.columns}
+::: {.column width="50%"}
+- If you are a betting man (or woman), you know that **odds** are another way to express uncertainty:
+- Instead of saying "75% probability" we might also say "3:1 odds"
+
+:::
+::: {.column width="50%"}
+![](../imgs/DALLE-2024-01-02-09.26.43-bookie board.png)
+:::
+::::
+
+$$o(x) = \frac{p(x)}{1-p(x)}$$
+
+Commonly used in gambling to express a fair bet: If we agree an event has a 75% probability, then to bet against it you should need to gain \$3 for every \$1 risked.
+
+## Functions and inverse functions
+
+::: {.callout-caution icon="false"}
+## Notation
+$f^{-1}$: the inverse of the function $f$.  The notation extends the notion of the inverse of a number expressed in negative exponents, $x^{-1} = 1/x$.
+:::
+
+If we define $g$ to be a function that transforms probabilities into odds, then its **inverse function** $g^{-1}$ is a function that transforms odds into probabilities.
+
+:::: {.columns}
+::: {.column width="50%"}
+$$g(p) = \frac{p}{1-p}$$
+:::
+::: {.column width="50%"}
+$$g^{-1}(o) = \frac{o}{o+1}$$
+:::
+::::
+
+
+## Functions and outputs
+
+Very loosely ...
+
+- Probabilities fall $[0, 1]$
+- Odds fall in  $[0, \infty]$
+- Linear equations are unconstrained, operating in $[-\infty, \infty]$
+
+## Logarithms and Exponentiation
+
+**Exponentiation**: $b^n = \underbrace{b \times b \times ... \times b}_{n \text{ times}}$
+
+**Logarithm**: The inverse of exponentiation
+
+$$y = log_bx \iff b^y=x$$
+::: {.callout-caution icon="false"}
+## Notation
+$\text{ln} \ x$: The natural logarithm of $x$, using euler's number $e \approx 2.718$ as the base. I.e., equivalent to $log_e x$.
+:::
+
+
+## Logarithms and Exponentiation in `R`
+
+`log()` computes the natural logarithm and `exp()` the exponentiation function (default natural base).
+
+```{r}
+exp(log(2))
+log(exp(2))
+```
+
+
+## Log-odds and the logit
+
+$\text{ln} \ x$ is defined for all positive numbers and the resulting values fall in $[-\infty, \infty]$
+
+The **logit** function:
+
+$$\text{logit}(p) =  \text{ln} \ \frac{p}{1-p}$$
+
+## The inverse-logit: the logistic function!
+
+By transforming probabilities into log odds, we expand values from the range $[0, 1]$ to the range $[-\infty, \infty]$.
+
+By doing just the opposite (inverse), we can smoosh our linear model predictions into the range of probabilities! And that's the **logistic** function!
+
+$$\text{logistic}(x) = \text{logit}^{-1}(x) = \frac{1}{1 + e^{x}}$$
+## Logistic Regression
+
+Substituting in our linear equation, we have logistic regression:
+
+$$\hat{p(y)} = \frac{1}{1 + e^{\alpha + \beta x}}$$

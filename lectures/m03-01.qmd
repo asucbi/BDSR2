@@ -1,0 +1,78 @@
+---
+title: "Introduction to Logistic Regression"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+```{r}
+#| include: false
+
+library(tidyverse)
+```
+
+## Classification
+
+Classification involves predicting **discrete** categorical outcomes.
+
+- Whether an event/outcome occurred
+- To which class does an observation belong
+- Etc.
+
+## Regression
+
+**Regression** techniques aim to predict **continuous** quantities (e.g. height, income, test performance, response time, etc.)
+
+## Classification with Logistic Regression
+
+We can use **regression** techniques to predict the **probability** of discrete outcomes.
+
+## Example
+
+Introduce whatever our example will be
+
+## Classification with Linear Regression?
+
+What if we tried to use linear regression to predict the probability of binary outcomes? Let's try it!
+
+```{r}
+
+```
+
+## A problem: Impossible Probabilities
+
+Probabilities must fall between $[0, 1]$, but our model predicts negative probabilities and probabilities $> 1$!
+
+< plot showing this >
+
+## A solution: A link function
+
+We need some way to smoosh our models' predicted probabilities so that they always fall between zero and 1.
+
+The **Logistic** link function does just that.
+
+< plot of logistic function >
+
+## Generalized linear models
+
+- **Logistic Regression** is an example of a **Generalized Linear Model**, a family of modeling approaches that extend the basics of linear regression to apply to a range of scenarios.
+- These models add a **link function** $f$ to the basic linear model:
+
+$$\hat{y} =  f(\alpha + \beta x)$$
+## Logistic Regression
+
+- **Logistic Regression** is a **Generalized Linear Model** that incorporates a **logistic** link function.
+- The probability of an event $p(y)$ is estimated with a linear equation, smooshed between zero and one with the logistic link.
+
+$$\hat{p(y)} =  \text{logistic}(\alpha + \beta x)$$
+## Loss function: Binomial Distribution
+
+- For logistic regression, we no longer use the residual sum of squares as our loss function.
+- Instead, we use the **Binomial distribution**
+- Use **optimization** to find the maximum likelihood estimate for model parameters
+
+< equation for this in negative log loss >
+
+

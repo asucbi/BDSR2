@@ -1,0 +1,101 @@
+---
+title: "Logistic Regression in Practice"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## Example: Extramarital affairs
+
+We'll consider self-report data from 535 individuals with information about their family situation, views toward marriage, and whether or not they are currently having an extramarital sexual affair. The data comes from a survey conducted by Psychology Today in 1969.
+
+## The data
+
+```{r}
+#| echo: true
+library(tidyverse)
+library(tidymodels)
+library(broom)
+
+affairs <- read_csv("data/affairs.csv") %>% 
+  mutate(having_affair = factor(if_else(affairs > 0, 1, 0)))
+
+head(affairs)
+```
+
+## Exploratory Data Analysis
+
+```{r}
+affairs %>% 
+  group_by(rating) %>% 
+  summarize(prop_affair = mean(having_affair==1), cnt = n()) %>% 
+  mutate(se = sqrt(prop_affair*(1-prop_affair)/cnt)) %>% 
+  ggplot(aes(x=rating, y = prop_affair, ymax = prop_affair + 2*se, ymin = prop_affair - 2*se )) +
+  geom_pointrange() +
+  ylim(0,1)
+```
+
+
+## Setting up
+
+```{r}
+#| echo: true
+library(tidymodels)
+set.seed(1234)
+splits <- initial_split(affairs, strata = rating)
+
+train <- training(splits)
+test <- testing(splits)
+```
+
+
+## Simple logistic regression model
+
+```{r}
+lr_wflow <- workflow(having_affair ~ rating) %>% 
+  add_model(logistic_reg())
+
+lr_fit1 <- fit(lr_wflow, data = train)
+
+lr_fit1
+```
+
+
+## Results
+
+```{r}
+tidy(lr_fit1)
+```
+
+## Plotting results
+
+```{r}
+lr_fit1 %>% 
+  augment(
+    tibble(rating = seq(1,5,.01))
+  ) %>% 
+  ggplot(aes(x = rating, y=.pred_1)) +
+  geom_line() +
+  geom_jitter(data = affairs, aes( x = rating, y = as.numeric(having_affair==1)), height = .05, alpha = .3)
+```
+
+
+## Adding predictors
+
+## More visualizations
+
+## Interpreting coefficients / predictions
+
+# Performance metrics
+
+## Accuracy
+
+## Precision and Recall
+
+## tidymodels vs `glm()`
+
+
+
+

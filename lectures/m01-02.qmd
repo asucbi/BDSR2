@@ -19,13 +19,28 @@ Models are a way to create a simplified or controllable version of some scientif
 
 Engineers construct physical models to test the properties of their designs and to predict how complex systems will operate.
 
+:::: {.columns}
+::: {.column width="50%"}
 ![](../imgs/1440px-USCAE_Bay_Model_-_San_Francisco_Bay_Detail.jpg)
+:::
+::: {.column width="50%"}
+![](../imgs/1266px-MD-11_12ft_Wind_Tunnel_Test.jpg)
+:::
+::::
+
 
 ## Model animals {.center}
 
 Biologists use model animals to examine biological systems and to conduct experiments that cannot be ethically conducted on humans.
 
+:::: {.columns}
+::: {.column width="50%"}
 ![](../imgs/1626px-White_rat_on_table.jpg)
+:::
+::: {.column width="50%"}
+![](../imgs/1620px-Drosophila_melanogaster_Proboscis.jpg)
+:::
+::::
 
 
 ## MONIAC

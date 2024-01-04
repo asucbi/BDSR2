@@ -1,0 +1,413 @@
+---
+title: "Module 11 Lab: Building perceptrons by hand"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+# Input classification with a single-layer perceptron
+```{r}
+rm(list = ls(all = TRUE))
+
+# Supervised learning
+
+# Initialization
+epochs <- 0
+
+Inputs <- matrix(c(1, 0, 0, 0,
+                   0, 1, 0, 0,
+                   0, 0, 1, 0,
+                   0, 0, 0, 1), ncol = 4, byrow = TRUE)
+
+Targets <- matrix(c(1, 0,
+                    1, 0,
+                    0, 1,
+                    0, 1), ncol = 2, byrow = TRUE)
+
+W <- matrix(runif(8, -1, 1), nrow = 4, ncol = 2)
+
+mse <- 100
+Lrate <- 0.1
+
+```
+
+```{r}
+vect=c()
+while (mse > 0.005) {
+  epochs <- epochs + 1
+  errs <- rep(0, 4)
+
+  for (n in 1:4) {
+    In <- Inputs[n, ]
+    Targ <- Targets[n, ]
+    Out <- In %*% W
+    Err <- Targ - Out
+    errs[n] <- mean(Err^2)
+    delta <- Lrate * In %*% Err
+    W <- W + delta
+  }
+
+  mse <- mean(errs)
+  vect <- c(vect, mse)
+}
+
+cat("Epochs:", epochs, "\n")
+plot(1:length(vect), vect)
+
+```
+
+
+```{r}
+# Test
+for (n in 1:4) {
+  In <- Inputs[n, ]
+  cat("Test results for input", n, "\n")
+  Out <- In %*% W
+  print(Out)
+  cat("Expected results for input", n, "\n")
+  Targ <- Targets[n, ]
+  print(Targ)
+}
+```
+
+# The XOR problem
+
+```{r}
+Inputs <- matrix(c(1, 0, 
+                   0, 1, 
+                   0, 0, 
+                   1, 1), ncol = 2, byrow = TRUE)
+
+Targets <- matrix(c(1,
+                    1, 
+                    0,
+                    0), ncol = 1, byrow = TRUE)
+```
+
+
+## Single-layer perceptron
+```{r}
+#learning rate -- scales the change in weights
+Lrate=.1;
+
+#momentum term 
+alpha=.9;
+
+#weights from input to output layer, initially random 2x1
+W1 = matrix(runif(2, -1, 1), nrow = 2, ncol = 1) 
+W1mom=0
+
+#bias to output layer, intitially random 1x1
+biasout= matrix(runif(1, -1, 1), nrow = 1, ncol = 1) 
+biasoutmom=0
+
+#set script to stop when mean squared error gets below a threshold
+epochs <- 0
+vect=c()
+mse <- 100
+while(mse > .0001 & epochs <10000) {
+  epochs = epochs+1
+    
+  errs <- c()
+  for(n in 1:4){
+    In <- Inputs[n, ]
+    Targ=Targets[n, ]
+    
+    #send activations through weights to output 
+    out = In %*% W1 + biasout
+    
+    #send through sigmoid activation function
+    out = 1/(1+exp(-1*out))
+    
+    #take derivative of output layer activations for later use
+    outprime = out*(1-out)
+    
+    #calculate errors and save for later
+    Err = Targ-out
+    
+    #each epoch stores 4 squared errors (1 for each training case)
+    errs = c(errs, Err^2)
+    
+    #delta for the output layer is the derivative of the output multiplied by the error 
+    delta = Err * outprime
+    
+    W1ch =  In %*% delta * Lrate + W2mom * alpha
+    
+    #then actually change the weights
+    W1 = W1 + W1ch
+        
+    #same as above for changing bias nodes
+    biasoutch = delta*Lrate + biasoutmom*alpha
+    biasout= biasout + biasoutch
+    
+    #save new momentum values for next iteration -- this is just the weight change on the last
+    #iteration
+    W1mom=W1ch
+    biasoutmom=biasoutch
+  }
+      
+  #take mean of all 4 squared errors on that epoch
+  mse=mean(errs)
+      
+  #save a vector of the mse over all epochs
+  vect <- c(vect, mse)
+}
+
+
+#plot the mse over epochs
+plot(vect)
+```
+
+```{r}
+# Test
+for (n in 1:4) {
+  In <- Inputs[n, ]
+  out = In %*% W1 + biasout
+  out = 1/(1+exp(-1*out))
+  
+  cat("Test results for input", n, "\n")
+  print(out)
+  
+  cat("Expected results for input", n, "\n")
+  Targ <- Targets[n, ]
+  print(Targ)
+}
+
+```
+
+
+## Multi-layer perceptron
+```{r}
+#learning rate -- scales the change in weights
+set.seed(1234)
+Lrate=.1;
+
+#momentum term -- scales the change in momentum
+alpha=.9;
+
+#weights from input to hidden layer, initially random, 2x2
+W1 = matrix(runif(4, -1, 1), nrow = 2, ncol = 2) 
+
+#start momentum values at 0
+W1mom=0
+   
+#weights from hidden to output layer, initially random 2x1
+W2 = matrix(runif(2, -1, 1), nrow = 2, ncol = 1) 
+W2mom=0
+
+#bias to hidden layer, initially random 1x2
+biashid= matrix(runif(2, -1, 1), nrow = 1, ncol = 2) 
+biashidmom= 0
+
+#bias to output layer, intitially random 1x1
+biasout= matrix(runif(1, -1, 1), nrow = 1, ncol = 1) 
+biasoutmom=0
+
+#set script to stop when mean squared error gets below a threshold
+epochs <- 0
+vect=c()
+mse <- 1
+while(mse > .0001 & epochs <100000) {
+  epochs = epochs+1
+    
+  errs <- c()
+  unsq_errs = c()
+  for(n in 1:4){
+    In <- Inputs[n, ]
+    Targ=Targets[n, ]
+    
+    #send inputs through weights to hidden
+    hid = In %*% W1 + biashid
+    
+    #send through sigmoid activation function
+    hid = 1/(1+exp(-1*hid))
+    
+    #get derivative of hidden layer activations for later use
+    hidprime = hid*(1-hid)
+    
+    #send hidden activations through weights to output 
+    out = hid %*% W2 + biasout
+    
+    #send through sigmoid activation function
+    out = 1/(1+exp(-1*out))
+    
+    #take derivative of output layer activations for later use
+    outprime = out*(1-out)
+    
+    #calculate errors and save for later
+    Err = Targ-out
+    
+    #each epoch stores 4 squared errors (1 for each training case)
+    errs = c(errs, Err^2)
+    unsq_errs = c(unsq_errs, Err)
+    
+    #delta for the output layer is the derivative of the output multiplied by the error
+    delta2 = Err * outprime
+
+    #then we simply feed that delta through the weights from hidden to output
+
+    #FIX
+    delta1 = (delta2 %*% t(W2)) * hidprime
+
+    #find amount to change weights between hidden and output (W2)
+    #hidden activations * delta2 * learning rate +
+    #momentum*momentum-term
+
+    W2ch = t(hid) %*% delta2 * Lrate + W2mom * alpha
+
+    #then actually change the weights
+    W2 = W2 + W2ch
+
+    #same as above for weights between input to hidden
+    W1ch = In %*% delta1 * Lrate + W1mom * alpha
+    W1 = W1 + W1ch
+
+    #same as above for changing bias nodes
+    biasoutch = delta2*Lrate + biasoutmom*alpha
+    biasout= biasout + biasoutch
+
+    biashidch=delta1*Lrate + biashidmom*alpha
+    biashid=biashid+biashidch
+
+    #save new momentum values for next iteration -- this is just the weight change on the last
+    #iteration
+    W2mom=W2ch
+    W1mom=W1ch
+    biashidmom=biashidch
+    biasoutmom=biasoutch
+    
+  }
+      
+  #take mean of all 4 squared errors on that epoch
+  mse=mean(errs)
+      
+  #save a vector of the mse over all epochs
+  vect <- c(vect, mse)
+}
+
+
+#plot the mse over epochs
+plot(vect)
+```
+
+```{r}
+# Test
+for (n in 1:4) {
+  In <- Inputs[n, ]
+  hid = In %*% W1 + biashid
+  hid = 1/(1+exp(-1*hid))
+  out = hid %*% W2 + biasout
+  out = 1/(1+exp(-1*out))
+  
+  cat("Test results for input", n, "\n")
+  print(out)
+  
+  cat("Expected results for input", n, "\n")
+  Targ <- Targets[n, ]
+  print(Targ)
+}
+
+```
+# Tidymodels version
+
+```{r}
+library(tidymodels)
+
+data <- data.frame(Inputs)
+colnames(data) <- c("X1","X2")
+data$Y <- as.factor(Targets[,1])
+
+mlp_spec <- mlp(
+  hidden_units = 2,
+  epochs = 100000,
+  learn_rate = .1
+  ) %>% 
+  set_engine("nnet", trace = TRUE, abstol = .0001) %>% 
+  set_mode("classification")
+
+fit <- mlp_spec %>% fit(Y ~ ., data = data)
+
+predict(fit, data)
+```
+
+# neuralnet package version
+```{r}
+library(neuralnet)
+
+s0 = Sys.time()
+nnet <- neuralnet(Y ~ .,
+                  data = data,
+                  hidden = 2,
+                  stepmax = 100000,
+                  learningrate = .1,
+                  threshold = .001,
+                  algorithm = "backprop",
+                  linear.output = FALSE,
+                  lifesign = "full",
+                  lifesign.step = 1000
+                  )
+
+s1 = Sys.time()
+elapsed = s1-s0
+elapsed
+
+plot(nnet)
+
+predict(nnet, as.matrix(data[,1:2],ncol=2))
+
+```
+
+# Keras/Tensorflow version
+```{r}
+library(tensorflow)
+library(keras)
+use_backend("tensorflow")
+
+model <- keras_model_sequential()
+
+model %>% 
+  layer_dense(
+    units = 2, 
+    activation = 'sigmoid', 
+    input_shape = c(2),
+    kernel_initializer = initializer_random_uniform(minval = -1, maxval = 1, seed = 1234), 
+    bias_initializer = initializer_random_uniform(minval = -1, maxval = 1)) %>% 
+  layer_dense(
+    units = 1, 
+    activation = 'sigmoid',
+    kernel_initializer = initializer_random_uniform(minval = -1, maxval = 1), 
+    bias_initializer = initializer_random_uniform(minval = -1, maxval = 1))
+
+model %>% compile(
+  loss = 'mse',
+  optimizer = keras::keras$optimizers$legacy$SGD(learning_rate = .1, momentum = .9),
+  metrics = 'accuracy'
+)
+
+data = matrix(rep(t(Inputs),100),ncol=ncol(Inputs),byrow=TRUE)
+labels = matrix(rep(t(Targets),100),ncol=ncol(Targets),byrow=TRUE)
+
+callbacks = list(callback_early_stopping(monitor = "loss", min_delta = -.00001, mode = "min", patience =6, restore_best_weights = TRUE,verbose=0))
+
+with(tf$device("CPU"),
+  model %>% fit(
+    data,
+    labels,
+    epochs=1000,
+    steps_per_epoch = 100,
+    batch_size=4,
+    shuffle = FALSE,
+    verbose=2,
+    callbacks = callbacks,
+    
+    view_metrics=FALSE
+  )
+)
+
+model %>% predict(data[1:4,1:2], steps=1)
+```
+```{r}
+tf_config(
+)
+```
+

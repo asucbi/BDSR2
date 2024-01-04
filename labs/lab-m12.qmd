@@ -1,0 +1,111 @@
+---
+title: "Module 12 Lab: Building perceptrons by hand"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this module are:
+
+-   blah
+:::
+
+Blah 
+
+## Library and data loading
+
+```{r}
+#| message = FALSE
+
+library(tidymodels)
+library(tidyverse)
+library(tensorflow)
+library(keras)
+```
+
+```{r}
+# Load the mnist data's training and testing dataset
+mnist <- dataset_mnist()
+
+x_train <- mnist$train$x
+y_train <- mnist$train$y
+
+x_test <- mnist$test$x
+y_test <- mnist$test$y
+
+```
+
+```{r}
+index_image = 28 ## change this index to see different image.
+input_matrix <- x_train[index_image,1:28,1:28]
+output_matrix <- apply(input_matrix, 2, rev)
+output_matrix <- t(output_matrix)
+image(1:28, 1:28, output_matrix, col=gray.colors(256), xlab=paste('Image for digit of: ', y_train[index_image]), ylab="")
+```
+
+```{r}
+# Define a few parameters to be used in the CNN model
+batch_size <- 128
+num_classes <- 10
+epochs <- 10
+
+# Input image dimensions
+img_rows <- 28
+img_cols <- 28
+
+x_train <- array_reshape(x_train, c(nrow(x_train), img_rows, img_cols, 1))
+x_test <- array_reshape(x_test, c(nrow(x_test), img_rows, img_cols, 1))
+input_shape <- c(img_rows, img_cols, 1)
+
+x_train <- x_train / 255
+x_test <- x_test / 255
+
+# Convert class vectors to binary class matrices
+y_train <- to_categorical(y_train, num_classes)
+y_test <- to_categorical(y_test, num_classes)
+```
+
+```{r}
+cnn_model <- keras_model_sequential() %>%
+  layer_conv_2d(filters = 32, kernel_size = c(3,3), activation = 'relu', input_shape = input_shape) %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  layer_conv_2d(filters = 64, kernel_size = c(3,3), activation = 'relu') %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  layer_dropout(rate = 0.25) %>% 
+  layer_flatten() %>% 
+  
+  layer_dense(units = 128, activation = 'relu') %>% 
+  layer_dropout(rate = 0.5) %>% 
+  layer_dense(units = num_classes, activation = 'softmax') 
+
+```
+
+```{r}
+cnn_model %>% compile(
+  loss = loss_categorical_crossentropy,
+  optimizer = optimizer_adadelta(learning_rate=2),
+  metrics = c('accuracy')
+)
+```
+
+```{r}
+cnn_history <- cnn_model %>% fit(
+  x_train, y_train,
+  batch_size = batch_size,
+  epochs = epochs,
+  validation_split = 0.2
+)
+```
+
+```{r}
+plot(cnn_history)
+```
+
+```{r}
+cnn_model %>% evaluate(x_test, y_test)
+```
+
+

@@ -1,0 +1,337 @@
+---
+title: "Module 5 Lab: Human Activity Recognition w/ KNN & Cross-Validation"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this module are:
+
+-   Understand the bias-variance tradeoff (accuracy vs overfitting)
+-   Understand the k-nearest neighbors algorithm for classification and implement it with tidymodels
+-   Use cross-validation to tune the value of k
+:::
+
+Our cellphones and smartwatches record a lot of different kinds of data. There's our search history and web traffic, of course, but also GPS, audio data, and a variety of sensors, including a gyroscope, accelerometer, and gravity sensor. In this module, we'll see how that sensor data can be used to predict what a user is doing during some interval of time--whether they're sitting down, riding a bike, driving a car, etc. This type of analysis might be useful, for example, for a tech company to figure out your interests and serve up targeted ads, or to deliver content/functionality at just the right moment (e.g. maybe you want your maps interface to change automatically depending upon whether you are biking, driving, or walking).
+
+The dataset for this module contains summarized data (i.e. means, maxs, mins, etc) from the accelerometer, gyroscope, and gravity sensor of a smartwatch while participants performed various actions. We will use the k-nearest neighbors (KNN) algorithm to classify the activity being performed. Then, we will use k-fold cross-validation to tune the parameters of our KNN model in order to get the highest classification accuracy, while avoiding overfitting.
+
+## Library and data loading
+
+```{r}
+#| message = FALSE
+library(tidyverse)
+library(tidymodels)
+library(broom)
+library(themis)
+
+df = rbind(read_csv('./data/OriginalProcessedData.csv'), read_csv('./data/NewProcessedData.csv'))
+
+colnames(df) <- gsub("~","", colnames(df))
+
+df$Activity = factor(df$Activity)
+```
+
+# Data visualization and exploration
+
+::: {.callout-note icon="false"}
+## Exercise 1
+
+First, make a bar plot showing the number of observations of each type of `Activity`.
+:::
+
+::: hidden
+```{r}
+
+ggplot(df, aes(x = Activity, fill = Activity))+geom_bar()
+
+```
+:::
+
+One thing to notice is that we have substantial "class imbalance," meaning there are many observations of some activities--such as cycling and football--and far fewer observations of other activities, such as jogging and pushups. Class imbalance can cause problems for our model, because the training data is driven much more strongly by only a subset of activities.
+
+To deal with this problem, we can use resampling techniques. We can either "upsample," to get more observations of the rarer classes, or "downsample," to have fewer observations of the more common classes.
+
+In this case, we will try upsampling, using the `step_upsample()` function. We set `over_ratio` to .5, meaning we will oversample the classes with fewer observations until they have 50% as many observations as the class with the most observations. The plot below shows what the distribution of activities will look like after this resampling step.
+
+```{r}
+recipe(Activity ~ ., df) %>% 
+  step_upsample(Activity, over_ratio = .5) %>% 
+  prep() %>%
+  bake(new_data = NULL) %>%
+  ggplot(aes(x = Activity, fill = Activity))+geom_bar() +
+  geom_bar()
+```
+
+Next, we'll explore the data a bit to see what it looks like while doing different activities. Notice that there are a LOT of variables in the dataset. First, we'll just grab any two variables and make a scatterplot, with points colored by `Activity`. I chose the mean of the accelerometer data in the X- and Y-axes, called `ACCELEROMETER_X_mean` and `ACCELEROMETER_Y_mean`
+
+```{r}
+ggplot(df, aes(x = ACCELEROMETER_X_mean, y = ACCELEROMETER_Y_mean, color = as.factor(Activity))) + geom_point()
+
+```
+
+We can see that the data is somewhat clustered. For example, there is a cloud of points associated with swimming, another for cycling and for football. But overall, it's pretty messy, and it would probably be hard to accurately predict the activity from this data.
+
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Next, make the same plot as above using the X- and Y-axis means of the gravity sensor, and another for the gyroscope data. Do you notice any differences? Which pair of variables do you think would be best for predicting `Activity`?
+:::
+
+```{r}
+ggplot(df, aes(x = GRAVITY_X_mean, y = GRAVITY_Y_mean, color = as.factor(Activity))) + geom_point()
+
+```
+
+```{r}
+ggplot(df, aes(x = GYROSCOPE_X_mean, y = GYROSCOPE_Y_mean, color = as.factor(Activity))) + geom_point()
+
+```
+
+Our dataset has a lot of different (potential) predictor variables--112, to be precise. As such, we can think of each row as a point in a 112-dimensional space. Above, we plotted the data in 3 different, 2-dimensional slices of that 112-D space. We can see that the datapoints appear more discriminable when we look at some dimensions rather than others. But how well could we tell the activities apart if we could see in *all 112* dimensions at once?
+
+The model we'll use today, the k-nearest neighbors (KNN) algorithm, is based on the euclidean distance between points. KNN assumes that "birds of a feather flock together"--meaning that observations from a given `Activity` class will be *near* other observations from that same class, within 112-dimensional space. When we encounter a new, unlabeled point and want to predict it's class, KNN simply checks the class labels for the *k* nearest other points (in the training set) and takes their labels as "votes" to determine the label of the new point.
+
+::: callout-tip
+*k* (called `neighbors` in our model spec) should always be an odd number, to avoid ties in voting.
+:::
+
+# Data splitting
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+First, we need to set up our usual test/train split.
+:::
+
+```{r}
+df_split <- initial_split(df)
+df_train <- training(df_split)
+df_test <- testing(df_split)
+```
+
+# Building a KNN model
+
+::: {.callout-note icon="false"}
+## Exercise 4
+
+Next, make a model specification using tidymodels, for a k-nearest neighbors model. The function is called `nearest_neighbor()`. The `mode` should be set to *"classification"*, the `engine` to *"kknn"*, and let's set `neighbors` to *5*, to start.
+:::
+
+```{r}
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = 5
+)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 5
+
+Next, build a recipe, `rec`, consisting of a formula and an upsampling step. The formula should predict `Activity` from all of the other variables in the dataset. We should also include a step to normalize all of our predictor variables. Then, build a workflow called `knn_wf`, with your model specification and recipe.
+:::
+
+```{r}
+rec <- recipe(Activity ~ ., df) %>% 
+  step_upsample(Activity, over_ratio = .5) %>% 
+  step_normalize(all_numeric())
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+```
+
+# Fitting the model
+
+::: {.callout-note icon="false"}
+## Exercise 6
+
+Next, fit the model to the training data.
+:::
+
+```{r}
+knn_fit <-
+  knn_wf %>% 
+  fit(data = df_train)
+```
+
+Keep in mind that the model we have built so far is just a starting point--we will need to tune the model in order to find the best parameter(s). For the k-nearest neighbors algorithm, there is just one model parameter: the value `k` (the number of neighbors considered). To find the best value for `k`, we will need to run the model with different values of `k`, and collect some metric of performance. But importantly, we don't want to use our testing data just yet to evaluate our models--the test set must be saved for the final model.
+
+::: {.callout-note icon="false"}
+## Exercise 7
+
+Explain WHY we don't want to evaluate model performance on the test set while we are tuning our model.
+:::
+
+So how are we supposed to evaluate model performance for the purpose of parameter tuning, without using the test set? That's where *cross-validation* comes in. We divide the training data into *n* subsets, set aside one subset as the current validation data, and train the model on the remaining subsets. We then repeat that procedure *n* times, each time leaving out a different subset of the data. This amounts to *resampling* the training set to use it as a preliminary test set. With this approach, we can test out different values of *k* (`neighbors` in the KNN) and estimate how each will perform, before tapping into our precious test set.
+
+# Model evaluation with cross-validation
+
+::: {.callout-note icon="false"}
+## Exercise 8
+
+Use the `vfold_cv()` function from tidymodels to divide `df_train` into 5 folds. Then, use the `fit_resamples()` function to estimate the performance of our initial KNN model. You need to give the function your workflow and your folds as input.
+:::
+
+```{r}
+folds <- 
+  vfold_cv(df_train, v = 5)
+
+knn_rs <- fit_resamples(
+  knn_wf,
+  folds
+)
+
+collect_metrics(knn_rs)
+```
+
+# Model tuning
+
+Next, we will tune the model to find the best value of *k* (`neighbors`). We essentially just repeat the process above for different values of *k*, but we'll do it in a nice tidymodels way.
+
+::: {.callout-note icon="false"}
+## Exercise 9
+
+Create a new model specification, like `knn_spec` above, but set `neighbors = tune()`.
+:::
+
+```{r}
+tune_spec <- 
+  nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = tune()
+)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 10
+
+Make a tibble called `neighbor_grid`, containing a list of values for *k* (`neighbors`) to search through for your model tuning. These should be odd numbers (to avoid voting ties) with a minimum of 1 and a maximum of 19.
+
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+
+Use the `seq()` function to create a sequence of odd numbers from 1-99 in steps of 4.
+:::
+:::
+
+```{r}
+neighbor_grid <- 
+  tibble(neighbors = seq(1,99,by=4)) 
+```
+
+::: {.callout-note icon="false"}
+## Exercise 11
+
+Next, build a workflow with your `tune_spec` model.
+:::
+
+```{r}
+tune_wf <- workflow() %>%
+  add_recipe(rec) %>% 
+  add_model(tune_spec)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 12
+
+Finally, use `tune_grid()` to tune your model parameters. The function arguments are the same as `fit_resamples()`, except we add `grid = neighbor_grid` to supply the values of *k* `neighbors` to try.
+:::
+
+```{r}
+tune_rs <- tune_grid(
+  tune_wf,
+  folds,
+  grid = neighbor_grid
+)
+
+```
+
+We can use `autoplot()` to quickly visualize how the model performed at each value of *k*.
+
+```{r}
+autoplot(tune_rs)
+```
+
+Finally, we need to choose a value for *k* for our final model, which we will evaluate on the test set. Then we fit the model with that parameter, and evaluate its performance on the test set. We can use the `select_best()` function and set the `metric` to "accuracy" to choose the value of *k* neighbors that produced the best accuracy. Then we can use `finalize_workflow` to plug in that best value, before fitting the model and finally evaluating its performance on the test set.
+
+```{r}
+chosen_n <- tune_rs %>% select_best(metric = "accuracy", neighbors)
+
+final_knn <- finalize_workflow(tune_wf, chosen_n)
+
+knn_fit <- fit(final_knn, df_train)
+
+knn_fit %>% 
+  augment(df_test) %>% 
+  metrics(Activity, .pred_class)
+```
+
+Our model gets an accuracy of around 85%. That seems pretty good, given that there are 12 classes. But what would be chance performance here? We need to compare our final model with a *null model*.
+
+A null model represents the best guess one could make *before* seeing any of the predictor variables. For our dataset, if we were guessing completely randomly, we would be right 1/12th of the time (8.3% accuracy). However, we could make a better guess by taking into account the *distribution* of the data, which is uneven--some activities account for *more* than 1/12th of the data, and others for less. The most frequent activity, football, accounts for around 19% of the data. Therefore, 19% would be the *best* accuracy we could expect to get, if our model were based only on the class labels. We hope to see that our actual model does much better than this null model.
+
+We can fit a null model to our training data and evaluate its performance on the test set. To do so, we simply repeat the normal model fitting workflow (like we did with `knn_spec`, `knn_wf`, and `knn_fit` on lines 112-145), but replace our model specification with a `null_model()`.
+
+::: {.callout-note icon="false"}
+## Exercise 13
+
+Complete the model fitting workflow below for the null model.
+:::
+
+```{r}
+null_spec <- null_model() %>%
+  set_engine("parsnip") %>%
+  set_mode("classification")
+  
+null_wf <- 
+  workflow() %>%
+  add_model(null_spec) %>%
+  add_formula(Activity ~ .)
+
+null_fit <-
+  null_wf %>%
+  fit(data = df)
+
+null_fit %>% 
+  augment(df) %>% 
+  metrics(Activity, .pred_class)
+```
+
+## Bonus exercise
+
+::: {.callout-note icon="false"}
+## Exercise 14
+
+Specify and fit a Naive Bayes model to the training data, and get the accuracy on the test set. How does it do compared to KNN?
+:::
+
+```{r}
+library(discrim)
+
+nb_spec <- 
+  naive_Bayes() %>%
+  set_mode("classification") %>%
+  set_engine("naivebayes")
+```
+
+```{r}
+nb_wf <- workflow() %>%
+  add_recipe(rec) %>% 
+  add_model(nb_spec)
+```
+
+```{r}
+nb_fit <- 
+  nb_wf %>%
+  fit(data = df_train)
+
+nb_fit %>% 
+  augment(df_test) %>% 
+  metrics(Activity, .pred_class)
+```

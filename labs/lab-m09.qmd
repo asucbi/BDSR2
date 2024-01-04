@@ -1,0 +1,466 @@
+---
+title: "Module 9 Lab: Clustering Mall Customer Data with k-means"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this module are:
+
+-   Become acquainted with measures of distance in multidimensional spaces
+-   Build a conceptual taxonomy of clustering algorithms--supervised vs unsupervised, hierarchical vs non-hierarchical
+-   Learn how to implement the k-means clustering algorithm
+-   Understand how dimensionality reduction techniques, such as PCA, project data into lower-dimensional spaces
+:::
+
+For this lab, we will imagine that we are data scientists hired by the owner of a mall, who gives us a dataset containing information on 200 mall customers, including their gender, age, annual income, and spending score (how much they spend at the mall). The mall owner would like to discover clusters of customer profiles, to be used for targeted advertising.
+
+We will use a dataset...
+
+## Library and data loading
+
+```{r}
+#| message = FALSE
+library(tidymodels)
+library(tidyverse)
+library(tidyclust)
+library(gridExtra)
+
+df = read_csv('./data/Mall_customers.xls')
+df$Gender = factor(df$Gender)
+colnames(df)<- c("ID", "Gender","Age","AnnualIncome","SpendingScore")
+```
+
+# Pt 1: Data visualization and exploration
+
+::: {.callout-note icon="false"}
+## Exercise 1.A
+
+Begin by building histograms for `Age`, `AnnualIncome` and `SpendingScore`, and a plot showing the breakdown of `Gender` (it could also be a histogram, but bonus points for a pie chart)
+:::
+
+```{r}
+ggplot(df, aes(x = Age)) + 
+  geom_histogram(aes(y = after_stat(density)))+
+  geom_density()+
+  scale_x_continuous(limits=c(0, 80))
+
+ggplot(df, aes(x = AnnualIncome)) + 
+  geom_histogram(aes(y = after_stat(density)))+
+  geom_density()+
+  scale_x_continuous(limits=c(0, 80))
+
+ggplot(df, aes(x = SpendingScore)) + 
+  geom_histogram(aes(y = after_stat(density)))+
+  geom_density()+
+  scale_x_continuous(limits=c(0, 80))
+```
+
+```{r}
+ggplot(df, aes(x = "", y = Gender, fill = Gender)) +
+  geom_bar(stat = "identity", width = 1) +
+  coord_polar("y", start = 0)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 1.B
+
+Make scatterplots of every pair of variables in `Age`, `AnnualIncome` and `SpendingScore`:
+
+-   `Age` X `AnnualIncome`
+-   `Age` X `SpendingScore`
+-   `AnnualIncome` X `SpendingScore`
+
+In each scatterplot, color the points by `Gender`.
+:::
+
+```{r}
+ggplot(df, aes(x = Age, y = AnnualIncome, color = Gender)) + geom_point() + guides(color=FALSE)
+
+ggplot(df, aes(x = Age, y = SpendingScore, color = Gender)) + geom_point() + guides(color=FALSE)
+
+ggplot(df, aes(x = AnnualIncome, y = SpendingScore, color = Gender)) + geom_point() + guides(color=FALSE)
+
+```
+
+Do you notice any obvious clusters in the data? The first thing we want a clustering algorithm to do is to capture the patterns that we can visually detect. But it may also be helpful for finding clusters in the data that we *can't* easily see--ones that cut across multiple dimensions.
+
+Most of the time, clustering is an exploratory process. There is no single "correct" way to assign data points into clusters, but instead we're looking for a *reasonable* way to chunk the data *for some purpose*. However, we can still use some rules of thumb as data scientists to make reasonable decisions about which clustering algorithm to use, and to tune our model parameters.
+
+# Pt 2: Fitting the k-means model
+
+Let's first try clustering the customer data using the *k-means* algorithm. This algorithm requires us to specify _k_, the number of clusters (called `num_clusters` in the function). We might have a good guess about what _k_ should be for our data, based on initial visualization, but most of the time we'll want to try out a few different values.
+
+To start, we'll specify a k-means model with `num_clusters` = 3.
+
+```{r}
+kmeans_spec <- k_means(num_clusters = 3)
+```
+
+Next, we will need a formula to specify the variables to use in the model. In this case, there is no response variable, so there is nothing on the left side of our formula.
+
+As predictors, we'll include all of the *continuous* variables in our data--`Age`, `AnnualIncome`, and `SpendingScore`. We'll leave out `Gender` because it's a categorical variable--the k-means algorithm operatse on the euclidean distance between points, which isn't inherently meaningful for categorical variables.
+
+We will also add a recipe to normalize all of our continuous variables, since the euclidean distance is also sensitive to different scales of variables. When we are clustering with multidimensional data, we will almost always want to normalize the data first.
+
+```{r}
+customer_rec <- recipe(~ Age + AnnualIncome + SpendingScore, data = df) %>% 
+  step_normalize(Age, AnnualIncome, SpendingScore)
+```
+
+We don't need to worry about creating a data split for this type of model. Normally, we would use a test set to evaluate our model performance. But in clustering, there is no response variable to predict, so we can use the complete dataset.
+
+::: {.callout-note icon="false"}
+## Exercise 2.A.
+
+Fit the k-means model using a tidymodels workflow. You will need to add the model specification, recipe, and then fit the model.
+:::
+
+```{r}
+kmeans_fit <- workflow() %>% 
+  add_model(kmeans_spec) %>% 
+  add_recipe(customer_rec) %>% 
+  fit(data = df)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 2.B.
+
+Augment the data with the model predictions. This will add a column called `.pred_cluster`. Make the same scatterplots you made above, for every pair of variables in the model, but this time color the data points by `.pred_cluster`.
+:::
+
+```{r}
+kmeans_fit %>% 
+  augment(df) %>% 
+  ggplot() +
+  geom_point(aes(x = Age, y = AnnualIncome, color = .pred_cluster))
+
+kmeans_fit %>% 
+  augment(df) %>% 
+  ggplot() +
+  geom_point(aes(x = Age, y = SpendingScore, color = .pred_cluster))
+
+kmeans_fit %>% 
+  augment(df) %>% 
+  ggplot() +
+  geom_point(aes(x = AnnualIncome, y = SpendingScore, color = .pred_cluster))
+```
+
+The plots above show how the clusters divide our dataset, and it looks like our initial try with _k_ = 3 does a pretty bad job. Our next step is to compare the performance with different values of _k_ and decide which to use. Usually, we prefer to use the fewest number of clusters that successfully captures the variability in the data. 
+
+We can use several different metrics to consider how well a clustering model captures the variability in the data, and look for the point at which adding additional clusters doesn't seem to do much.
+
+One useful metric for k-means is the sum-of-squared-error (SSE) ratio. This is the ratio of the within-cluster sum-of-squared error (WSS) and the total sum-of-squared error (TSS). When this ratio is small, it suggests that clusters are more distinct--points within a single cluster are close together, while points in different clusters tend to be further apart.
+
+```{r}
+metrics <- cluster_metric_set(sse_within_total, sse_total, sse_ratio)
+
+kmeans_fit %>% metrics() 
+```
+
+
+# Pt 3: Tuning the value of _k_
+
+Next, we will build a workflow to tune the value of _k_ and plot how the SSE ratio changes.
+
+::: {.callout-note icon="false"}
+## Exercise 3.A.
+
+First, we will need to set up cross-validation for model-tuning. Create a 5-fold split of the data using `vfold_cv()`
+:::
+
+```{r}
+customer_cv <- vfold_cv(df, v = 5)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.B.
+
+Create a model spec, like `kmeans_spec` above, but set `num_clusters = tune()`.
+:::
+
+```{r}
+knn_tune_spec <- k_means(num_clusters = tune())
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.C.
+
+Next, make a workflow called `knn_tune_wflow`.
+:::
+```{r}
+knn_tune_wflow <- workflow() %>% 
+  add_model(knn_tune_spec) %>% 
+  add_recipe(customer_rec)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.D.
+Then, make a grid of values for _k_, called `clust_num_grid`, with integers from 1-10. This should be a tibble with a single column named "num_clusters".
+:::
+```{r}
+clust_num_grid <- tibble(num_clusters = seq(1:10)) 
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.E.
+
+Use `tune_cluster()` to run the models on the validation folds, and save the result as `knn_tune_res`. Include the argument `metrics = cluster_metric_set(sse_ratio)` in order to save the SSE ratio for each model.
+:::
+```{r}
+knn_tune_res <- tune_cluster(
+  knn_tune_wflow,
+  resamples = customer_cv,
+  grid = clust_num_grid,
+  metrics = cluster_metric_set(sse_ratio)
+)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.F.
+
+Finally, plot the mean sse_ratio (y-axis) as a function of _k_.
+:::
+```{r}
+knn_tune_res %>% 
+  collect_metrics() %>% 
+  ggplot(aes(x = num_clusters, y = mean)) +
+  geom_point() +
+  geom_line() +
+  theme_minimal() +
+  ylab("mean WSS/TSS ratio, over 5 folds") +
+  xlab("Number of clusters") +
+  scale_x_continuous(breaks = 1:10)
+```
+
+A popular way to pick the best value of _k_ is the "elbow" method. In the plot of SSE ratio, we look for an elbow--a bend, or inflection point--at which higher values of _k_ don't make much of a difference. This helps us choose the fewest number of clusters that effectively captures the data.
+
+::: {.callout-note icon="false"}
+## Exercise 3.G.
+
+In the plot above, look for the "elbow" point. Choose that as the value for _k_, then build and fit a final model.
+:::
+
+```{r}
+final_kmeans_spec <- k_means(num_clusters = 5)
+
+final_knn_fit <- workflow() %>% 
+  add_model(final_kmeans_spec) %>% 
+  add_recipe(customer_rec) %>% 
+  fit(data = df)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.H.
+
+Remake the scatterplots we built at the start, for each pair of variables, but this time color the data points by .pred_cluster. 
+
+Note: If you want, you can compute the centroid means to add to the plot. You can use `extract_centroids()` to get them directly from your model, but those centroids have been computed on normalized data. To adjust for this, you can either normalize your data again for plotting, or re-compute the centroids based on the un-normalized data.
+:::
+
+```{r}
+centroids <- final_knn_fit %>% extract_centroids() 
+# these centroids will be off, because we scaled the variables. So we'll just compute our own means
+
+centroids <- final_knn_fit %>% 
+  augment(df) %>% 
+  group_by(.pred_cluster) %>% 
+  summarise_all(mean)
+
+final_knn_fit %>% 
+  augment(df) %>% 
+  group_by(.pred_cluster) %>%
+  ggplot() +
+  geom_point(aes(x = Age, y = AnnualIncome, color = .pred_cluster, group = .pred_cluster)) +
+  geom_point(data = centroids, aes(x = Age, y = AnnualIncome, color = .pred_cluster), size = 10, shape = "X")
+
+final_knn_fit %>% 
+  augment(df) %>% 
+  group_by(.pred_cluster) %>%
+  ggplot() +
+  geom_point(aes(x = Age, y = SpendingScore, color = .pred_cluster, group = .pred_cluster)) +
+  geom_point(data = centroids, aes(x = Age, y = SpendingScore, color = .pred_cluster), size = 10, shape = "X")
+
+final_knn_fit %>% 
+  augment(df) %>% 
+  group_by(.pred_cluster) %>%
+  ggplot() +
+  geom_point(aes(x = AnnualIncome, y = SpendingScore, color = .pred_cluster, group = .pred_cluster)) +
+  geom_point(data = centroids, aes(x = AnnualIncome, y = SpendingScore, color = .pred_cluster), size = 10, shape = "X")
+
+```
+
+# Pt 4: Hierarchical Clustering
+
+Next we can compare the performance of k-means with our data to the hierarchical clustering algorithm.
+
+::: {.callout-note icon="false"}
+## Exercise 4.A.
+
+Specify a hierarchical clustering model with `hier_clust()`, using the same number of clusters as you did for your final k-means model. Set `linkage_method` to "average". 
+:::
+```{r}
+hc_spec <- hier_clust(
+  num_clusters = 5,
+  linkage_method = "average" 
+)
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 4.B.
+
+Fit the hierarchical clustering model.
+:::
+```{r}
+hc_fit <- workflow() %>% 
+  add_model(hc_spec) %>% 
+  add_recipe(customer_rec) %>% 
+  fit(data = df)
+```
+
+::: {.callout-note icon="false"}
+## Exercise 4.C.
+
+Once again, make scatterplots of every pair of variables and color the points by the cluster assignment.
+:::
+```{r}
+centroids <- hc_fit %>% 
+  augment(df) %>% 
+  group_by(.pred_cluster) %>% 
+  summarise_all(mean)
+
+hc_fit %>% 
+  augment(df) %>% 
+  ggplot() +
+  geom_point(aes(x = Age, y = AnnualIncome, color = .pred_cluster)) +
+  geom_point(data = centroids, aes(x = Age, y = AnnualIncome, color = .pred_cluster), size = 10, shape = "X")
+
+hc_fit %>% 
+  augment(df) %>% 
+  ggplot() +
+  geom_point(aes(x = Age, y = SpendingScore, color = .pred_cluster)) +
+  geom_point(data = centroids, aes(x = Age, y = SpendingScore, color = .pred_cluster), size = 10, shape = "X")
+
+hc_fit %>% 
+  augment(df) %>% 
+  ggplot() +
+  geom_point(aes(x = AnnualIncome, y = SpendingScore, color = .pred_cluster)) +
+  geom_point(data = centroids, aes(x = AnnualIncome, y = SpendingScore, color = .pred_cluster), size = 10, shape = "X")
+```
+Comparing the cluster assignments you got with k-means to the results with hierarchical clustering, do you notice any differences? 
+
+# Pt 5: Dimensionality reduction
+
+Since clusters can cut across multiple variables, they may sometimes be difficult to visualize. Dimensionality reduction techniques are useful here, because they allow us to project high-dimensional data into a lower dimensional space for plotting. This is also useful when we have many variables and don't know which will be useful for clustering the data. Dimensionality reduction techniques, like PCA, can generate new axes that cut across multiple of our original variables. To better understand this, let's apply PCA to our customer data.
+
+We will use `step_pca` to transform our data, plot the first two components. 
+
+```{r}
+rec <- recipe( ~ ., data = USArrests)
+
+pca_trans <- customer_rec %>%
+  step_normalize(all_numeric()) %>%
+  step_pca(all_numeric(), num_comp = 2, keep_original_cols = TRUE) 
+
+pca_estimates <- prep(pca_trans, training = df)
+
+pca_data <- bake(pca_estimates, df)
+
+ggplot(pca_data, aes(x = PC1, y = PC2)) + geom_point()
+```
+
+If we call `tidy()` on pca_estimates and set `type = "variance"`, we can see how much of the variance in the data is captured by each component. The first two components capture ~77% of the variance.
+```{r}
+tidy(pca_estimates, number = 3, type = "variance")
+```
+
+If we use `tidy()` again but set `type = "coef"`, we can look at the loadings of each variable onto the principal components. We can see that the first component captures a combination of variability from `Age` and from `SpendingScore`. Higher values in PC1 are associated with higher age (the loading for `Age` on PC1 is +.706), and lower spending score (the loading for `SpendingScore` on PC1 is -.706). PC2 captures mainly variation in `AnnualIncome`, which has a loading of .998.
+```{r}
+tidy(pca_estimates,number=3, type = "coef")
+```
+::: {.callout-note icon="false"}
+## Exercise 5.A.
+
+To better understand what loadings mean, make a scatter plot of each variable (`Age`, `AnnualIncome` and `SpendingScore`) against `PC1`, and another against `PC2`.
+:::
+```{r}
+ggplot(pca_data, aes(x = SpendingScore, y=PC1)) + geom_point()
+ggplot(pca_data, aes(x = Age, y=PC1)) + geom_point()
+ggplot(pca_data, aes(x = AnnualIncome, y=PC1)) + geom_point()
+
+ggplot(pca_data, aes(x = SpendingScore, y=PC2)) + geom_point()
+ggplot(pca_data, aes(x = Age, y=PC2)) + geom_point()
+ggplot(pca_data, aes(x = AnnualIncome, y=PC2)) + geom_point()
+```
+::: {.callout-note icon="false"}
+## Exercise 5.B.
+
+Repeat the clustering process on the PCA data, using k-means or hierarchical clustering. Use just the first two principal components as predictors. Set up cross-validation folds once again for the PCA data, then use `tune_cluster()` again, and plot the SSE ratio across values of _k_. Then use the elbow method to choose a final value for _k_, fit a final model, and make a scatterplot of the first two principal components, with points colored by cluster assignment.
+:::
+```{r}
+pca_cv <- vfold_cv(pca_data, v=5)
+
+pca_rec <- recipe(~ PC1 + PC2, data = pca_data)
+
+pca_kmeans_spec <- k_means(
+  num_clusters = tune(),
+)
+
+pca_wflow <- workflow() %>% 
+  add_model(pca_kmeans_spec) %>% 
+  add_recipe(pca_rec)
+
+clust_num_grid <- tibble(num_clusters = seq(1:10)) 
+
+pca_res <- tune_cluster(
+  pca_wflow,
+  resamples = pca_cv,
+  grid = clust_num_grid,
+  metrics = cluster_metric_set(sse_ratio)
+)
+
+```
+
+```{r}
+pca_res %>% 
+  collect_metrics() %>% 
+  ggplot(aes(x = num_clusters, y = mean)) +
+  geom_point() +
+  geom_line() +
+  theme_minimal() +
+  ylab("mean WSS/TSS ratio, over 5 folds") +
+  xlab("Number of clusters") +
+  scale_x_continuous(breaks = 1:10)
+```
+
+```{r}
+final_pca_spec <- k_means(num_clusters = 5)
+
+final_fit <- workflow() %>% 
+  add_model(final_pca_spec) %>% 
+  add_recipe(pca_rec) %>% 
+  fit(data = pca_data)
+```
+
+```{r}
+
+centroids <- final_fit %>% extract_centroids()
+
+final_fit %>% 
+  augment(pca_data) %>% 
+  ggplot() +
+  geom_point(aes(x = PC1, y = PC2, color = .pred_cluster)) 
+```
+::: {.callout-note icon="false"}
+## Exercise 5.C.
+
+Use the PCA loadings to interpret the final clustering scheme. We can think about the location of a cluster in PCA-space, and then consider how each of the original variables maps onto PCA-space. What does it mean, in terms of age, annual income, and spending score, to be in cluster 1 vs 2, for example? 
+:::
+```{r}
+tidy(pca_estimates,number=3, type = "coef")
+```
+Given that clustering is generally exploratory, it's up to you to decide if PCA has added any insights in the case of the customer data. Do you think the PCA transformation helped you to visualize, discover, or understand patterns in the data?

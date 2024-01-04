@@ -384,10 +384,12 @@ folds
 #| echo: true
 lin_model <- linear_reg()
 
-m1 <- workflow(rides ~ temp_feel) %>% 
+m1 <- workflow() %>% 
+  add_formula(rides ~ temp_feel) %>% 
   add_model(lin_model)
 
-m2 <- workflow(rides ~ temp_feel + humidity + windspeed + day_of_week + holiday + weather_cat) %>% 
+m2 <- workflow() %>% 
+  add_formula(rides ~ temp_feel + humidity + windspeed + day_of_week + holiday + weather_cat) %>% 
   add_model(lin_model)
 ```
 

@@ -5,3 +5,27 @@
   align-items: center;
   height: 90%;
 }
+
+.text-red {
+  color: red;
+}
+
+.text-blue {
+  color: blue;
+}
+
+.text-green {
+  color: green;
+}
+
+.highlight {
+  background-color: #fad346;
+}
+
+.highlight-red {
+  background-color: lightsalmon;
+}
+
+.highlight-blue {
+  background-color: lightblue;
+}

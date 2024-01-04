@@ -1,0 +1,263 @@
+---
+title: "`Tidymodels` and translation"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+```{r}
+#| include: false
+
+library(tidyverse)
+
+standardize <- function(x){
+  (x-mean(x))/sd(x)
+}
+
+N <- 10
+
+set.seed(234234)
+
+dfsim <- tibble(
+  x = rnorm(N, 3, 2),
+  y = 3 + 1/2*x + rnorm(N, 0, 1)
+)
+```
+
+## `Tidydmodels`
+
+![](../imgs/tidymodels.png)
+
+## Parsnip
+
+![](../imgs/parsnip.png)
+
+## Recipes
+
+![](../imgs/recipes.png)
+
+## Workflows
+
+![](../imgs/workflows.png)
+
+## Workflows and Models
+
+In the simplest case, a `parsnip` model is integrated into a `workflow`.
+
+::: {.center}
+```{mermaid}
+%%| fig-width: 7
+%%| mermaid-format: svg
+graph LR
+  
+  subgraph Workflow
+  m1[Parsnip Model]
+  end
+
+```
+:::
+
+## Adding recipes
+
+And `workflow`s can also include a `recipe` to pre-process data.
+
+::: {.center}
+```{mermaid}
+%%| fig-width: 7
+%%| mermaid-format: svg
+graph LR
+  
+  subgraph Workflow
+  Recipe --> m1[Parsnip Model]
+  end
+
+```
+:::
+
+# Translating to and from `tidymodels`
+
+## Loading the election data
+
+```{r}
+#| echo: true
+library(rosdata)
+data(hibbs)
+
+head(hibbs)
+```
+
+## Plotting our data
+
+```{r}
+hibbs %>% 
+  ggplot(aes(x=growth, y = vote)) +
+  geom_point(color = "blue") +
+  geom_text(aes(y =  vote - 1, label = year)) +
+  geom_hline(yintercept = 50, linetype = "dashed") +
+  labs(
+    title = "US Economy and Presidential Election outcomes",
+    y = "Incumbent vote share",
+    x = "Economic Growth"
+  ) +
+  scale_x_continuous(labels = scales::percent_format(scale = 1)) +
+  scale_y_continuous(labels = scales::percent_format(scale = 1))
+```
+
+## Step 1: Training and testing splits
+
+```{r}
+#| message: false
+#| echo: true
+library(tidymodels)
+
+set.seed(1234)
+
+df_split <- initial_split(as_tibble(hibbs))
+
+train <- training(df_split)
+test <- testing(df_split)
+```
+
+## Making and training models
+
+:::: {.columns}
+::: {.column width="50%"}
+**`tidymodels`**
+
+::: {style="font-size: 80%;"}
+
+```{r}
+#| echo: true
+linear_spec <- linear_reg()
+
+lin_wflow <- workflow() %>% 
+  add_formula(vote ~ growth) %>% 
+  add_model(linear_spec)
+
+fit_tm <- lin_wflow %>% 
+  fit(data = train)
+```
+:::
+
+:::
+::: {.column width="50%"}
+**classic**
+
+::: {style="font-size: 80%;"}
+
+```{r}
+#| echo: true
+fit_c <- lm(vote ~ growth, train)
+```
+
+:::
+
+:::
+::::
+
+
+## Examining our model coefficients
+
+:::: {.columns}
+::: {.column width="50%"}
+**`tidymodels`**
+
+::: {style="font-size: 60%;"}
+```{r}
+#| echo: true
+tidy(fit_tm)
+```
+
+:::
+
+:::
+::: {.column width="50%"}
+**classic**
+
+::: {style="font-size: 60%;"}
+```{r}
+#| echo: true
+tidy(fit_c)
+```
+
+:::
+
+:::
+::::
+
+## Predicting from the model
+
+
+:::: {.columns}
+::: {.column width="50%"}
+**`tidymodels`**
+
+::: {style="font-size: 60%;"}
+```{r}
+#| echo: true
+augment(fit_tm, test)
+```
+
+:::
+
+
+:::
+::: {.column width="50%"}
+**classic**
+
+::: {style="font-size: 60%;"}
+
+```{r}
+#| echo: true
+test %>% 
+  mutate(
+    .pred = predict(fit_c, .)
+  )
+
+```
+:::
+
+
+:::
+::::
+
+## Assessing the model's fit
+
+:::: {.columns}
+::: {.column width="50%"}
+**`tidymodels`**
+```{r}
+#| echo: true
+fit_tm %>% 
+  augment(test) %>% 
+  metrics(vote, .pred)
+```
+
+:::
+::: {.column width="50%"}
+**classic**
+
+
+::: {style="font-size: 80%;"}
+
+```{r}
+#| echo: true
+test %>% 
+  mutate(
+    .pred = predict(fit_c, .)
+  ) %>% 
+  summarize(
+    mse = sqrt(mean((vote - .pred)^2)),
+    mae = mean(abs(vote - .pred)),
+    rsq = cor(vote, .pred)^2
+  ) %>% 
+  gather(.metric, .estimate)
+```
+:::
+
+
+:::
+::::
+

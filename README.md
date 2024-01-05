@@ -18,7 +18,7 @@ The project is configured so all `.qmd` run from the project's root directory. T
 
 ## Viewing pages
 
-Hosted by github pages. E.g. https://derekpowell.github.io/BDSR2/labs/lab-m01.html
+Hosted by github pages. E.g. https://asucbi.github.io/BDSR2/labs/lab-m01.html
 
 ## Tech notes and issues
 

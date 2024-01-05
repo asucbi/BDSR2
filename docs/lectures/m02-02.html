@@ -389,10 +389,16 @@
 
 <section id="what-is-a-probability" class="slide level2">
 <h2>What is a probability?</h2>
+<div class="columns">
+<div class="column" style="width:70%;">
 <blockquote>
 <p>Probability theory is nothing but common sense reduced to calculation.<br>
 —Laplace, 1829</p>
 </blockquote>
+</div><div class="column" style="width:30%;">
+<p><img data-src="../imgs/laplace.jpg" data-fig.align="center"></p>
+</div>
+</div>
 <p><span class="math display">\[\newcommand{\ind}{\perp\!\!\!\perp}\]</span></p>
 </section>
 <section id="what-is-a-probability-1" class="slide level2">
@@ -466,12 +472,12 @@
 <p><strong>Notation</strong></p>
 </div>
 <div class="callout-content">
-<p><span class="math inline">\(P(A | B)\)</span>: Probability of event A given event B</p>
+<p><span class="math inline">\(P(B | A)\)</span>: Probability of event B given event A</p>
 </div>
 </div>
 </div>
 <div class="fragment">
-<p><span class="math display">\[P(A|B) = \frac{P(A \cap B)}{P(B)}\]</span></p>
+<p><span class="math display">\[P(B|A) = \frac{P(A \cap B)}{P(A)}\]</span></p>
 </div>
 <div class="fragment" style="font-size: 80%;">
 <ul>
@@ -486,6 +492,16 @@
 <img data-src="../imgs/cond-prob-viz2.jpeg" class="r-stretch"></section>
 <section id="independence" class="slide level2">
 <h2>Independence</h2>
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math inline">\(A \ind B\)</span>: Event <span class="math inline">\(A\)</span> is <strong>independent</strong> of event <span class="math inline">\(B\)</span></p>
+</div>
+</div>
+</div>
 <ul>
 <li><p>If knowing event B happened tells you something about event A happening, or vice versa, then events A and B are <strong>dependent</strong></p>
 <ul>
@@ -495,7 +511,6 @@
 <ul>
 <li><span class="math inline">\(P(A | B) = P(A)\)</span></li>
 </ul></li>
-<li><p>We will denote the probability of an event <span class="math inline">\(A\)</span> as <span class="math inline">\(P(A)\)</span></p></li>
 </ul>
 </section>
 <section id="joint-probability" class="slide level2">

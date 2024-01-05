@@ -12,8 +12,9 @@ bibliography: ../references.bib
 What should you believe about a hypothesis based on some data?
 
 ::: {.fragment}
+:::{.text-blue}
 Bayesian inference gives an answer to this question.
-
+:::
 ::: {.incremental}
 - We start with a belief
 - Examine some new evidence (ie, data)

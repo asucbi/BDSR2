@@ -390,7 +390,7 @@
 <section id="nyt-dialect-quiz" class="slide level2">
 <h2>NYT Dialect quiz</h2>
 
-<img data-src="../imgs/nyt-dialect-ex.png" class="r-stretch"></section>
+<img data-src="../imgs/nyt-dialect-ex.png" class="r-stretch quarto-figure-center"></section>
 <section id="classification" class="slide level2">
 <h2>Classification</h2>
 <ul>
@@ -540,11 +540,24 @@
 <section id="bayesian-inference" class="slide level2">
 <h2>Bayesian Inference</h2>
 <p>I’m a Wisconsinite and I say “soda”—what’s the probability I am from Eastern Wisconsin?</p>
+<div style="font-size: 65%;">
 <div class="fragment">
 <p><span class="math display">\[P(h|d) = \frac{P(d|h)P(h)}{P(d)}\]</span></p>
 </div>
+<div class="columns">
+<div class="column" style="width:50%;">
 <div class="fragment">
+<p><strong>Uniform prior probability</strong></p>
 <p><span class="math display">\[P(h|d) = \frac{(.71) (.50)}{(.71)(.50) + (.30)(.50)} = .702\]</span></p>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment">
+<p><strong>Informative prior probability</strong></p>
+<p>Vast majority of Wisconsinites live in Eastern Wisconsin</p>
+<p><span class="math display">\[P(h|d) = \frac{(.71) (.80)}{(.71)(.80) + (.30)(.20)} = .904\]</span></p>
+</div>
+</div>
+</div>
 </div>
 </section>
 <section id="adding-up-observations" class="slide level2">
@@ -584,10 +597,10 @@
 <div class="cell-output-display">
 <div>
 <p>
-<svg viewbox="0 0 493.28125 150.65625" height="147" aria-labelledby="chart-title-mermaid-1704478019639 chart-desc-mermaid-1704478019639" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="480" id="mermaid-figure-1" style=" display: block; margin: auto auto auto auto">
-<title id="chart-title-mermaid-1704478019639">
+<svg viewbox="0 0 493.28125 150.65625" height="147" aria-labelledby="chart-title-mermaid-1704488870938 chart-desc-mermaid-1704488870938" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="480" id="mermaid-figure-1" style=" display: block; margin: auto auto auto auto">
+<title id="chart-title-mermaid-1704488870938">
 </title>
-<desc id="chart-desc-mermaid-1704478019639"></desc>
+<desc id="chart-desc-mermaid-1704488870938"></desc>
 <style>#mermaid-figure-1 {font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-figure-1 .error-icon{fill:#552222;}#mermaid-figure-1 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-1 .edge-thickness-normal{stroke-width:2px;}#mermaid-figure-1 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-1 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-1 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-1 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-1 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-1 .marker.cross{stroke:#333333;}#mermaid-figure-1 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-1 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-1 .cluster-label text{fill:#333;}#mermaid-figure-1 .cluster-label span{color:#333;}#mermaid-figure-1 .label text,#mermaid-figure-1 span{fill:#333;color:#333;}#mermaid-figure-1 .node rect,#mermaid-figure-1 .node circle,#mermaid-figure-1 .node ellipse,#mermaid-figure-1 .node polygon,#mermaid-figure-1 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-1 .node .label{text-align:center;}#mermaid-figure-1 .node.clickable{cursor:pointer;}#mermaid-figure-1 .arrowheadPath{fill:#333333;}#mermaid-figure-1 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-1 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-1 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-figure-1 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-figure-1 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-1 .cluster text{fill:#333;}#mermaid-figure-1 .cluster span{color:#333;}#mermaid-figure-1 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-1 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#mermaid-figure-1 .foo>*{fill:#d0d0d0!important;stroke:#d0d0d0!important;stroke-width:2px!important;}#mermaid-figure-1 .foo span{fill:#d0d0d0!important;stroke:#d0d0d0!important;stroke-width:2px!important;}</style>
 <g transform="translate(0, 0)"><marker orient="auto" markerheight="12" markerwidth="12" markerunits="userSpaceOnUse" refy="5" refx="9" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-pointEnd"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker><marker orient="auto" markerheight="12" markerwidth="12" markerunits="userSpaceOnUse" refy="5" refx="0" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-pointStart"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 5 L 10 10 L 10 0 z"></path></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5" refx="11" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-circleEnd"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5" refx="-1" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-circleStart"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5.2" refx="12" viewbox="0 0 11 11" class="marker cross flowchart" id="flowchart-crossEnd"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5.2" refx="-1" viewbox="0 0 11 11" class="marker cross flowchart" id="flowchart-crossStart"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-F1" id="L-A-F1-0" d="M232.59942782377513,39.42178578211357L202.8562940198126,46.79419648509464C173.11316021585012,54.166607188075716,113.62689260792506,68.91142859403786,83.88375880396252,80.45050596368559C54.140625,91.98958333333333,54.140625,100.32291666666667,54.140625,104.48958333333333L54.140625,108.65625"></path><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-F2" id="L-A-F2-0" d="M237.67766335609102,49.48462819480061L230.80169863007586,55.179898495667175C223.92573390406065,60.875168796533735,210.17380445203034,72.26570939826688,203.29783972601516,82.1276463658001C196.421875,91.98958333333333,196.421875,100.32291666666667,196.421875,104.48958333333333L196.421875,108.65625"></path><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-Fd" id="L-A-Fd-0" d="M276.689524143909,49.48462819480061L283.5654888699242,55.179898495667175C290.4414535959393,60.875168796533735,304.1933830479697,72.26570939826688,311.0693477739848,82.1276463658001C317.9453125,91.98958333333333,317.9453125,100.32291666666667,317.9453125,104.48958333333333L317.9453125,108.65625"></path><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-Fk" id="L-A-Fk-0" d="M281.59669888366153,40.074547292475714L307.88136365305127,47.33816441039642C334.166028422441,54.60178152831714,386.7353579612205,69.12901576415857,413.02002273061026,80.55929954874595C439.3046875,91.98958333333333,439.3046875,100.32291666666667,439.3046875,104.48958333333333L439.3046875,108.65625"></path></g><g class="edgeLabels"><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0">
 <div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">

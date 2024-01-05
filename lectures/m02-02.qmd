@@ -15,8 +15,17 @@ library(tidyverse)
 
 ## What is a probability?
 
+:::: {.columns}
+::: {.column width="70%"}
 > Probability theory is nothing but common sense reduced to calculation.  
 ---Laplace, 1829
+
+:::
+::: {.column width="30%"}
+![](../imgs/laplace.jpg){fig.align='center'}
+:::
+::::
+
 
 
 $$\newcommand{\ind}{\perp\!\!\!\perp}$$
@@ -77,11 +86,11 @@ We often want to talk about the probability of multiple variables and their rela
 
 ::: {.callout-caution icon="false"}
 ## Notation
- $P(A | B)$: Probability of event A given event B
+ $P(B | A)$: Probability of event B given event A
 :::
 
 :::{.fragment}
-$$P(A|B) = \frac{P(A \cap B)}{P(B)}$$
+$$P(B|A) = \frac{P(A \cap B)}{P(A)}$$
 :::
 
 
@@ -97,6 +106,12 @@ $$P(A|B) = \frac{P(A \cap B)}{P(B)}$$
 
 ## Independence
 
+::: {.callout-caution icon="false"}
+## Notation
+$A \ind B$: Event $A$ is **independent** of event $B$
+:::
+
+
 - If knowing event B happened tells you something about event A happening, or vice versa, then events A and B are **dependent**
 
   - $P(A|B) \neq P(A)$
@@ -104,8 +119,6 @@ $$P(A|B) = \frac{P(A \cap B)}{P(B)}$$
 - If not, they are said to be **independent**
 
   - $P(A | B) = P(A)$
-
-- We will denote the probability of an event $A$ as $P(A)$
 
 ## Joint probability
 

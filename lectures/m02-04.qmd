@@ -9,7 +9,7 @@ bibliography: ../references.bib
 
 ## NYT Dialect quiz
 
-![](../imgs/nyt-dialect-ex.png)
+![](../imgs/nyt-dialect-ex.png){fig-align='center'}
 
 ## Classification
 
@@ -88,13 +88,40 @@ $$\rightarrow$$
 
 I'm a Wisconsinite and I say "soda"---what's the probability I am from Eastern Wisconsin?
 
+
+
+::: {style="font-size: 65%;"}
+
 ::: {.fragment}
 $$P(h|d) = \frac{P(d|h)P(h)}{P(d)}$$
 :::
 
+:::: {.columns}
+::: {.column width="50%"}
+
 ::: {.fragment}
+
+**Uniform prior probability**
+
 $$P(h|d) = \frac{(.71) (.50)}{(.71)(.50) + (.30)(.50)} = .702$$
+
+
 :::
+:::
+::: {.column width="50%"}
+
+::: {.fragment}
+**Informative prior probability**
+
+Vast majority of Wisconsinites live in Eastern Wisconsin
+
+$$P(h|d) = \frac{(.71) (.80)}{(.71)(.80) + (.30)(.20)} = .904$$
+:::
+
+:::
+::::
+:::
+
 
 ## Adding up observations
 

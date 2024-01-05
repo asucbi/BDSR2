@@ -578,9 +578,59 @@
 <h2>Naive Bayes: The idea</h2>
 <ul>
 <li>The key idea behind Naive Bayes is to assume independence between the features used for prediction.</li>
-<li>Models the features as independently caused by the class label or category membership</li>
+<li>Model the features as each independently caused by the class label or category membership</li>
 </ul>
-<p>[diagram]</p>
+<div class="cell">
+<div class="cell-output-display">
+<div>
+<p>
+<svg viewbox="0 0 493.28125 150.65625" height="147" aria-labelledby="chart-title-mermaid-1704478019639 chart-desc-mermaid-1704478019639" role="img" xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="480" id="mermaid-figure-1" style=" display: block; margin: auto auto auto auto">
+<title id="chart-title-mermaid-1704478019639">
+</title>
+<desc id="chart-desc-mermaid-1704478019639"></desc>
+<style>#mermaid-figure-1 {font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}#mermaid-figure-1 .error-icon{fill:#552222;}#mermaid-figure-1 .error-text{fill:#552222;stroke:#552222;}#mermaid-figure-1 .edge-thickness-normal{stroke-width:2px;}#mermaid-figure-1 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-figure-1 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-figure-1 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-figure-1 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-figure-1 .marker{fill:#333333;stroke:#333333;}#mermaid-figure-1 .marker.cross{stroke:#333333;}#mermaid-figure-1 svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#mermaid-figure-1 .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#mermaid-figure-1 .cluster-label text{fill:#333;}#mermaid-figure-1 .cluster-label span{color:#333;}#mermaid-figure-1 .label text,#mermaid-figure-1 span{fill:#333;color:#333;}#mermaid-figure-1 .node rect,#mermaid-figure-1 .node circle,#mermaid-figure-1 .node ellipse,#mermaid-figure-1 .node polygon,#mermaid-figure-1 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-figure-1 .node .label{text-align:center;}#mermaid-figure-1 .node.clickable{cursor:pointer;}#mermaid-figure-1 .arrowheadPath{fill:#333333;}#mermaid-figure-1 .edgePath .path{stroke:#333333;stroke-width:2.0px;}#mermaid-figure-1 .flowchart-link{stroke:#333333;fill:none;}#mermaid-figure-1 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-figure-1 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-figure-1 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-figure-1 .cluster text{fill:#333;}#mermaid-figure-1 .cluster span{color:#333;}#mermaid-figure-1 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-figure-1 :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}#mermaid-figure-1 .foo>*{fill:#d0d0d0!important;stroke:#d0d0d0!important;stroke-width:2px!important;}#mermaid-figure-1 .foo span{fill:#d0d0d0!important;stroke:#d0d0d0!important;stroke-width:2px!important;}</style>
+<g transform="translate(0, 0)"><marker orient="auto" markerheight="12" markerwidth="12" markerunits="userSpaceOnUse" refy="5" refx="9" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-pointEnd"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 0 L 10 5 L 0 10 z"></path></marker><marker orient="auto" markerheight="12" markerwidth="12" markerunits="userSpaceOnUse" refy="5" refx="0" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-pointStart"><path style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 0 5 L 10 10 L 10 0 z"></path></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5" refx="11" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-circleEnd"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5" refx="-1" viewbox="0 0 10 10" class="marker flowchart" id="flowchart-circleStart"><circle style="stroke-width: 1; stroke-dasharray: 1, 0;" class="arrowMarkerPath" r="5" cy="5" cx="5"></circle></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5.2" refx="12" viewbox="0 0 11 11" class="marker cross flowchart" id="flowchart-crossEnd"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><marker orient="auto" markerheight="11" markerwidth="11" markerunits="userSpaceOnUse" refy="5.2" refx="-1" viewbox="0 0 11 11" class="marker cross flowchart" id="flowchart-crossStart"><path style="stroke-width: 2; stroke-dasharray: 1, 0;" class="arrowMarkerPath" d="M 1,1 l 9,9 M 10,1 l -9,9"></path></marker><g class="root"><g class="clusters"></g><g class="edgePaths"><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-F1" id="L-A-F1-0" d="M232.59942782377513,39.42178578211357L202.8562940198126,46.79419648509464C173.11316021585012,54.166607188075716,113.62689260792506,68.91142859403786,83.88375880396252,80.45050596368559C54.140625,91.98958333333333,54.140625,100.32291666666667,54.140625,104.48958333333333L54.140625,108.65625"></path><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-F2" id="L-A-F2-0" d="M237.67766335609102,49.48462819480061L230.80169863007586,55.179898495667175C223.92573390406065,60.875168796533735,210.17380445203034,72.26570939826688,203.29783972601516,82.1276463658001C196.421875,91.98958333333333,196.421875,100.32291666666667,196.421875,104.48958333333333L196.421875,108.65625"></path><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-Fd" id="L-A-Fd-0" d="M276.689524143909,49.48462819480061L283.5654888699242,55.179898495667175C290.4414535959393,60.875168796533735,304.1933830479697,72.26570939826688,311.0693477739848,82.1276463658001C317.9453125,91.98958333333333,317.9453125,100.32291666666667,317.9453125,104.48958333333333L317.9453125,108.65625"></path><path marker-end="url(#flowchart-pointEnd)" style="fill:none;" class="edge-thickness-normal edge-pattern-solid flowchart-link LS-A LE-Fk" id="L-A-Fk-0" d="M281.59669888366153,40.074547292475714L307.88136365305127,47.33816441039642C334.166028422441,54.60178152831714,386.7353579612205,69.12901576415857,413.02002273061026,80.55929954874595C439.3046875,91.98958333333333,439.3046875,100.32291666666667,439.3046875,104.48958333333333L439.3046875,108.65625"></path></g><g class="edgeLabels"><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g><g class="edgeLabel"><g transform="translate(0, 0)" class="label"><foreignobject height="0" width="0">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="edgeLabel"></span>
+</div>
+</foreignobject></g></g></g><g class="nodes"><g transform="translate(257.18359375, 33.328125)" id="flowchart-A-6" class="node default default"><circle height="34" width="50.65625" r="25.328125" ry="0" rx="0" style=""></circle><g transform="translate(-17.828125, -9.5)" style="" class="label"><foreignobject height="19" width="35.65625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">Class</span>
+</div>
+</foreignobject></g></g><g transform="translate(54.140625, 125.65625)" id="flowchart-F1-7" class="node default default"><rect height="34" width="92.28125" y="-17" x="-46.140625" ry="17" rx="17" style=""></rect><g transform="translate(-34.390625, -9.5)" style="" class="label"><foreignobject height="19" width="68.78125">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">Feature 1</span>
+</div>
+</foreignobject></g></g><g transform="translate(196.421875, 125.65625)" id="flowchart-F2-8" class="node default default"><rect height="34" width="92.28125" y="-17" x="-46.140625" ry="17" rx="17" style=""></rect><g transform="translate(-34.390625, -9.5)" style="" class="label"><foreignobject height="19" width="68.78125">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">Feature 2</span>
+</div>
+</foreignobject></g></g><g transform="translate(317.9453125, 125.65625)" id="flowchart-Fd-9" class="node default foo"><rect height="34" width="50.765625" y="-17" x="-25.3828125" ry="17" rx="17" style=""></rect><g transform="translate(-13.6328125, -9.5)" style="" class="label"><foreignobject height="19" width="27.265625">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">. . .</span>
+</div>
+</foreignobject></g></g><g transform="translate(439.3046875, 125.65625)" id="flowchart-Fk-10" class="node default default"><rect height="34" width="91.953125" y="-17" x="-45.9765625" ry="17" rx="17" style=""></rect><g transform="translate(-34.2265625, -9.5)" style="" class="label"><foreignobject height="19" width="68.453125">
+<div style="display: inline-block; white-space: nowrap;" data-xmlns="http://www.w3.org/1999/xhtml">
+<span class="nodeLabel">Feature k</span>
+</div>
+</foreignobject></g></g></g></g></g>
+</svg>
+</p>
+</div>
+</div>
+</div>
 </section>
 <section id="multi-class-naive-bayes-classifier-the-math" class="slide level2">
 <h2>Multi-class Naive Bayes Classifier: The math</h2>
@@ -591,27 +641,45 @@
 </ul>
 <p><span class="math display">\[P(C_j | x_1, x_2, ..., x_k) \propto P(C_j) \prod^k_{i=1}P(x_i|C_j)\]</span></p>
 </section>
-<section id="example" class="slide level2">
+<section id="example" class="slide level2 scrollable">
 <h2>Example</h2>
 <p>Let’s examine 3 items from the Harvard dialect survey for the Midwestern states.</p>
+<div style="font-size: 50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">head</span>(hds_mini, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">head</span>(hds_mini, <span class="dv">20</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 10 × 6
-   state item_num item    ans_ind ans_text                               ans_p…¹
-   &lt;chr&gt;    &lt;dbl&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;chr&gt;                                    &lt;dbl&gt;
- 1 iowa         4 caramel a       "with 2 syllables (\"car-ml\")"         0.677 
- 2 iowa         4 caramel b       "with 3 syllables (\"carra-mel\")"      0.127 
- 3 iowa         4 caramel c       "I use both interchangeably"            0.151 
- 4 iowa         4 caramel d       "I have both forms, but the two have …  0.0359
- 5 iowa         4 caramel e       "other"                                 0.0096
- 6 iowa        21 pecan   a       "[pi:kn] with stress on the first syl…  0.0611
- 7 iowa        21 pecan   b       "[pi:kn] with stress on the second sy…  0.0562
- 8 iowa        21 pecan   c       "[pi:kn] with stress on the first syl…  0.237 
- 9 iowa        21 pecan   d       "[pi:kn] with stress on the second sy…  0.376 
-10 iowa        21 pecan   e       "[pkn] (\"pick Ann\")"                  0.0122
+<pre><code># A tibble: 20 × 6
+   state    item_num item                   ans_ind ans_text             ans_p…¹
+   &lt;chr&gt;       &lt;dbl&gt; &lt;chr&gt;                  &lt;chr&gt;   &lt;chr&gt;                  &lt;dbl&gt;
+ 1 iowa            4 caramel                a       "with 2 syllables (…  0.677 
+ 2 iowa            4 caramel                b       "with 3 syllables (…  0.127 
+ 3 iowa            4 caramel                c       "I use both interch…  0.151 
+ 4 iowa            4 caramel                d       "I have both forms,…  0.0359
+ 5 iowa            4 caramel                e       "other"               0.0096
+ 6 iowa           50 What word(s) do you u… a       "you all"             0.0995
+ 7 iowa           50 What word(s) do you u… b       "yous, youse"         0.005 
+ 8 iowa           50 What word(s) do you u… d       "you guys"            0.547 
+ 9 iowa           50 What word(s) do you u… g       "you"                 0.276 
+10 iowa           50 What word(s) do you u… h       "other"               0.0199
+11 iowa           50 What word(s) do you u… i       "y'all"               0.0522
+12 iowa          105 What is your generic … a       "soda"                0.142 
+13 iowa          105 What is your generic … j       "other"               0.0305
+14 iowa          105 What is your generic … b       "pop"                 0.799 
+15 iowa          105 What is your generic … c       "coke"                0.0102
+16 iowa          105 What is your generic … e       "soft drink"          0.0178
+17 illinois        4 caramel                a       "with 2 syllables (…  0.595 
+18 illinois        4 caramel                b       "with 3 syllables (…  0.190 
+19 illinois        4 caramel                c       "I use both interch…  0.162 
+20 illinois        4 caramel                d       "I have both forms,…  0.0388
 # … with abbreviated variable name ¹​ans_prop</code></pre>
 </div>
+</div>
+</div>
+<div class="cell">
+
 </div>
 </section>
 <section id="multinomial-naive-bayes-the-code" class="slide level2">
@@ -626,7 +694,7 @@
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>x <span class="ot">&lt;-</span> <span class="fu">tribble</span>(</span>
 <span id="cb3-2"><a href="#cb3-2"></a>  <span class="sc">~</span>item_num, <span class="sc">~</span>ans_ind,</span>
 <span id="cb3-3"><a href="#cb3-3"></a>  <span class="dv">4</span>, <span class="st">"a"</span>,</span>
-<span id="cb3-4"><a href="#cb3-4"></a>  <span class="dv">21</span>, <span class="st">"c"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="dv">50</span>, <span class="st">"d"</span>,</span>
 <span id="cb3-5"><a href="#cb3-5"></a>  <span class="dv">105</span>, <span class="st">"a"</span></span>
 <span id="cb3-6"><a href="#cb3-6"></a>)</span>
 <span id="cb3-7"><a href="#cb3-7"></a></span>
@@ -646,13 +714,13 @@
 <pre><code># A tibble: 7 × 5
   state     likeli prior  pdata posterior
   &lt;chr&gt;      &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;     &lt;dbl&gt;
-1 illinois  0.0355 0.143 0.0384    0.132 
-2 indiana   0.0174 0.143 0.0384    0.0647
-3 iowa      0.0229 0.143 0.0384    0.0851
-4 michigan  0.0210 0.143 0.0384    0.0781
-5 minnesota 0.0237 0.143 0.0384    0.0880
-6 ohio      0.0177 0.143 0.0384    0.0659
-7 wisconsin 0.131  0.143 0.0384    0.486 </code></pre>
+1 illinois  0.104  0.143 0.0848    0.175 
+2 indiana   0.0543 0.143 0.0848    0.0914
+3 iowa      0.0528 0.143 0.0848    0.0889
+4 michigan  0.0507 0.143 0.0848    0.0854
+5 minnesota 0.0585 0.143 0.0848    0.0985
+6 ohio      0.0584 0.143 0.0848    0.0984
+7 wisconsin 0.215  0.143 0.0848    0.362 </code></pre>
 </div>
 </div>
 </div>
@@ -660,7 +728,7 @@
 <section id="visualizing-the-results" class="slide level2">
 <h2>Visualizing the results</h2>
 
-<img data-src="m02-04_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"><div class="footer footer-default">
+<img data-src="m02-04_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"><div class="footer footer-default">
 
 </div>
 </section>

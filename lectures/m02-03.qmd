@@ -9,9 +9,19 @@ bibliography: ../references.bib
 
 ## Bayesian Inference
 
-Idea is, what should you believe about a hypothesis based on some data?
+What should you believe about a hypothesis based on some data?
 
-[ expand on this more]
+::: {.fragment}
+Bayesian inference gives an answer to this question.
+
+::: {.incremental}
+- We start with a belief
+- Examine some new evidence (ie, data)
+- Update our belief by combining what we used to believe with the new evidence
+:::
+:::
+
+
 
 ## Bayes' Rule
 
@@ -91,7 +101,15 @@ If we test 100,000 people for vampirism, we can expect:
 
 ## Bayesian approaches to science
 
-[turn the crank, etc.]
+Bayesian Statistics offers an opportunity to reach conclusions by "turning the Bayesian crank" [e.g. @etz.vandekerckhove2018; @maclehose.etal2011] or firing up the "Bayesian machine" [@strevens2006].
+
+We can use the same process for almost any problem:
+
+:::{.incremental}
+- Specify a prior to represent our existing beliefs
+- We specify a model of the likelihood of the data under different hypotheses
+- "Turn the crank" to reach a conclusion
+:::
 
 ## Challenges to Bayesian approaches to science
 
@@ -128,10 +146,11 @@ $$P(\mathcal{M}|d) \propto P(d|\mathcal{M})$$
 Indifference to the prior probability of hypotheses can be problematic
 
 :::{.incremental}
-- Say we flip a coin 10 times and get 6 heads
-- $P(d|\text{fair coin}) < P(d|\text{60% biased coin})$
+- Say we get a nice shiny coin from the bank
+- We flip it 10 times and get 6 heads
+- $P(d|\text{fair coin}) < P(d|\text{60% biased coin}) \rightarrow$ is it a trick coin?
 - MLE approaches work best with relatively large amounts of data
-- Use of cross validation approaches can help with this in some cases
 :::
 
+## References
 

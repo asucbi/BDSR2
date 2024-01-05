@@ -17,11 +17,13 @@ Our learning objectives for this module are:
 -   Demonstrate use of linear regression in `tidymodels`
 :::
 
-Elections are important! More about this blah blah.
+U.S. Congressional House elections do more than just fill seats in government; they significantly impact the daily lives of people. Every ballot cast is a decision about which policies will shape the nation's future, from healthcare and education to economic and environmental strategies. The elected representatives hold the power to craft laws that can affect job opportunities, healthcare access, and even the air we breathe. These elections, therefore, are not just a political ritual; they're a crucial mechanism through which citizens exert direct influence on their own well-being and the direction of their community and country. Understanding this influence underscores the tangible consequences of each vote, reminding us that these democratic processes play a pivotal role in shaping the realities of everyday life.
+
+At the same time, elections offer a revealing look into the psyche of American voters. For instance, Americans are increasingly  polarized and entrenched in their political tribes. As behavioral scientists, elections offer a window into deep societal divides and group loyalties influence choices at the ballot box. In today's politically charged environment, voters often align with their party's broad brushstrokes, sometimes overlooking the finer details of a candidate's policies or background. This trend highlights the strong role of group identity in shaping decisions. By examining the patterns and outcomes of these elections, we might better understand important psychological forces like thoes behind group loyalty and opposition.
 
 # Data
 
-We will use data on U.S. House of Representatives Congressional Elections in 2014, 2016, 2018, and 2020.
+We will use data on U.S. House of Representatives Congressional Elections in 2014, 2016, 2018, and 2020. This data comes from the U.S. Federal Election Commission ([fec.gov]( https://www.fec.gov/introduction-campaign-finance/election-results-and-voting-information/)).
 
 ```{r}
 #| message = FALSE

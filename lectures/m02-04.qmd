@@ -123,9 +123,16 @@ $$P(h|d_1, d_2) = P(h|d_1) \times P(h|d_2)$$
 ## Naive Bayes: The idea
 
 - The key idea behind Naive Bayes is to assume independence between the features used for prediction.
-- Models the features as independently caused by the class label or category membership
+- Model the features as each independently caused by the class label or category membership
 
-[diagram]
+```{mermaid}
+%%| fig-width: 5
+%%| mermaid-format: svg
+flowchart TD
+  A((Class)) --> F1([Feature 1]) & F2([Feature 2]) & Fd([. . .]) & Fk([Feature k])
+  Fd:::foo
+  classDef foo fill:#d0d0d0,stroke:#d0d0d0,stroke-width:2px
+```
 
 ## Multi-class Naive Bayes Classifier: The math
 
@@ -136,7 +143,7 @@ If we have:
 
 $$P(C_j | x_1, x_2, ..., x_k) \propto P(C_j) \prod^k_{i=1}P(x_i|C_j)$$
 
-## Example
+## Example {.scrollable}
 
 Let's examine 3 items from the Harvard dialect survey for the Midwestern states.
 
@@ -150,14 +157,28 @@ names(states) <- state.abb
 hds <- read_csv("data/hds.csv")
 
 hds_mini <- hds %>% 
-  filter(item_num %in% c(4, 105, 21)) %>% 
+  filter(item_num %in% c(4, 105, 50)) %>% 
   filter(state %in% c("wisconsin","minnesota", "michigan", "ohio", "illinois", "iowa", "indiana"))
 ```
 
+::: {style="font-size: 50%;"}
+```{r}
+old <- getOption("pillar.min_chars")
+options(pillar.min_chars = 20)
+```
+
+
 ```{r}
 #| echo: true
-head(hds_mini, 10)
+head(hds_mini, 20)
 ```
+:::
+
+```{r}
+options(pillar.min_chars = old)
+```
+
+
 ## Multinomial Naive Bayes: The Code
 
 
@@ -179,7 +200,7 @@ head(hds_mini, 10)
 x <- tribble(
   ~item_num, ~ans_ind,
   4, "a",
-  21, "c",
+  50, "d",
   105, "a"
 )
 

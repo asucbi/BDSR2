@@ -86,6 +86,25 @@
     code span.va { color: #111111; } /* Variable */
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
   </style>
   <link rel="stylesheet" href="m02-03_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link rel="stylesheet" href="style.css">
@@ -389,8 +408,17 @@
 
 <section id="bayesian-inference" class="slide level2">
 <h2>Bayesian Inference</h2>
-<p>Idea is, what should you believe about a hypothesis based on some data?</p>
-<p>[ expand on this more]</p>
+<p>What should you believe about a hypothesis based on some data?</p>
+<div class="fragment">
+<p>Bayesian inference gives an answer to this question.</p>
+<div>
+<ul>
+<li class="fragment">We start with a belief</li>
+<li class="fragment">Examine some new evidence (ie, data)</li>
+<li class="fragment">Update our belief by combining what we used to believe with the new evidence</li>
+</ul>
+</div>
+</div>
 </section>
 <section id="bayes-rule" class="slide level2">
 <h2>Bayes’ Rule</h2>
@@ -461,7 +489,15 @@ P(positive|\neg vampire)P(\neg vampire)
 </section>
 <section id="bayesian-approaches-to-science" class="slide level2">
 <h2>Bayesian approaches to science</h2>
-<p>[turn the crank, etc.]</p>
+<p>Bayesian Statistics offers an opportunity to reach conclusions by “turning the Bayesian crank” <span class="citation" data-cites="etz.vandekerckhove2018 maclehose.etal2011">(e.g. <a href="#/ref-etz.vandekerckhove2018" role="doc-biblioref" onclick="return false;">Etz and Vandekerckhove 2018</a>; <a href="#/ref-maclehose.etal2011" role="doc-biblioref" onclick="return false;">MacLehose, Oakes, and Carlin 2011</a>)</span> or firing up the “Bayesian machine” <span class="citation" data-cites="strevens2006">(<a href="#/ref-strevens2006" role="doc-biblioref" onclick="return false;">Strevens 2006</a>)</span>.</p>
+<p>We can use the same process for almost any problem:</p>
+<div>
+<ul>
+<li class="fragment">Specify a prior to represent our existing beliefs</li>
+<li class="fragment">We specify a model of the likelihood of the data under different hypotheses</li>
+<li class="fragment">“Turn the crank” to reach a conclusion</li>
+</ul>
+</div>
 </section>
 <section id="challenges-to-bayesian-approaches-to-science" class="slide level2">
 <h2>Challenges to Bayesian approaches to science</h2>
@@ -501,8 +537,22 @@ P(positive|\neg vampire)P(\neg vampire)
 <li class="fragment">Use of cross validation approaches can help with this in some cases</li>
 </ul>
 </div>
+</section>
+<section id="references" class="slide level2 smaller scrollable">
+<h2>References</h2>
 <div class="footer footer-default">
 
+</div>
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-etz.vandekerckhove2018" class="csl-entry" role="doc-biblioentry">
+Etz, Alexander, and Joachim Vandekerckhove. 2018. <span>“Introduction to <span>Bayesian Inference</span> for <span>Psychology</span>.”</span> <em>Psychonomic Bulletin &amp; Review</em> 25 (1): 5–34. <a href="https://doi.org/10.3758/s13423-017-1262-3">https://doi.org/10.3758/s13423-017-1262-3</a>.
+</div>
+<div id="ref-maclehose.etal2011" class="csl-entry" role="doc-biblioentry">
+MacLehose, Richard F., J. Michael Oakes, and Bradley P. Carlin. 2011. <span>“Turning the <span>Bayesian Crank</span>.”</span> <em>Epidemiology (Cambridge, Mass.)</em> 22 (3): 365–67. <a href="https://doi.org/10.1097/EDE.0b013e318212b31a">https://doi.org/10.1097/EDE.0b013e318212b31a</a>.
+</div>
+<div id="ref-strevens2006" class="csl-entry" role="doc-biblioentry">
+Strevens, Michael. 2006. <span>“The <span>Bayesian Approach</span> to the <span>Philosophy</span> of <span>Science</span>.”</span> In <em>Encyclopedia of <span>Philosophy</span>, Second Edition</em>, edited by D. M. Borchert, 495–502. <span>Macmillan Reference</span>.
+</div>
 </div>
 </section>
     </div>

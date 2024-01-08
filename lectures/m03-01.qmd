@@ -4,6 +4,8 @@ subtitle: Behavioral Data Science in R II
 format: 
   revealjs:
     css: style.css
+execute:
+  echo: true
 bibliography: ../references.bib
 ---
 
@@ -11,6 +13,7 @@ bibliography: ../references.bib
 #| include: false
 
 library(tidyverse)
+theme_set(theme_grey(base_size = 20))
 ```
 
 ## Classification
@@ -29,31 +32,87 @@ Classification involves predicting **discrete** categorical outcomes.
 
 We can use **regression** techniques to predict the **probability** of discrete outcomes.
 
-## Example
+## Example: Binary election outcomes
 
-Introduce whatever our example will be
-
-## Classification with Linear Regression?
-
-What if we tried to use linear regression to predict the probability of binary outcomes? Let's try it!
+- Recall our example of the `hibbs` data connecting economic growth and U.S. Presidential election outcomes
+- We can compute a binary categorical outcome from our `hibbs` data to indicate whether the incumbent won (`1`) or lost (`0`)
 
 ```{r}
+library(tidyverse)
+library(tidymodels)
+library(rosdata)
+
+data(hibbs)
+
+df <- hibbs %>% 
+  mutate(inc_won = if_else(vote > 50, 1, 0))
 
 ```
 
-## A problem: Impossible Probabilities
+## Classification with Linear Regression?
 
-Probabilities must fall between $[0, 1]$, but our model predicts negative probabilities and probabilities $> 1$!
+::: {.callout-note icon="false"}
+## Think about it ...
+What if we tried to use linear regression to predict the probability of binary outcomes? 
+:::
 
-< plot showing this >
+Let's try it!
+
+## Linear regression on binary outcomes
+
+```{r}
+linfit <- lm(inc_won ~ growth, df)
+
+pred_df <- df %>% 
+  mutate(
+    .pred = predict(linfit, .),
+    .pred1 = if_else(.pred > .50, 1, 0),
+    )
+  
+pred_df %>% 
+  summarize(acc = mean(.pred1 == inc_won))
+
+```
+## What' wrong with this picture?
+
+```{r}
+#| fig-align: center
+#| echo: false
+tibble(
+  growth = c(min(df$growth)-.75, max(df$growth)+.75)
+  ) %>% 
+  mutate(.pred = predict(linfit, .)) %>% 
+  ggplot(aes(x = growth, y = .pred)) +
+  geom_line() +
+  geom_point(data = df, aes(y = inc_won)) +
+  scale_y_continuous(breaks = c(0, .25, .5, .75, 1))
+```
+
+::: {.fragment}
+Probabilities must fall between $[0, 1]$, but our model predicts probabilities $p < 0$ and $p > 1$!
+:::
+
+
 
 ## A solution: A link function
 
-We need some way to smoosh our models' predicted probabilities so that they always fall between zero and 1.
+- We need some way to *smoosh* our models' predicted probabilities so that they always fall between zero and one.
+- The **Logistic** link function does just that.
 
-The **Logistic** link function does just that.
 
-< plot of logistic function >
+```{r}
+#| output-location: column
+
+tibble(
+  x = seq(-5, 5, .01),
+  x_logistic = plogis(x)
+) %>% 
+  ggplot() +
+  aes(x= x, y = x_logistic) +
+  geom_line()
+```
+
+
 
 ## Generalized linear models
 
@@ -63,16 +122,27 @@ The **Logistic** link function does just that.
 $$\hat{y} =  f(\alpha + \beta x)$$
 ## Logistic Regression
 
-- **Logistic Regression** is a **Generalized Linear Model** that incorporates a **logistic** link function.
-- The probability of an event $p(y)$ is estimated with a linear equation, smooshed between zero and one with the logistic link.
+- **Logistic Regression** is a **Generalized Linear Model** 
+- Incorporating a **logistic** link function.
+
+The probability of an event $p(y)$ is estimated with a linear equation, smooshed between zero and one with the logistic link.
 
 $$\hat{p(y)} =  \text{logistic}(\alpha + \beta x)$$
-## Loss function: Binomial Distribution
+## `hibbs` logistic model predictions
 
-- For logistic regression, we no longer use the residual sum of squares as our loss function.
-- Instead, we use the **Binomial distribution**
-- Use **optimization** to find the maximum likelihood estimate for model parameters
+```{r}
+#| echo: false
+lrfit <- glm(inc_won ~ growth, family = "binomial", data = df)
 
-< equation for this in negative log loss >
+tibble(
+  growth = modelr::seq_range(df$growth, 100)
+  ) %>% 
+  mutate(.pred = predict(lrfit, ., type = "response")) %>% 
+  ggplot(aes(x = growth, y = .pred)) +
+  geom_line() +
+  geom_point(data = df, aes(y = inc_won))
+```
+
+
 
 

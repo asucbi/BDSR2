@@ -4,6 +4,8 @@ subtitle: Behavioral Data Science in R II
 format: 
   revealjs:
     css: style.css
+execute:
+  echo: true
 bibliography: ../references.bib
 ---
 
@@ -22,12 +24,13 @@ library(broom)
 affairs <- read_csv("data/affairs.csv") %>% 
   mutate(having_affair = factor(if_else(affairs > 0, 1, 0)))
 
-head(affairs)
+glimpse(affairs, width = 60)
 ```
 
 ## Exploratory Data Analysis
 
 ```{r}
+#| echo: false
 affairs %>% 
   group_by(rating) %>% 
   summarize(prop_affair = mean(having_affair==1), cnt = n()) %>% 
@@ -44,7 +47,7 @@ affairs %>%
 #| echo: true
 library(tidymodels)
 set.seed(1234)
-splits <- initial_split(affairs, strata = rating)
+splits <- initial_split(affairs, strata = having_affair)
 
 train <- training(splits)
 test <- testing(splits)
@@ -54,24 +57,20 @@ test <- testing(splits)
 ## Simple logistic regression model
 
 ```{r}
-lr_wflow <- workflow(having_affair ~ rating) %>% 
+#| echo: true
+lr_wflow <- workflow() %>% 
+  add_formula(having_affair ~ rating) %>% 
   add_model(logistic_reg())
 
 lr_fit1 <- fit(lr_wflow, data = train)
 
-lr_fit1
-```
-
-
-## Results
-
-```{r}
 tidy(lr_fit1)
 ```
 
-## Plotting results
+## Plotting model and predictions
 
 ```{r}
+#| echo: false
 lr_fit1 %>% 
   augment(
     tibble(rating = seq(1,5,.01))
@@ -81,21 +80,134 @@ lr_fit1 %>%
   geom_jitter(data = affairs, aes( x = rating, y = as.numeric(having_affair==1)), height = .05, alpha = .3)
 ```
 
-
 ## Adding predictors
 
-## More visualizations
+```{r}
+#| echo: true
+lr_wflow2 <- workflow() %>% 
+  add_formula(having_affair ~ rating + gender) %>% 
+  add_model(logistic_reg())
+
+lr_fit2 <- fit(lr_wflow2, data = train)
+```
+
+## Visualization
+
+```{r}
+#| echo: false
+lr_fit2 %>% 
+  augment(
+    crossing(
+  rating = seq(1,5,.01),
+  gender = c("male", "female"),
+  children = c("yes", "no")
+  )
+  ) %>% 
+  ggplot(aes(x = rating, y=.pred_1)) +
+  geom_line(aes(color = gender)) +
+  geom_jitter(data = affairs, aes( x = rating, y = as.numeric(having_affair==1), color = gender), height = .05, alpha = .3) +
+  facet_wrap(~children)
+```
 
 ## Interpreting coefficients / predictions
+
+```{r}
+#| echo: true
+tidy(lr_fit2)
+```
+
 
 # Performance metrics
 
 ## Accuracy
 
-## Precision and Recall
+$$\text{accuracy} = \frac{\text{correct predictions}}{\text{total predictions}}$$
+```{r}
+#| echo: true
+lr_fit2 %>% 
+  augment(test) %>% 
+  summarize(acc = sum(.pred_class == having_affair)/n())
+```
 
-## tidymodels vs `glm()`
+## Confusion Matrix
 
+```{r}
+#| echo: false
+tibble(
+  actual = factor(c("+", "-", "+", "-"), ordered = TRUE, levels = c("+", "-")),
+  predicted = factor(c("+", "-", "-", "+")),
+  label = c("True Positive", "True Negative", "False Negative", "False Positive")
+) %>% 
+  ggplot(aes(x=actual, y = predicted, label = label)) +
+  geom_tile(fill = "white", color = "black") +
+  geom_text(size = 9) +
+  theme_minimal(base_size = 24) +
+  theme(
+    panel.grid = element_blank(),
+    # axis.text = element_blank()
+    ) +
+  labs(x = "Actual", y = "Predicted") +
+  scale_x_discrete(position = "top") 
+  
 
+```
 
+## True positives and true negatives
+
+```{r}
+lr_fit2 %>% 
+  augment(test) %>% 
+  summarize(
+    acc = sum(.pred_class == having_affair)/n(),
+    TP = sum(.pred_class == 1 & having_affair ==1)/sum(.pred_class == 1) ,
+    TN = sum(.pred_class == 0 & having_affair ==0)/sum(.pred_class == 0) ,
+    )
+```
+
+## Loss Function
+
+For logistic regression, the loss function is based on **likelihood** of the data. 
+
+Where $y_i \in \{0, 1\}$:
+
+$$\mathcal{L(y_i, p_i)} = \prod_i p_i^{y_i} \prod_i (1-p_i)^{y_i}$$
+
+::: {.callout-tip icon="false"}
+## In words:
+"The product of the model's predicted probability of positive for all the positive cases times the product of the models predicted probability of negative for all negative cases."
+:::
+
+## Cross-Entropy Loss [^1]
+
+In log-space, multiplication becomes addition and exponentiation becomes multiplication.
+
+So, it is generally easier to define the loss $\mathcal{l}$ in terms of the log-likelihood:
+
+$$ \mathcal{l(y_i, p_i)} = \sum_i y_i log(p_i) + (1-y_i) log(1-p_i)$$
+
+[^1]: AKA: the binomial log likelihood loss
+
+# tidymodels vs `glm()`
+
+## Comparison with `glm()`
+
+**`tidymodels`**
+
+```{r}
+lr_wflow2 <- workflow() %>% 
+  add_formula(having_affair ~ rating + gender + children) %>% 
+  add_model(logistic_reg())
+
+fit_tm <- fit(lr_wflow2, data = train)
+```
+
+**`glm()`**
+
+```{r}
+fit_glm <- glm(
+  having_affair ~ rating + gender + children,
+  family = "binomial",
+  data = train
+)
+```
 

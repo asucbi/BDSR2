@@ -11,7 +11,21 @@ bibliography: ../references.bib
 
 The **Logistic** function smooshes continuous values in the range $[-\infty, \infty]$ to fall between zero and 1.
 
-< plot of logistic function >
+```{r}
+#| echo: false
+library(tidyverse)
+theme_set(theme_minimal(base_size = 20))
+
+tibble(
+  x = seq(-5, 5, .01),
+  x_logistic = plogis(x)
+) %>% 
+  ggplot() +
+  aes(x= x, y = x_logistic) +
+  geom_line() +
+  labs(y = "logistic(x)")
+```
+
 
 ## Working backwards
 
@@ -23,8 +37,22 @@ Then see how the logistic function does just the opposite of that.
 
 :::: {.columns}
 ::: {.column width="50%"}
-- If you are a betting man (or woman), you know that **odds** are another way to express uncertainty:
-- Instead of saying "75% probability" we might also say "3:1 odds"
+
+::: {style="font-size: 65%;"}
+
+If you are a betting man (or woman), you know that **odds** are another way to express uncertainty:
+
+$$o(x) = \frac{p(x)}{1-p(x)}$$
+
+::: {.fragment}
+Commonly used to express a fair bet: 
+
+- If we agree an event has a 75% probability, then to bet against it you should need to gain \$3 for every \$1 risked.  
+- So, instead of saying "75% probability" we might also say "3:1 odds".
+:::
+
+
+:::
 
 :::
 ::: {.column width="50%"}
@@ -32,9 +60,7 @@ Then see how the logistic function does just the opposite of that.
 :::
 ::::
 
-$$o(x) = \frac{p(x)}{1-p(x)}$$
 
-Commonly used in gambling to express a fair bet: If we agree an event has a 75% probability, then to bet against it you should need to gain \$3 for every \$1 risked.
 
 ## Functions and inverse functions
 
@@ -81,6 +107,10 @@ $\text{ln} \ x$: The natural logarithm of $x$, using euler's number $e \approx 2
 `log()` computes the natural logarithm and `exp()` the exponentiation function (default natural base).
 
 ```{r}
+#| echo: true
+
+log(2)
+exp(2)
 exp(log(2))
 log(exp(2))
 ```
@@ -106,3 +136,101 @@ $$\text{logistic}(x) = \text{logit}^{-1}(x) = \frac{1}{1 + e^{x}}$$
 Substituting in our linear equation, we have logistic regression:
 
 $$\hat{p(y)} = \frac{1}{1 + e^{\alpha + \beta x}}$$
+
+## Another link idea: Clamping
+
+What if we instead just "clamp" the values of a linear probability model so that they are forced to fall in $[0,1]$?
+
+```{r}
+#| fig-align: center
+#| echo: false
+
+library(tidyverse)
+library(tidymodels)
+library(rosdata)
+
+data(hibbs)
+
+df <- hibbs %>% 
+  mutate(inc_won = if_else(vote > 50, 1, 0))
+
+lrfit <- glm(inc_won ~ growth, family = "binomial", data = df)
+linfit <- lm(inc_won ~ growth, df)
+
+tibble(
+  growth = seq(min(df$growth)-.75, max(df$growth)+.75, .01)
+  ) %>% 
+  mutate(.pred = predict(linfit, .)) %>% 
+  mutate(.pred = case_when(
+    .pred < 0 ~ 0,
+    .pred > 1 ~ 1,
+    TRUE ~ .pred
+  )
+  ) %>% 
+  ggplot(aes(x = growth, y = .pred)) +
+  geom_line() +
+  geom_point(data = df, aes(y = inc_won)) +
+  scale_y_continuous(breaks = c(0, .25, .5, .75, 1))
+```
+
+## Another problem: Which differences matter?
+
+- Is the difference between 51% and 63% probability the same as:
+  - the difference between 87% and 99% probability?
+  - the difference between 1% and 13% probability?
+
+## Linear probability problems
+
+For each 0.25% increase in growth, the linear probability models predicts approx. 5% increase in probability.
+
+:::: {.columns}
+::: {.column width="70%"}
+
+
+```{r}
+#| echo: false
+tibble(
+  growth = seq(min(df$growth)-.75, max(df$growth)+.75, .01)
+  ) %>% 
+  mutate(.pred = predict(linfit, .)) %>% 
+  mutate(.pred = case_when(
+    .pred < 0 ~ .001,
+    .pred > 1 ~ .999,
+    TRUE ~ .pred
+  )
+  ) %>% 
+  ggplot(aes(x = growth, y = .pred)) +
+  geom_line() +
+  geom_point(data = df, aes(y = inc_won)) +
+  geom_point(data = tibble(growth = 3.9, .pred = 1.), size = 30, shape  = 1, color = "red") +
+  geom_point(data = tibble(growth = 1.625, .pred = .5), size = 30, shape  = 1, color = "red") +
+  geom_point(data = tibble(growth = -0.5, .pred = 0.), size = 30, shape  = 1, color = "red") +
+  scale_y_continuous(limits =  c(-.1, 1.1), breaks = c(0, .25, .5, .75, 1))
+```
+:::
+::: {.column width="30%"}
+
+```{r}
+tibble(
+  growth = c(-.9, -.65, 1.5, 1.75, 3.8, 4.05)
+) %>% 
+  mutate(.pred = predict(linfit, .))
+  # arrange(desc(.pred))
+```
+:::
+::::
+
+
+## Linear in probabilities vs. linear in log-odds
+
+- For most real-world contexts, it doesn't make much sense to think of differences in probabilities of a response variable as linearly related to changes in any of the independent predictors.
+- In logistic regression, the relationship is non-linear in the probabilities and linear in the **log-odds**
+
+## Interpreting logistic regression coefficients
+
+```{r}
+tidy(lrfit)
+```
+- The log-odds of incumbent re-election increase by 1.04 for each percentage point increase in growth
+- A linear relationship in log-odds is multiplicative in odds:
+  - The odds of incumbent re-election are `exp(1.04)`  = `r round(exp(1.04),2)` **times greater** for each percentage point increase in growth

@@ -49,7 +49,7 @@ Our first step will be to set up our data so we can build our models. For each d
 ::: {.callout-note icon="false"}
 ## Exercise 1
 
-Now, do some further data munging of the sort we learned last semester.
+First, do some further data munging of the sort we learned last semester.
 
 1.  Filter `df` to include only the rows for Democrat and Republican candidates
 2.  Pivot the data to a wide format, so that for each Congressional district we have variables representing the proportion of democratic votes in 2014, 2016, 2018, and 2020, and whether or not there was a democrat incumbent going into the 2018 election. If there is more than one D or R candidate, use the proportion value for the candidate with the most votes.
@@ -78,9 +78,10 @@ Using `tidymodels`, split the data into training and testing splits called `trai
 :::
 
 
-Now we'll build our model specification and modeling workflow.
 
 ## Exercise 3
+
+Now we'll start building our model specification and modeling workflow.
 
 ::: {.callout-note icon="false"}
 ## Exercise 3
@@ -91,26 +92,27 @@ Create a model specification for linear regression and call it `linear_spec`. Th
 
 
 ## Exercise 4
+Next we'll fit the model (finally!).
 
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
-Now fit the model to the `train` data (finally!). Call this `lin_fit1`.
+Fit the model to the `train` data. Call this `lin_fit1`.
 :::
 
 ## Exercise 5
 
-Now check the fit on the training data. We will focus on two ways of examining model fit. First, we'll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). Second, we'll plot plotting the predicted values against the actual observed values.
+Check the fit of the model on the training data. We will focus on two ways of examining model fit. First, we'll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). Second, we'll plot the predicted values against the actual observed values.
 
 ::: {.callout-note icon="false"}
 ## Exercise 5
 
-Compute predictive metrics for the model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
+Compute predictive metrics for the model on our training data using `metrics()`. Then, plot the predicted values against the actual observed values.
 :::
 
 ## Exercise 6
 
-By looking at the predictions against the actual election results, we can see our model's performane is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the "cloud" of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?
+By looking at the predictions against the actual election results, we can see our model's performance is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the "cloud" of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?
 
 ::: {.callout-note icon="false"}
 ## Exercise 6
@@ -120,7 +122,7 @@ Let's inspect the model's coefficients and see if they offer any clues. Use the 
 ::: {.callout-warning icon="false" collapse="true"}
 ## Explanation
 
-Of course the intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot---so that's a clue there are actually data points in our data with a proportion of zero. These are *uncontested* elections where there was no Democratic party candidate.
+The intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot---so that's a clue there are actually data points in our data with a proportion of zero. These are *uncontested* elections where there was no Democratic party candidate.
 
 But whenever a candidate actually runs, they do so because they expect to get at least some share of the vote---more than 21% at least.
 :::
@@ -128,20 +130,16 @@ But whenever a candidate actually runs, they do so because they expect to get at
 
 ## Exercise 7
 
-We'd like to add a predictor to our dataset to account for this in our model. But, if we are going to add a predictor we will need to add it to our train and test splits. A better way to manage this kind of "feature engineering" is to use a **recipe**.
+We'd like to add a predictor to our dataset to account for uncontested elections in our model. But, if we are going to add a new predictor we will need to also add it to our train and test splits. A better way to manage this kind of "feature engineering" is to use a **recipe**. The function `step_mutate()` can be used to engineer a new predictor in our dataset. By default, the created variable(s) are then automatically added as predictors to the model formula.
+
+Let's create a recipe and add that to the workflow.
 
 ::: {.callout-note icon="false"}
 ## Exercise 7
 
-Rather than adding a formula to our workflow, instead we'll create a recipe and add that to the workflow. Create a recipe `rec2` that uses a `step_mutate()` to add a recipe step creating a new variable called `prior_uncontested` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. Remember, now the formula goes in the recipe rather than directly into the workflow. The tip below should help.
+Create a recipe `rec2` that uses a `step_mutate()` to add a recipe step creating a new variable called `prior_uncontested` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. Remember, now the formula goes in the recipe rather than directly into the workflow. 
 
 Then, fit this new model and call it `lin_fit2`.
-:::
-
-::: callout-tip
-We can use a `.` in our formula to refer to all other variables. So if we set our formula to `y ~ .` we will tell the model to predict using all other variables. This is useful when we have a LOT of predictors in our model and we don't want to type them all. It is also useful when we are using recipes to create new variables that don't already exist in the original data.
-
-If we don't actually want to use all predictors, we can use the function `step_select(..., skip = TRUE)` to select only the subset we want (and to skip this step when predicting from an already-fit model).
 :::
 
 ## Exercise 8
@@ -151,7 +149,7 @@ Now let's examine the fit of our new model and compare it to the previous one.
 ::: {.callout-note icon="false"}
 ## Exercise 8
 
-Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot plotting the predicted values against the actual observed values.
+Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot the predicted values against the actual observed values.
 
 Have the metrics improved? Focusing on the plot, what do you notice has changed? Does that make sense?
 :::
@@ -165,6 +163,14 @@ Now let's try creating some new model specifications that use more predictors. W
 
 Create a new recipe, workflow specification, and fitted model using all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent. Call the relevant workflow, recipe, and models number 3 (e.g. `lin_fit3`).
 :::
+
+
+::: callout-tip
+We can use a `.` in our formula to refer to all other variables. So if we set our formula to `y ~ .` we will tell the model to predict using all other variables. This is useful when we have a LOT of predictors in our model and we don't want to type them all. It is also useful when we are using recipes to create new variables that don't already exist in the original data.
+
+If we don't actually want to use all predictors, we can use the function `step_select(..., skip = TRUE)` to select only the subset we want (and to skip this step when predicting from an already-fit model).
+:::
+
 
 ## Exercise 10
 
@@ -190,7 +196,9 @@ If the metrics are different, why is that?
 
 ## Exercise 12
 
-But wait, how would we actually use data or a model like this? Let's take ourselves back to 2019---the federal government was shutting down, Felicity Huffman was in prison, "Old Town Road" was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data.
+But wait, how would we actually use data or a model like this? The real usefulness of a model like this would be to predict the **future**.
+
+Let's take ourselves back to 2019---the federal government was shutting down, Felicity Huffman was in prison, "Old Town Road" was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data. 
 
 To reuse our model, we will cheat and rename our variables so that the model can generate predictions for 2020 using the 2018 data in place of the 2016 data and the 2016 data in place of the 2014 data.
 
@@ -208,7 +216,7 @@ Create a new dataset `test2020` based off of `test` where variables are construc
 ::: {.callout-note icon="false"}
 ## Exercise 13
 
-Now compute the metrics against the real election results in 2020. How well would such a model do?
+Now generate the model's predictions and compute the metrics against the real election results in 2020. How well would such a model do?
 
 Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating predictions this way.
 :::

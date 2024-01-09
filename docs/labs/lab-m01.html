@@ -202,7 +202,7 @@ Exercise 1
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Now, do some further data munging of the sort we learned last semester.</p>
+<p>First, do some further data munging of the sort we learned last semester.</p>
 <ol type="1">
 <li>Filter <code>df</code> to include only the rows for Democrat and Republican candidates</li>
 <li>Pivot the data to a wide format, so that for each Congressional district we have variables representing the proportion of democratic votes in 2014, 2016, 2018, and 2020, and whether or not there was a democrat incumbent going into the 2018 election. If there is more than one D or R candidate, use the proportion value for the candidate with the most votes.</li>
@@ -244,10 +244,10 @@ Exercise 2
 <p>Using <code>tidymodels</code>, split the data into training and testing splits called <code>train</code> and <code>test</code>.</p>
 </div>
 </div>
-<p>Now we’ll build our model specification and modeling workflow.</p>
 </section>
 <section id="exercise-3" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-3">Exercise 3</h2>
+<p>Now we’ll start building our model specification and modeling workflow.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -264,6 +264,7 @@ Exercise 3
 </section>
 <section id="exercise-4" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-4">Exercise 4</h2>
+<p>Next we’ll fit the model (finally!).</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -274,13 +275,13 @@ Exercise 4
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Now fit the model to the <code>train</code> data (finally!). Call this <code>lin_fit1</code>.</p>
+<p>Fit the model to the <code>train</code> data. Call this <code>lin_fit1</code>.</p>
 </div>
 </div>
 </section>
 <section id="exercise-5" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-5">Exercise 5</h2>
-<p>Now check the fit on the training data. We will focus on two ways of examining model fit. First, we’ll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). Second, we’ll plot plotting the predicted values against the actual observed values.</p>
+<p>Check the fit of the model on the training data. We will focus on two ways of examining model fit. First, we’ll compute some metrics, including the Root Mean Squared Error and Mean Absolute Error (MAE). Second, we’ll plot the predicted values against the actual observed values.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -291,13 +292,13 @@ Exercise 5
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Compute predictive metrics for the model on our training data using <code>metrics()</code>. Then, plot plotting the predicted values against the actual observed values.</p>
+<p>Compute predictive metrics for the model on our training data using <code>metrics()</code>. Then, plot the predicted values against the actual observed values.</p>
 </div>
 </div>
 </section>
 <section id="exercise-6" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-6">Exercise 6</h2>
-<p>By looking at the predictions against the actual election results, we can see our model’s performane is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the “cloud” of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?</p>
+<p>By looking at the predictions against the actual election results, we can see our model’s performance is somewhat mixed! Specifically, there are some elections that seem to be predicted quite well (the “cloud” of points along the 1:1 line), but others that are not (those kind of along the edges of the plot). What do you think is going on with the elections the model is failing to predict well?</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -321,7 +322,7 @@ Explanation
 </div>
 <div id="callout-8" class="callout-8-contents callout-collapse collapse">
 <div class="callout-body-container callout-body">
-<p>Of course the intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot—so that’s a clue there are actually data points in our data with a proportion of zero. These are <em>uncontested</em> elections where there was no Democratic party candidate.</p>
+<p>The intercept represents the predicted value when all predictors are zero. We can see a vertical line of points at about exactly that spot—so that’s a clue there are actually data points in our data with a proportion of zero. These are <em>uncontested</em> elections where there was no Democratic party candidate.</p>
 <p>But whenever a candidate actually runs, they do so because they expect to get at least some share of the vote—more than 21% at least.</p>
 </div>
 </div>
@@ -331,7 +332,8 @@ Explanation
 </section>
 <section id="exercise-7" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-7">Exercise 7</h2>
-<p>We’d like to add a predictor to our dataset to account for this in our model. But, if we are going to add a predictor we will need to add it to our train and test splits. A better way to manage this kind of “feature engineering” is to use a <strong>recipe</strong>.</p>
+<p>We’d like to add a predictor to our dataset to account for uncontested elections in our model. But, if we are going to add a new predictor we will need to also add it to our train and test splits. A better way to manage this kind of “feature engineering” is to use a <strong>recipe</strong>. The function <code>step_mutate()</code> can be used to engineer a new predictor in our dataset. By default, the created variable(s) are then automatically added as predictors to the model formula.</p>
+<p>Let’s create a recipe and add that to the workflow.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -342,22 +344,8 @@ Exercise 7
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Rather than adding a formula to our workflow, instead we’ll create a recipe and add that to the workflow. Create a recipe <code>rec2</code> that uses a <code>step_mutate()</code> to add a recipe step creating a new variable called <code>prior_uncontested</code> that is <code>1</code> if the democratic vote share was 0 in 2016 and <code>0</code> otherwise. Remember, now the formula goes in the recipe rather than directly into the workflow. The tip below should help.</p>
+<p>Create a recipe <code>rec2</code> that uses a <code>step_mutate()</code> to add a recipe step creating a new variable called <code>prior_uncontested</code> that is <code>1</code> if the democratic vote share was 0 in 2016 and <code>0</code> otherwise. Remember, now the formula goes in the recipe rather than directly into the workflow.</p>
 <p>Then, fit this new model and call it <code>lin_fit2</code>.</p>
-</div>
-</div>
-<div class="callout-tip callout callout-style-default callout-captioned">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
-</div>
-<div class="callout-caption-container flex-fill">
-Tip
-</div>
-</div>
-<div class="callout-body-container callout-body">
-<p>We can use a <code>.</code> in our formula to refer to all other variables. So if we set our formula to <code>y ~ .</code> we will tell the model to predict using all other variables. This is useful when we have a LOT of predictors in our model and we don’t want to type them all. It is also useful when we are using recipes to create new variables that don’t already exist in the original data.</p>
-<p>If we don’t actually want to use all predictors, we can use the function <code>step_select(..., skip = TRUE)</code> to select only the subset we want (and to skip this step when predicting from an already-fit model).</p>
 </div>
 </div>
 </section>
@@ -374,7 +362,7 @@ Exercise 8
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Compute predictive metrics for the new model on our training data using <code>metrics()</code>. Then, plot plotting the predicted values against the actual observed values.</p>
+<p>Compute predictive metrics for the new model on our training data using <code>metrics()</code>. Then, plot the predicted values against the actual observed values.</p>
 <p>Have the metrics improved? Focusing on the plot, what do you notice has changed? Does that make sense?</p>
 </div>
 </div>
@@ -393,6 +381,20 @@ Exercise 9
 </div>
 <div class="callout-body-container callout-body">
 <p>Create a new recipe, workflow specification, and fitted model using all predictors from 2016 or before as well as whether the election in 2018 is for an incumbent. Call the relevant workflow, recipe, and models number 3 (e.g.&nbsp;<code>lin_fit3</code>).</p>
+</div>
+</div>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>We can use a <code>.</code> in our formula to refer to all other variables. So if we set our formula to <code>y ~ .</code> we will tell the model to predict using all other variables. This is useful when we have a LOT of predictors in our model and we don’t want to type them all. It is also useful when we are using recipes to create new variables that don’t already exist in the original data.</p>
+<p>If we don’t actually want to use all predictors, we can use the function <code>step_select(..., skip = TRUE)</code> to select only the subset we want (and to skip this step when predicting from an already-fit model).</p>
 </div>
 </div>
 </section>
@@ -432,7 +434,8 @@ Exercise 11
 </section>
 <section id="exercise-12" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-12">Exercise 12</h2>
-<p>But wait, how would we actually use data or a model like this? Let’s take ourselves back to 2019—the federal government was shutting down, Felicity Huffman was in prison, “Old Town Road” was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data.</p>
+<p>But wait, how would we actually use data or a model like this? The real usefulness of a model like this would be to predict the <strong>future</strong>.</p>
+<p>Let’s take ourselves back to 2019—the federal government was shutting down, Felicity Huffman was in prison, “Old Town Road” was blaring everywhere, and an intrepid data scientist like yourself might be looking to forecast the likely results of the 2020 U.S. House election. Perhaps such a budding Nate Silver could use a model like the one we just created to do just that: using a forecasting model built from 2016 data to forecast by predicting 2020 vote shares from the 2018 data.</p>
 <p>To reuse our model, we will cheat and rename our variables so that the model can generate predictions for 2020 using the 2018 data in place of the 2016 data and the 2016 data in place of the 2014 data.</p>
 <div class="callout-note callout callout-style-default no-icon callout-captioned">
 <div class="callout-header d-flex align-content-center">
@@ -464,7 +467,7 @@ Exercise 13
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Now compute the metrics against the real election results in 2020. How well would such a model do?</p>
+<p>Now generate the model’s predictions and compute the metrics against the real election results in 2020. How well would such a model do?</p>
 <p>Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating predictions this way.</p>
 </div>
 </div>

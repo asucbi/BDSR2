@@ -48,7 +48,7 @@ Then, we'll load in our data.
 ```{r}
 # read the other dataset in
 
-survey <- read_csv("data/dialect-survey.csv")
+survey <- read_csv("data/dialect-survey-full.csv")
 ```
 
 
@@ -150,6 +150,7 @@ res
 ```
 
 :::
+
 
 ## Exercise 6
 

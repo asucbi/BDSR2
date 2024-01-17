@@ -29,7 +29,7 @@ bibliography: ../references.bib
 ![](../imgs/BangladeshArsenic_6_254.jpg)
 :::
 
-## Symptoms of Arsenic poisoning
+## Arsenic poisoning symptoms
 
 ![](../imgs/arsenic-symptoms.png){fig-align="center"}
 
@@ -96,7 +96,7 @@ wells %>%
   mutate(prop = n/sum(n))
 ```
 
-## EDA: Visualization
+## EDA: Boxplot visualization
 
 ::: {.panel-tabset}
 
@@ -121,7 +121,7 @@ arsenic_dist100_plt
 :::
 
 
-## EDA: More Visualizations
+## EDA: Binned obs. visualization
 ::: {.panel-tabset}
 
 ## Code
@@ -140,7 +140,9 @@ arsenic_switching_plt <- wells %>%
   geom_point() +
   geom_line() +
   geom_ribbon(alpha = .25) +
-  labs(x = "Arsenic Bin Avg.",  y = "Prop. switched")
+  labs(x = "Arsenic Bin Avg.",  y = "Prop. switched", 
+       title = "Proportion switching across binned levels of arsenic",
+       subtitle = "with 95% confidence intervals")
 ```
 
 ## Plot
@@ -236,10 +238,14 @@ How would you interpret the coefficients for `arsenic` and `dist100`?
 :::
 ::: {.column width="50%"}
 
+::: {style="font-size: 65%;"}
 ::: {.fragment}
 - As arsenic increases, $p(switching)$ increases, as distance increases, $p(switching)$ decreases
 - An increase in 100m distance reduces log-odds by .863 or **multiplies odds** by `exp(-.863)` = `r round(exp(-.328),3)`
 :::
+
+:::
+
 :::
 ::::
 
@@ -271,7 +277,7 @@ Comparing extremes (90th vs 10th percentile) for $p(switch)$:
 
 ```{r}
 #| echo: true
-
+#| code-line-numbers: "|1-2|5"
 stdize_rec <- recipe(switch ~ arsenic + dist100, train) %>% 
   step_normalize(all_numeric_predictors())
 
@@ -357,7 +363,7 @@ lr_fit1b %>%
 
 ```{r}
 #| echo: true
-
+#| code-line-numbers: "|2|3-6"
 lr_rec <- recipe(switch ~ dist100 + arsenic + educ4, train) %>%
   step_interact(~all_predictors():all_predictors()) %>%
   step_mutate(
@@ -385,6 +391,7 @@ folds <- vfold_cv(train, v = 10, strata = switch)
 
 ## Setup
 ```{r}
+#| code-line-numbers: "|1-5|7-12"
 wflows <- as_workflow_set(
   simple = lr_wflow1, 
   two_pred = lr_wflow2, 
@@ -541,3 +548,6 @@ fit_glm <- glm(
 
 
 ## References
+
+- Reporting from *The Guardian*: [https://www.theguardian.com/global-development/2016/apr/06/millions-of-people-in-bangladesh-still-drinking-arsenic-laced-water](https://www.theguardian.com/global-development/2016/apr/06/millions-of-people-in-bangladesh-still-drinking-arsenic-laced-water)
+- Reporting from *Human Rights Watch*: [https://www.hrw.org/news/2016/04/06/bangladesh-20-million-drink-arsenic-laced-water](https://www.hrw.org/news/2016/04/06/bangladesh-20-million-drink-arsenic-laced-water)

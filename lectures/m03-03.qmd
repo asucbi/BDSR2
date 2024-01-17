@@ -9,10 +9,55 @@ execute:
 bibliography: ../references.bib
 ---
 
+
 ## Example: Wells in Bangladesh
 
-< introduce this >
+![](../imgs/bangladeshi-wells-guardian.png){fig-align="center"}
 
+
+## Arsenic in well water
+
+::: {style="font-size: 65%;"}
+- Millions of people in Bangladesh get their water from hand-pumped tube wells
+- A screening of 5 million wells from 2000 to 2003 found that wells of an estimated 20 million people had unsafe levels of arsenic (above 50 micrograms per liter)
+- More recent screenings suggest that the government's efforts have failed to address this problem
+:::
+
+::: {layout-nrow={1}}
+![](../imgs/Bangla-map-contam-wells-HRW.jpg)
+![](../imgs/BangladeshArsenic_6_254.jpg)
+:::
+
+## Symptoms of Arsenic poisoning
+
+![](../imgs/arsenic-symptoms.png)
+
+::: {.hidden}
+- Short-term symptoms:
+  - Flu-like symptoms, shortness of breath, numbness
+  - Warts and lesions, hardening of skin, chronic sore throat and digestive issues
+- Long-term symtoms:
+  - Increased risk for liver, heart, bladder disease
+  - Neurotoxicity and neurosystem complications
+  - Increased risk for many cancers
+:::
+
+## Health decision-making: Switching wells
+
+:::: {.columns}
+::: {.column width="70%"}
+- The Bangladeshi water system is highly distibuted, each well serves on average 11 people
+- Even though your well is unsafe, a neighbor's well may be safe
+- @gelman.etal2004 analyzed a survey of users of several thousand wells to examine people's decision-making: when will people with unsafe wells switch to using another neighbors well?
+
+:::
+::: {.column width="30%"}
+
+**Map of wells surveyed**
+
+![](../imgs/bangladeshi-well-map.png)
+:::
+::::
 
 
 ## The data

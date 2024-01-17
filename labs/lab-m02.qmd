@@ -89,7 +89,6 @@ Fix the problem as described in the explanation above. You can overwrite the `hd
 :::
 
 
-
 ## Exercise 4
 
 Our efforts have fixed the structure of the dataset, but they have left many rows with zero values (assuming you replaced the `NA`s). In the original data survey data, no one gave these answers, so the proportion should be zero. But, can we use these values directly in our model? The maximum-likelihood estimate for the conditional probability would be zero, but could this cause problems?
@@ -153,65 +152,19 @@ res
 
 
 ## Exercise 6
-
-Great! Now we are going to make this code a bit simpler. Think back to Bayes' Rule and recall that we called the the $P(d)$ term the "normalization" term and that we sometimes went so far as to leave it out and express Bayes Rule as the proportionality:
-
-$$P(h|d) \propto P(d|h)P(h)$$
-It turns out we can often ignore this term when thinking about probabilities, as we can skip computing it directly and simply normalize the values computed from the expression above. 
-
-::: column-margin
-This is only true exactly as I'm showing it here in the case of discrete probability distributions. Things are a bit different in the case of continuous probability distributions as there is no longer a finite number of realizations of $h$.
-:::
-
-As is often the case, the right notation makes this clear:
-
-$$p(H=h|d) = \frac{P(d|H=h)P(H=h)}{\sum_hP(d|H=h)P(H=h)}$$
-
-As this makes clearer, the probability of the data $P(d)$ is just the probability of the data given each hypothesis, summed over all the possible hypotheses. But this is exactly what we are doing when we calculate `likeli*prior` for each state, so we can just divide by the sum. I.e. we can normalize these values into probabilities.
-
-
 ::: {.callout-note icon="false"}
 ## Exercise 6
-Modify model code to skip explicitly calculating the probability of the data (`pdata` in the lecture code) and instead simply normalize the `likeli*prior` values.
-:::
-
-
-## Exercise 7
-
-::: callout-tip
-## Calculating with log-probabilities
-
-- Often, calculations of probabilities are computed in terms of log-probabilities (i.e. in log-space, or after log-transformation)
-- In log-space, multiplication becomes addition
-
-$$log(a \times b) = log(a) + log(b) $$
-- Then, log-probabilites are transformed back into probabilities through exponentiation
-
-The function `log()` takes the log of a value (transforms probabilities into log-probabilities) and the function `exp()` exponentiates the log back into the original value (transforms log probabilities into probabilities). i.e. `exp(log(x)) == x`.
-
-:::
-
-::: {.callout-note icon="false"}
-## Exercise 7
-Further modify the code to perform the computations in log-space. Confirm that the results are the same.
-:::
-
-
-
-## Exercise 8
-::: {.callout-note icon="false"}
-## Exercise 8
 Make a map of predictions for your own data and see if it makes sense. Did our model predict where you grew up? Where you have lived?
 :::
 
 
 
-## Exercise 9
+## Exercise 7
 
 We have created a "model" through a process of joining against a dataframe of conditional probabilities. Let's close by transforming this code into something more closely resembling the model functions we have seen before and generally use in Machine Learning.
 
 ::: {.callout-note icon="false"}
-## Exercise 9
+## Exercise 7
 Let's do three things:
 
 1. Test generating predicted probabilities for multiple respondents' data, revising the code if necessary.
@@ -223,23 +176,23 @@ Your function should take the following form `nb_predict(input_data)` and should
 
 
 
-## Exercise 10
+## Exercise 8
 
 ::: {.callout-note icon="false"}
-## Exercise 10
+## Exercise 8
 Compare your predictions to the actual observed values in our survey data. Compute an accuracy metric and compare to chance accuracy (briefly describe).
 :::
 
 
 
-## Exercise 11
+## Exercise 9
 
 Are you impressed by the accuracy score for our model? If not, consider whether guessing the exact state someone is from is really a fair test. If we think about American dialects, many are more regional rather than state-specific, and people have different personal backgrounds that could influence their dialect. For instance, a Wisconsin dialect (and accent) is in many ways similar to a Minnesotan dialect. So if the model guesses "Minnesota" for someone from Wisconsin, is it entirely wrong?
 
 In multi-class classification tasks it is common to measure accuracy in terms of "top-$n$" accuracy. That is, whether the correct class was in the top $n$ most probable classes identified by the model (e.g. top 5, top 10, etc.). This can sometimes offer a more realistic or "fair" assessment.
 
 ::: {.callout-note icon="false"}
-## Exercise 11
+## Exercise 9
 
 Write a new function `nb_predict_topN(input_data, N)` that takes an additional argument `N` and outputs the top N classes and their probabilities. The tibble output by the function should include a `.rank` variable indicating the rank of the guess in terms of posterior probability.
 
@@ -256,8 +209,53 @@ One approach would be to estimate a prior empirically from our training dataset-
 Let's keep things relatively simple while experimenting with this a bit by forming a prior based on the population of U.S. states. 
 
 ::: {.callout-note icon="false"}
-## Exercise 12 (bonus)
+## Exercise 10 (bonus)
 Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Modify your code for `nb_predict_topN` as needed to include that probability as the prior when making predictions. Then, rerun the calculations from exercises 10 and 11 and compare what you find with the uniform vs informative prior.
+:::
+
+
+## Exercise 11
+
+We can actually make our code a bit simpler. Think back to Bayes' Rule and recall that we called the the $P(d)$ term the "normalization" term and that we sometimes went so far as to leave it out and express Bayes Rule as the proportionality:
+
+$$P(h|d) \propto P(d|h)P(h)$$
+It turns out we can often ignore this term when thinking about probabilities, as we can skip computing it directly and simply normalize the values computed from the expression above. 
+
+::: column-margin
+This is only true exactly as I'm showing it here in the case of discrete probability distributions. Things are a bit different in the case of continuous probability distributions as there is no longer a finite number of realizations of $h$.
+:::
+
+As is often the case, the right notation makes this clear:
+
+$$p(H=h|d) = \frac{P(d|H=h)P(H=h)}{\sum_hP(d|H=h)P(H=h)}$$
+
+As this makes clearer, the probability of the data $P(d)$ is just the probability of the data given each hypothesis, summed over all the possible hypotheses. But this is exactly what we are doing when we calculate `likeli*prior` for each state, so we can just divide by the sum. I.e. we can normalize these values into probabilities.
+
+
+::: {.callout-note icon="false"}
+## Exercise 11 (bonus)
+Modify your model code to skip explicitly calculating the probability of the data (`pdata` in the lecture code) and instead simply normalize the `likeli*prior` values.
+:::
+
+
+## Exercise 12
+
+::: callout-tip
+## Calculating with log-probabilities
+
+- Often, calculations of probabilities are computed in terms of log-probabilities (i.e. in log-space, or after log-transformation)
+- In log-space, multiplication becomes addition
+
+$$log(a \times b) = log(a) + log(b) $$
+- Then, log-probabilites are transformed back into probabilities through exponentiation
+
+The function `log()` takes the log of a value (transforms probabilities into log-probabilities) and the function `exp()` exponentiates the log back into the original value (transforms log probabilities into probabilities). i.e. `exp(log(x)) == x`.
+
+:::
+
+::: {.callout-note icon="false"}
+## Exercise 12 (bonus)
+Further modify your code to perform the computations in log-space. Confirm that the results are the same.
 :::
 
 

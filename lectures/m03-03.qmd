@@ -9,45 +9,105 @@ execute:
 bibliography: ../references.bib
 ---
 
-## Example: Extramarital affairs
+## Example: Wells in Bangladesh
 
-We'll consider self-report data from 535 individuals with information about their family situation, views toward marriage, and whether or not they are currently having an extramarital sexual affair. The data comes from a survey conducted by Psychology Today in 1969.
+< introduce this >
+
+
 
 ## The data
 
 ```{r}
-#| echo: true
+#| include: false
 library(tidyverse)
 library(tidymodels)
 library(broom)
+```
 
-affairs <- read_csv("data/affairs.csv") %>% 
-  mutate(having_affair = factor(if_else(affairs > 0, 1, 0)))
 
-glimpse(affairs, width = 60)
+```{r}
+#| echo: true
+library(rosdata)
+
+data(wells)
+
+wells <- as_tibble(wells) %>% 
+  mutate(switch = factor(if_else(switch == 1, "Yes", "No")))
+
+wells
 ```
 
 ## Exploratory Data Analysis
 
 ```{r}
-#| echo: false
-affairs %>% 
-  group_by(rating) %>% 
-  summarize(prop_affair = mean(having_affair==1), cnt = n()) %>% 
-  mutate(se = sqrt(prop_affair*(1-prop_affair)/cnt)) %>% 
-  ggplot(aes(x=rating, y = prop_affair, ymax = prop_affair + 2*se, ymin = prop_affair - 2*se )) +
-  geom_pointrange() +
-  ylim(0,1)
+#| echo: true
+wells %>% 
+  count(switch) %>% 
+  mutate(prop = n/sum(n))
 ```
 
+## EDA: Visualization
 
-## Setting up
+::: {.panel-tabset}
+
+## Code
 
 ```{r}
 #| echo: true
-library(tidymodels)
+arsenic_dist100_plt <- wells %>%
+  pivot_longer(cols = c(arsenic, dist100), names_to = "var", values_to = "val") %>% 
+  ggplot(aes(x = switch, y = val)) +
+  geom_boxplot() +
+  facet_wrap(~var, scales = "free_y")
+```
+
+## Plot
+
+```{r}
+#| echo: false
+arsenic_dist100_plt
+```
+
+:::
+
+
+## EDA: More Visualizations
+::: {.panel-tabset}
+
+## Code
+```{r}
+#| echo: true
+arsenic_switching_plt <- wells %>%
+  mutate(
+    arsenic_bin = cut(percent_rank(arsenic), 20),
+  ) %>% 
+  group_by(arsenic_bin) %>% 
+  mutate(arsenic_bin_x = mean(arsenic)) %>% 
+  group_by(arsenic_bin, arsenic_bin_x) %>% 
+  summarize(prop = mean(switch=="Yes"), cnt = n()) %>% 
+  mutate(se = sqrt(prop*(1-prop)/cnt)) %>%
+  ggplot(aes(x = arsenic_bin_x, y = prop, ymin = prop - 2*se, ymax = prop + 2*se)) +
+  geom_point() +
+  geom_line() +
+  geom_ribbon(alpha = .25) +
+  labs(x = "Arsenic Bin Avg.",  y = "Prop. switched")
+```
+
+## Plot
+
+```{r}
+#| echo: false
+arsenic_switching_plt
+```
+
+:::
+
+## Modeling Setup
+
+```{r}
+#| echo: true
 set.seed(1234)
-splits <- initial_split(affairs, strata = having_affair)
+splits <- initial_split(wells, prop =.85, strata = switch)
 
 train <- training(splits)
 test <- testing(splits)
@@ -58,75 +118,241 @@ test <- testing(splits)
 
 ```{r}
 #| echo: true
-lr_wflow <- workflow() %>% 
-  add_formula(having_affair ~ rating) %>% 
+lr_wflow1 <- workflow() %>%
+  add_formula(switch ~ arsenic) %>% 
   add_model(logistic_reg())
 
-lr_fit1 <- fit(lr_wflow, data = train)
+lr_fit1 <- fit(lr_wflow1, data = train)
+
+```
+## Evaluating the simple model
+
+```{r}
+metrics_unbalanced <- metric_set(accuracy, bal_accuracy)
+
+lr_fit1 %>% 
+  augment(test) %>% 
+  metrics_unbalanced(truth = switch, estimate = .pred_class)
+```
+## Interpreting model coefficients
+
+```{r}
+#| echo: true
 
 tidy(lr_fit1)
 ```
 
-## Plotting model and predictions
+- increases log-odds blah  blah
+
+## Plotting model predictions
 
 ```{r}
 #| echo: false
 lr_fit1 %>% 
   augment(
-    tibble(rating = seq(1,5,.01))
+    tibble(arsenic = seq(min(train$arsenic), max(train$arsenic), .1))
   ) %>% 
-  ggplot(aes(x = rating, y=.pred_1)) +
-  geom_line() +
-  geom_jitter(data = affairs, aes( x = rating, y = as.numeric(having_affair==1)), height = .05, alpha = .3)
+  ggplot(aes(x = arsenic, y=.pred_Yes)) +
+  geom_line(color = "blue") +
+  geom_point(data = train, aes( x = arsenic, y = as.numeric(switch=="Yes")), position = position_jitter(height = .075, seed = .42), alpha = .1)
 ```
+
+
+
 
 ## Adding predictors
 
 ```{r}
 #| echo: true
-lr_wflow2 <- workflow() %>% 
-  add_formula(having_affair ~ rating + gender) %>% 
+lr_wflow2 <- workflow() %>%
+  add_formula(switch ~ arsenic + dist100) %>% 
   add_model(logistic_reg())
 
 lr_fit2 <- fit(lr_wflow2, data = train)
-```
 
-## Visualization
-
-```{r}
-#| echo: false
-lr_fit2 %>% 
-  augment(
-    crossing(
-  rating = seq(1,5,.01),
-  gender = c("male", "female"),
-  children = c("yes", "no")
-  )
-  ) %>% 
-  ggplot(aes(x = rating, y=.pred_1)) +
-  geom_line(aes(color = gender)) +
-  geom_jitter(data = affairs, aes( x = rating, y = as.numeric(having_affair==1), color = gender), height = .05, alpha = .3) +
-  facet_wrap(~children)
-```
-
-## Interpreting coefficients / predictions
-
-```{r}
-#| echo: true
 tidy(lr_fit2)
 ```
 
+- First look at sign: 
+  - As arsenic increases, $p(switching)$ increases
+  - As distance increases, $p(switching)$ decreases
+- As distance increases, log odds blah blah
 
-# Performance metrics
+## Interpreting predicted probabilities
+
+::: {style="font-size: 80%;"}
+
+```{r}
+#| echo: true
+ex_data <- crossing(
+      arsenic =  quantile(train$arsenic, c(.1, .5, .9)),
+      dist100 = quantile(train$dist100, c(.1, .5, .9))
+    )
+
+augment(lr_fit2, ex_data)
+
+```
+Comparing extremes (90th vs 10th percentile) for $p(switch)$:
+
+- Extreme `arsenic` difference at median `dist100` $\rightarrow .758 - .488 = .270$
+- Extreme `dist100` difference at median `arsenic` $\rightarrow .434 - .618 = -.184$
+
+:::
+
+## Standardizing predictors
+
+```{r}
+#| echo: true
+
+stdize_rec <- recipe(switch ~ arsenic + dist100, train) %>% 
+  step_normalize(all_numeric_predictors())
+
+lr_wflow2 <- workflow() %>%
+  add_recipe(stdize_rec) %>% 
+  add_model(logistic_reg())
+
+lr_fit2 <- fit(lr_wflow2, data = train)
+
+tidy(lr_fit2)
+```
+
+After standardizing, we can see that `arsenic` is actually a more important predictor
+
+## Feature Engineering
+
+```{r}
+#| echo: false
+x <- train %>%
+  mutate(
+    arsenic_bin = cut(percent_rank(arsenic), 20),
+  ) %>% 
+  group_by(arsenic_bin) %>% 
+  mutate(arsenic_bin_x = mean(arsenic)) %>% 
+  group_by(arsenic_bin, arsenic_bin_x) %>% 
+  summarize(prop = mean(switch=="Yes"), cnt = n()) %>% 
+  mutate(se = sqrt(prop*(1-prop)/cnt))
+
+lr_fit1 %>% 
+  augment(
+    tibble(arsenic = seq(min(train$arsenic), max(train$arsenic), .1))
+  ) %>% 
+  ggplot(aes(x = arsenic, y=.pred_Yes)) +
+  geom_line(color = "blue") +
+  geom_point(data = train, aes( x = arsenic, y = as.numeric(switch=="Yes")), position = position_jitter(height = .075, seed = .42), alpha = .1) +
+  geom_line(data = x, aes(x = arsenic_bin_x, y = prop, ymin = prop - 2*se, ymax = prop + 2*se), linetype = "dashed") +
+  geom_ribbon(data = x, aes(x = arsenic_bin_x, y = prop, ymin = prop - 2*se, ymax = prop + 2*se), alpha = .25) +
+  xlim(0, 6)
+```
+
+
+## Feature Engineering II
+
+```{r}
+#| echo: false
+lr_fe <- recipe(switch ~ arsenic, train) %>%
+  step_mutate(low_arsenic = if_else(arsenic < .6, "negligible", "noticeable"))
+  
+lr_wflow1b <- workflow() %>%
+  add_recipe(lr_fe) %>%
+  add_model(logistic_reg())
+
+lr_fit1b <- fit(lr_wflow1b, data = train)
+```
+
+```{r}
+#| message: false
+#| warning: false 
+#| echo: false
+x <- train %>%
+  mutate(
+    arsenic_bin = cut(percent_rank(arsenic), 20),
+  ) %>% 
+  group_by(arsenic_bin) %>% 
+  mutate(arsenic_bin_x = mean(arsenic)) %>% 
+  group_by(arsenic_bin, arsenic_bin_x) %>% 
+  summarize(prop = mean(switch=="Yes"), cnt = n()) %>% 
+  mutate(se = sqrt(prop*(1-prop)/cnt))
+
+lr_fit1b %>% 
+  augment(
+    tibble(arsenic = seq(min(train$arsenic), max(train$arsenic), .1))
+  ) %>% 
+  ggplot(aes(x = arsenic, y=.pred_Yes)) +
+  geom_line(color = "blue") +
+  geom_point(data = train, aes( x = arsenic, y = as.numeric(switch=="Yes")), position = position_jitter(height = .075, seed = .42), alpha = .1) +
+  geom_line(data = x, aes(x = arsenic_bin_x, y = prop, ymin = prop - 2*se, ymax = prop + 2*se), linetype = "dashed") +
+  geom_ribbon(data = x, aes(x = arsenic_bin_x, y = prop, ymin = prop - 2*se, ymax = prop + 2*se), alpha = .25) +
+  xlim(0, 6)
+```
+
+## A more complex model
+
+```{r}
+#| echo: true
+
+lr_rec <- recipe(switch ~ dist100 + arsenic + educ4, train) %>%
+  step_interact(~all_predictors():all_predictors()) %>%
+  step_mutate(
+    low_arsenic = if_else(arsenic < .6, "negligible", "noticeable"),
+    no_educ = if_else(educ4 == 0, 1, 0)
+    )
+  
+lr_wflow3 <- workflow() %>%
+  add_recipe(lr_rec) %>%
+  add_model(logistic_reg())
+
+lr_fit3 <- fit(lr_wflow3, data = train)
+```
+
+## Setting up $k$-fold cross validation
+
+```{r}
+set.seed(1234)
+folds <- vfold_cv(train, v = 10, strata = switch)
+```
+
+## Applying $k$-fold cross validation
+
+::: {.panel-tabset}
+
+## Setup
+```{r}
+wflows <- as_workflow_set(
+  simple = lr_wflow1, 
+  two_pred = lr_wflow2, 
+  complex = lr_wflow3
+  )
+
+cv_res <- workflow_map(
+  wflows, 
+  fn = "fit_resamples", 
+  resamples = folds, 
+  metrics = metric_set(accuracy, bal_accuracy)
+  )
+```
+
+## Results
+
+::: {style="font-size: 80%;"}
+```{r}
+collect_metrics(cv_res)
+```
+:::
+
+:::
+
+
+# Details: Performance metrics
 
 ## Accuracy
 
 $$\text{accuracy} = \frac{\text{correct predictions}}{\text{total predictions}}$$
+
 ```{r}
 #| echo: true
-lr_fit2 %>% 
+lr_fit3 %>% 
   augment(test) %>% 
-  summarize(acc = sum(.pred_class == having_affair)/n())
+  summarize(acc = sum(.pred_class == switch)/n())
 ```
 
 ## Confusion Matrix
@@ -144,70 +370,105 @@ tibble(
   theme_minimal(base_size = 24) +
   theme(
     panel.grid = element_blank(),
-    # axis.text = element_blank()
     ) +
   labs(x = "Actual", y = "Predicted") +
   scale_x_discrete(position = "top") 
   
-
 ```
 
 ## True positives and true negatives
 
+::: {style="font-size: 65%;"}
+
+**Manual calculation**
+
 ```{r}
-lr_fit2 %>% 
+lr_fit3 %>% 
   augment(test) %>% 
   summarize(
-    acc = sum(.pred_class == having_affair)/n(),
-    TP = sum(.pred_class == 1 & having_affair ==1)/sum(.pred_class == 1) ,
-    TN = sum(.pred_class == 0 & having_affair ==0)/sum(.pred_class == 0) ,
+    acc = sum(.pred_class == switch)/n(),
+    TP = sum(.pred_class == "Yes" & switch == "Yes")/sum(switch == "Yes") ,
+    TN = sum(.pred_class == "No" & switch == "No")/sum(switch == "No") ,
     )
 ```
 
-## Loss Function
+**`tidymodels` calculation**
 
-For logistic regression, the loss function is based on **likelihood** of the data. 
+```{r}
+class_metrics <- metric_set(accuracy, bal_accuracy, sensitivity, specificity)
 
-Where $y_i \in \{0, 1\}$:
-
-$$\mathcal{L(y_i, p_i)} = \prod_i p_i^{y_i} \prod_i (1-p_i)^{y_i}$$
-
-::: {.callout-tip icon="false"}
-## In words:
-"The product of the model's predicted probability of positive for all the positive cases times the product of the models predicted probability of negative for all negative cases."
+lr_fit3 %>% 
+  augment(test) %>% 
+  class_metrics(switch, estimate = .pred_class, event_level = "second") 
+```
 :::
 
-## Cross-Entropy Loss [^1]
 
-In log-space, multiplication becomes addition and exponentiation becomes multiplication.
+## Accuracy and balanced accuracy
 
-So, it is generally easier to define the loss $\mathcal{l}$ in terms of the log-likelihood:
+$$\text{balanced accuracy} = \frac{\text{TPR} + \text{TNR}}{2}$$
 
-$$ \mathcal{l(y_i, p_i)} = \sum_i y_i log(p_i) + (1-y_i) log(1-p_i)$$
+::: {style="font-size: 50%;"}
 
-[^1]: AKA: the binomial log likelihood loss
+
+**Manual calculation**
+```{r}
+lr_fit3 %>% 
+  augment(test) %>% 
+  summarize(
+    acc = sum(.pred_class == switch)/n(),
+    TP = sum(.pred_class == "Yes" & switch == "Yes")/sum(switch == "Yes") ,
+    TN = sum(.pred_class == "No" & switch == "No")/sum(switch == "No") ,
+    bal_acc = (TP + TN)/2
+    )
+```
+
+**`tidymodels` calculation**
+
+```{r}
+class_metrics <- metric_set(accuracy, sensitivity, specificity, bal_accuracy)
+
+lr_fit3 %>% 
+  augment(test) %>% 
+  class_metrics(switch, estimate = .pred_class, event_level = "second") 
+```
+:::
+
 
 # tidymodels vs `glm()`
 
 ## Comparison with `glm()`
+::: {style="font-size: 80%;"}
 
 **`tidymodels`**
 
 ```{r}
-lr_wflow2 <- workflow() %>% 
-  add_formula(having_affair ~ rating + gender + children) %>% 
+lr_rec <- recipe(switch ~ dist100 + arsenic + educ4, train) %>%
+  step_interact(~ all_predictors():all_predictors()) %>%
+  step_mutate(
+    low_arsenic = if_else(arsenic < .6, "negligible", "noticeable"),
+    no_educ = if_else(educ4 == 0, 1, 0)
+  )
+
+lr_wflow3 <- workflow() %>%
+  add_recipe(lr_rec) %>%
   add_model(logistic_reg())
 
-fit_tm <- fit(lr_wflow2, data = train)
+fit_tm <- fit(lr_wflow3, data = train)
 ```
 
 **`glm()`**
 
 ```{r}
 fit_glm <- glm(
-  having_affair ~ rating + gender + children,
+  switch ~ dist100 * arsenic * educ4 + no_educ + low_arsenic,
   family = "binomial",
-  data = train
+  data = train %>% mutate(
+    no_educ = if_else(educ4 == 0, 1, 0),
+    low_arsenic = if_else(arsenic < .6, "negligible", "noticeable")
+  )
 )
 ```
+:::
+
 

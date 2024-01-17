@@ -387,168 +387,432 @@
   <p class="subtitle">Behavioral Data Science in R II</p>
 </section>
 
-<section id="example-extramarital-affairs" class="slide level2">
-<h2>Example: Extramarital affairs</h2>
-<p>We’ll consider self-report data from 535 individuals with information about their family situation, views toward marriage, and whether or not they are currently having an extramarital sexual affair. The data comes from a survey conducted by Psychology Today in 1969.</p>
+<section id="example-wells-in-bangladesh" class="slide level2">
+<h2>Example: Wells in Bangladesh</h2>
+<p>&lt; introduce this &gt;</p>
 </section>
 <section id="the-data" class="slide level2">
 <h2>The data</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">library</span>(broom)</span>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(rosdata)</span>
+<span id="cb1-2"><a href="#cb1-2"></a></span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="fu">data</span>(wells)</span>
 <span id="cb1-4"><a href="#cb1-4"></a></span>
-<span id="cb1-5"><a href="#cb1-5"></a>affairs <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/affairs.csv"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb1-6"><a href="#cb1-6"></a>  <span class="fu">mutate</span>(<span class="at">having_affair =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(affairs <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)))</span>
+<span id="cb1-5"><a href="#cb1-5"></a>wells <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(wells) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-6"><a href="#cb1-6"></a>  <span class="fu">mutate</span>(<span class="at">switch =</span> <span class="fu">factor</span>(<span class="fu">if_else</span>(<span class="cf">switch</span> <span class="sc">==</span> <span class="dv">1</span>, <span class="st">"Yes"</span>, <span class="st">"No"</span>)))</span>
 <span id="cb1-7"><a href="#cb1-7"></a></span>
-<span id="cb1-8"><a href="#cb1-8"></a><span class="fu">glimpse</span>(affairs, <span class="at">width =</span> <span class="dv">60</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-8"><a href="#cb1-8"></a>wells</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>Rows: 601
-Columns: 11
-$ ...1          &lt;dbl&gt; 4, 5, 11, 16, 23, 29, 44, 45, 47, 49…
-$ affairs       &lt;dbl&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …
-$ gender        &lt;chr&gt; "male", "female", "female", "male", …
-$ age           &lt;dbl&gt; 37, 27, 32, 57, 22, 32, 22, 57, 32, …
-$ yearsmarried  &lt;dbl&gt; 10.00, 4.00, 15.00, 15.00, 0.75, 1.5…
-$ children      &lt;chr&gt; "no", "no", "yes", "yes", "no", "no"…
-$ religiousness &lt;dbl&gt; 3, 4, 1, 5, 2, 2, 2, 2, 4, 4, 2, 4, …
-$ education     &lt;dbl&gt; 18, 14, 12, 18, 17, 17, 12, 14, 16, …
-$ occupation    &lt;dbl&gt; 7, 6, 1, 6, 6, 5, 1, 4, 1, 4, 7, 6, …
-$ rating        &lt;dbl&gt; 4, 4, 4, 5, 3, 5, 3, 4, 2, 5, 2, 4, …
-$ having_affair &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …</code></pre>
+<pre><code># A tibble: 3,020 × 7
+   switch arsenic  dist dist100 assoc  educ educ4
+   &lt;fct&gt;    &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt; &lt;int&gt; &lt;int&gt; &lt;dbl&gt;
+ 1 Yes       2.36  16.8   0.168     0     0  0   
+ 2 Yes       0.71  47.3   0.473     0     0  0   
+ 3 No        2.07  21.0   0.210     0    10  2.5 
+ 4 Yes       1.15  21.5   0.215     0    12  3   
+ 5 Yes       1.1   40.9   0.409     1    14  3.5 
+ 6 Yes       3.9   69.5   0.695     1     9  2.25
+ 7 Yes       2.97  80.7   0.807     1     4  1   
+ 8 Yes       3.24  55.1   0.551     0    10  2.5 
+ 9 Yes       3.28  52.6   0.526     1     0  0   
+10 Yes       2.52  75.1   0.751     1     0  0   
+# … with 3,010 more rows</code></pre>
 </div>
 </div>
 </section>
 <section id="exploratory-data-analysis" class="slide level2">
 <h2>Exploratory Data Analysis</h2>
-
-<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
-<section id="setting-up" class="slide level2">
-<h2>Setting up</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(tidymodels)</span>
-<span id="cb3-2"><a href="#cb3-2"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
-<span id="cb3-3"><a href="#cb3-3"></a>splits <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(affairs, <span class="at">strata =</span> having_affair)</span>
-<span id="cb3-4"><a href="#cb3-4"></a></span>
-<span id="cb3-5"><a href="#cb3-5"></a>train <span class="ot">&lt;-</span> <span class="fu">training</span>(splits)</span>
-<span id="cb3-6"><a href="#cb3-6"></a>test <span class="ot">&lt;-</span> <span class="fu">testing</span>(splits)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>wells <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2"></a>  <span class="fu">count</span>(<span class="cf">switch</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3"></a>  <span class="fu">mutate</span>(<span class="at">prop =</span> n<span class="sc">/</span><span class="fu">sum</span>(n))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  switch     n  prop
+  &lt;fct&gt;  &lt;int&gt; &lt;dbl&gt;
+1 No      1283 0.425
+2 Yes     1737 0.575</code></pre>
+</div>
+</div>
+</section>
+<section id="eda-visualization" class="slide level2">
+<h2>EDA: Visualization</h2>
+<div class="panel-tabset">
+<ul id="tabset-1" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-1-1">Code</a></li><li><a href="#tabset-1-2">Plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-1-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>arsenic_dist100_plt <span class="ot">&lt;-</span> wells <span class="sc">%&gt;%</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(arsenic, dist100), <span class="at">names_to =</span> <span class="st">"var"</span>, <span class="at">values_to =</span> <span class="st">"val"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-3"><a href="#cb5-3"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="cf">switch</span>, <span class="at">y =</span> val)) <span class="sc">+</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>var, <span class="at">scales =</span> <span class="st">"free_y"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-1-2">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="m03-03_files/figure-revealjs/unnamed-chunk-5-1.png" width="960"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="eda-more-visualizations" class="slide level2">
+<h2>EDA: More Visualizations</h2>
+<div class="panel-tabset">
+<ul id="tabset-2" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-2-1">Code</a></li><li><a href="#tabset-2-2">Plot</a></li></ul>
+<div class="tab-content">
+<div id="tabset-2-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>arsenic_switching_plt <span class="ot">&lt;-</span> wells <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb6-3"><a href="#cb6-3"></a>    <span class="at">arsenic_bin =</span> <span class="fu">cut</span>(<span class="fu">percent_rank</span>(arsenic), <span class="dv">20</span>),</span>
+<span id="cb6-4"><a href="#cb6-4"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-5"><a href="#cb6-5"></a>  <span class="fu">group_by</span>(arsenic_bin) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-6"><a href="#cb6-6"></a>  <span class="fu">mutate</span>(<span class="at">arsenic_bin_x =</span> <span class="fu">mean</span>(arsenic)) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-7"><a href="#cb6-7"></a>  <span class="fu">group_by</span>(arsenic_bin, arsenic_bin_x) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-8"><a href="#cb6-8"></a>  <span class="fu">summarize</span>(<span class="at">prop =</span> <span class="fu">mean</span>(<span class="cf">switch</span><span class="sc">==</span><span class="st">"Yes"</span>), <span class="at">cnt =</span> <span class="fu">n</span>()) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-9"><a href="#cb6-9"></a>  <span class="fu">mutate</span>(<span class="at">se =</span> <span class="fu">sqrt</span>(prop<span class="sc">*</span>(<span class="dv">1</span><span class="sc">-</span>prop)<span class="sc">/</span>cnt)) <span class="sc">%&gt;%</span></span>
+<span id="cb6-10"><a href="#cb6-10"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> arsenic_bin_x, <span class="at">y =</span> prop, <span class="at">ymin =</span> prop <span class="sc">-</span> <span class="dv">2</span><span class="sc">*</span>se, <span class="at">ymax =</span> prop <span class="sc">+</span> <span class="dv">2</span><span class="sc">*</span>se)) <span class="sc">+</span></span>
+<span id="cb6-11"><a href="#cb6-11"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb6-12"><a href="#cb6-12"></a>  <span class="fu">geom_line</span>() <span class="sc">+</span></span>
+<span id="cb6-13"><a href="#cb6-13"></a>  <span class="fu">geom_ribbon</span>(<span class="at">alpha =</span> .<span class="dv">25</span>) <span class="sc">+</span></span>
+<span id="cb6-14"><a href="#cb6-14"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Arsenic Bin Avg."</span>,  <span class="at">y =</span> <span class="st">"Prop. switched"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-2-2">
+<div class="cell">
+<div class="cell-output-display">
+<p><img data-src="m03-03_files/figure-revealjs/unnamed-chunk-7-1.png" width="960"></p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="modeling-setup" class="slide level2">
+<h2>Modeling Setup</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb7-2"><a href="#cb7-2"></a>splits <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(wells, <span class="at">prop =</span>.<span class="dv">85</span>, <span class="at">strata =</span> <span class="cf">switch</span>)</span>
+<span id="cb7-3"><a href="#cb7-3"></a></span>
+<span id="cb7-4"><a href="#cb7-4"></a>train <span class="ot">&lt;-</span> <span class="fu">training</span>(splits)</span>
+<span id="cb7-5"><a href="#cb7-5"></a>test <span class="ot">&lt;-</span> <span class="fu">testing</span>(splits)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="simple-logistic-regression-model" class="slide level2">
 <h2>Simple logistic regression model</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>lr_wflow <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb4-2"><a href="#cb4-2"></a>  <span class="fu">add_formula</span>(having_affair <span class="sc">~</span> rating) <span class="sc">%&gt;%</span> </span>
-<span id="cb4-3"><a href="#cb4-3"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
-<span id="cb4-4"><a href="#cb4-4"></a></span>
-<span id="cb4-5"><a href="#cb4-5"></a>lr_fit1 <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow, <span class="at">data =</span> train)</span>
-<span id="cb4-6"><a href="#cb4-6"></a></span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="fu">tidy</span>(lr_fit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>lr_wflow1 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>  <span class="fu">add_formula</span>(<span class="cf">switch</span> <span class="sc">~</span> arsenic) <span class="sc">%&gt;%</span> </span>
+<span id="cb8-3"><a href="#cb8-3"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
+<span id="cb8-4"><a href="#cb8-4"></a></span>
+<span id="cb8-5"><a href="#cb8-5"></a>lr_fit1 <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow1, <span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="evaluating-the-simple-model" class="slide level2">
+<h2>Evaluating the simple model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>metrics_unbalanced <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(accuracy, bal_accuracy)</span>
+<span id="cb9-2"><a href="#cb9-2"></a></span>
+<span id="cb9-3"><a href="#cb9-3"></a>lr_fit1 <span class="sc">%&gt;%</span> </span>
+<span id="cb9-4"><a href="#cb9-4"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
+<span id="cb9-5"><a href="#cb9-5"></a>  <span class="fu">metrics_unbalanced</span>(<span class="at">truth =</span> <span class="cf">switch</span>, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 2 × 5
-  term        estimate std.error statistic       p.value
-  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
-1 (Intercept)    1.09      0.385      2.82 0.00484      
-2 rating        -0.577     0.100     -5.75 0.00000000910</code></pre>
+<pre><code># A tibble: 2 × 3
+  .metric      .estimator .estimate
+  &lt;chr&gt;        &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy     binary         0.606
+2 bal_accuracy binary         0.569</code></pre>
 </div>
 </div>
 </section>
-<section id="plotting-model-and-predictions" class="slide level2">
-<h2>Plotting model and predictions</h2>
+<section id="interpreting-model-coefficients" class="slide level2">
+<h2>Interpreting model coefficients</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">tidy</span>(lr_fit1)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)   -0.309    0.0766     -4.04 5.41e- 5
+2 arsenic        0.384    0.0423      9.07 1.20e-19</code></pre>
+</div>
+</div>
+<ul>
+<li>increases log-odds blah blah</li>
+</ul>
+</section>
+<section id="plotting-model-predictions" class="slide level2">
+<h2>Plotting model predictions</h2>
 
-<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-12-1.png" width="960" class="r-stretch"></section>
 <section id="adding-predictors" class="slide level2">
 <h2>Adding predictors</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>lr_wflow2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">add_formula</span>(having_affair <span class="sc">~</span> rating <span class="sc">+</span> gender) <span class="sc">%&gt;%</span> </span>
-<span id="cb6-3"><a href="#cb6-3"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
-<span id="cb6-4"><a href="#cb6-4"></a></span>
-<span id="cb6-5"><a href="#cb6-5"></a>lr_fit2 <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow2, <span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
-</section>
-<section id="visualization" class="slide level2">
-<h2>Visualization</h2>
-
-<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
-<section id="interpreting-coefficients-predictions" class="slide level2">
-<h2>Interpreting coefficients / predictions</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">tidy</span>(lr_fit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>lr_wflow2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb13-2"><a href="#cb13-2"></a>  <span class="fu">add_formula</span>(<span class="cf">switch</span> <span class="sc">~</span> arsenic <span class="sc">+</span> dist100) <span class="sc">%&gt;%</span> </span>
+<span id="cb13-3"><a href="#cb13-3"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
+<span id="cb13-4"><a href="#cb13-4"></a></span>
+<span id="cb13-5"><a href="#cb13-5"></a>lr_fit2 <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow2, <span class="at">data =</span> train)</span>
+<span id="cb13-6"><a href="#cb13-6"></a></span>
+<span id="cb13-7"><a href="#cb13-7"></a><span class="fu">tidy</span>(lr_fit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 3 × 5
-  term        estimate std.error statistic       p.value
-  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
-1 (Intercept)    0.958     0.401      2.39 0.0169       
-2 rating        -0.580     0.101     -5.75 0.00000000896
-3 gendermale     0.260     0.229      1.14 0.255        </code></pre>
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)  -0.0150    0.0865    -0.174 8.62e- 1
+2 arsenic       0.463     0.0454    10.2   2.03e-24
+3 dist100      -0.863     0.114     -7.58  3.44e-14</code></pre>
+</div>
+</div>
+<ul>
+<li>First look at sign:
+<ul>
+<li>As arsenic increases, <span class="math inline">\(p(switching)\)</span> increases</li>
+<li>As distance increases, <span class="math inline">\(p(switching)\)</span> decreases</li>
+</ul></li>
+<li>As distance increases, log odds blah blah</li>
+</ul>
+</section>
+<section id="interpreting-predicted-probabilities" class="slide level2">
+<h2>Interpreting predicted probabilities</h2>
+<div style="font-size: 80%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>ex_data <span class="ot">&lt;-</span> <span class="fu">crossing</span>(</span>
+<span id="cb15-2"><a href="#cb15-2"></a>      <span class="at">arsenic =</span>  <span class="fu">quantile</span>(train<span class="sc">$</span>arsenic, <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">5</span>, .<span class="dv">9</span>)),</span>
+<span id="cb15-3"><a href="#cb15-3"></a>      <span class="at">dist100 =</span> <span class="fu">quantile</span>(train<span class="sc">$</span>dist100, <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">5</span>, .<span class="dv">9</span>))</span>
+<span id="cb15-4"><a href="#cb15-4"></a>    )</span>
+<span id="cb15-5"><a href="#cb15-5"></a></span>
+<span id="cb15-6"><a href="#cb15-6"></a><span class="fu">augment</span>(lr_fit2, ex_data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 9 × 5
+  arsenic dist100 .pred_class .pred_No .pred_Yes
+    &lt;dbl&gt;   &lt;dbl&gt; &lt;fct&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+1    0.62   0.118 Yes            0.457     0.543
+2    0.62   0.370 No             0.512     0.488
+3    0.62   0.980 No             0.640     0.360
+4    1.29   0.118 Yes            0.382     0.618
+5    1.29   0.370 Yes            0.435     0.565
+6    1.29   0.980 No             0.566     0.434
+7    3.19   0.118 Yes            0.204     0.796
+8    3.19   0.370 Yes            0.242     0.758
+9    3.19   0.980 Yes            0.350     0.650</code></pre>
+</div>
+</div>
+<p>Comparing extremes (90th vs 10th percentile) for <span class="math inline">\(p(switch)\)</span>:</p>
+<ul>
+<li>Extreme <code>arsenic</code> difference at median <code>dist100</code> <span class="math inline">\(\rightarrow .758 - .488 = .270\)</span></li>
+<li>Extreme <code>dist100</code> difference at median <code>arsenic</code> <span class="math inline">\(\rightarrow .434 - .618 = -.184\)</span></li>
+</ul>
+</div>
+</section>
+<section id="standardizing-predictors" class="slide level2">
+<h2>Standardizing predictors</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a>stdize_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="cf">switch</span> <span class="sc">~</span> arsenic <span class="sc">+</span> dist100, train) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_numeric_predictors</span>())</span>
+<span id="cb17-3"><a href="#cb17-3"></a></span>
+<span id="cb17-4"><a href="#cb17-4"></a>lr_wflow2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5"></a>  <span class="fu">add_recipe</span>(stdize_rec) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-6"><a href="#cb17-6"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
+<span id="cb17-7"><a href="#cb17-7"></a></span>
+<span id="cb17-8"><a href="#cb17-8"></a>lr_fit2 <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow2, <span class="at">data =</span> train)</span>
+<span id="cb17-9"><a href="#cb17-9"></a></span>
+<span id="cb17-10"><a href="#cb17-10"></a><span class="fu">tidy</span>(lr_fit2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 5
+  term        estimate std.error statistic  p.value
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;     &lt;dbl&gt;    &lt;dbl&gt;
+1 (Intercept)    0.333    0.0415      8.02 1.02e-15
+2 arsenic        0.510    0.0501     10.2  2.03e-24
+3 dist100       -0.328    0.0433     -7.58 3.44e-14</code></pre>
+</div>
+</div>
+<p>After standardizing, we can see that <code>arsenic</code> is actually a more important predictor</p>
+</section>
+<section id="feature-engineering" class="slide level2">
+<h2>Feature Engineering</h2>
+
+<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-16-1.png" width="960" class="r-stretch"></section>
+<section id="feature-engineering-ii" class="slide level2">
+<h2>Feature Engineering II</h2>
+<div class="cell">
+
+</div>
+
+<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-18-1.png" width="960" class="r-stretch"></section>
+<section id="a-more-complex-model" class="slide level2">
+<h2>A more complex model</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>lr_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="cf">switch</span> <span class="sc">~</span> dist100 <span class="sc">+</span> arsenic <span class="sc">+</span> educ4, train) <span class="sc">%&gt;%</span></span>
+<span id="cb19-2"><a href="#cb19-2"></a>  <span class="fu">step_interact</span>(<span class="sc">~</span><span class="fu">all_predictors</span>()<span class="sc">:</span><span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb19-3"><a href="#cb19-3"></a>  <span class="fu">step_mutate</span>(</span>
+<span id="cb19-4"><a href="#cb19-4"></a>    <span class="at">low_arsenic =</span> <span class="fu">if_else</span>(arsenic <span class="sc">&lt;</span> .<span class="dv">6</span>, <span class="st">"negligible"</span>, <span class="st">"noticeable"</span>),</span>
+<span id="cb19-5"><a href="#cb19-5"></a>    <span class="at">no_educ =</span> <span class="fu">if_else</span>(educ4 <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb19-6"><a href="#cb19-6"></a>    )</span>
+<span id="cb19-7"><a href="#cb19-7"></a>  </span>
+<span id="cb19-8"><a href="#cb19-8"></a>lr_wflow3 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb19-9"><a href="#cb19-9"></a>  <span class="fu">add_recipe</span>(lr_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb19-10"><a href="#cb19-10"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
+<span id="cb19-11"><a href="#cb19-11"></a></span>
+<span id="cb19-12"><a href="#cb19-12"></a>lr_fit3 <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow3, <span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="setting-up-k-fold-cross-validation" class="slide level2">
+<h2>Setting up <span class="math inline">\(k\)</span>-fold cross validation</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a><span class="fu">set.seed</span>(<span class="dv">1234</span>)</span>
+<span id="cb20-2"><a href="#cb20-2"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train, <span class="at">v =</span> <span class="dv">10</span>, <span class="at">strata =</span> <span class="cf">switch</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="applying-k-fold-cross-validation" class="slide level2">
+<h2>Applying <span class="math inline">\(k\)</span>-fold cross validation</h2>
+<div class="panel-tabset">
+<ul id="tabset-3" class="panel-tabset-tabby"><li><a data-tabby-default="" href="#tabset-3-1">Setup</a></li><li><a href="#tabset-3-2">Results</a></li></ul>
+<div class="tab-content">
+<div id="tabset-3-1">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>wflows <span class="ot">&lt;-</span> <span class="fu">as_workflow_set</span>(</span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="at">simple =</span> lr_wflow1, </span>
+<span id="cb21-3"><a href="#cb21-3"></a>  <span class="at">two_pred =</span> lr_wflow2, </span>
+<span id="cb21-4"><a href="#cb21-4"></a>  <span class="at">complex =</span> lr_wflow3</span>
+<span id="cb21-5"><a href="#cb21-5"></a>  )</span>
+<span id="cb21-6"><a href="#cb21-6"></a></span>
+<span id="cb21-7"><a href="#cb21-7"></a>cv_res <span class="ot">&lt;-</span> <span class="fu">workflow_map</span>(</span>
+<span id="cb21-8"><a href="#cb21-8"></a>  wflows, </span>
+<span id="cb21-9"><a href="#cb21-9"></a>  <span class="at">fn =</span> <span class="st">"fit_resamples"</span>, </span>
+<span id="cb21-10"><a href="#cb21-10"></a>  <span class="at">resamples =</span> folds, </span>
+<span id="cb21-11"><a href="#cb21-11"></a>  <span class="at">metrics =</span> <span class="fu">metric_set</span>(accuracy, bal_accuracy)</span>
+<span id="cb21-12"><a href="#cb21-12"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+<div id="tabset-3-2">
+<div style="font-size: 80%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">collect_metrics</span>(cv_res)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 9
+  wflow_id .config             preproc model .metric .esti…¹  mean     n std_err
+  &lt;chr&gt;    &lt;chr&gt;               &lt;chr&gt;   &lt;chr&gt; &lt;chr&gt;   &lt;chr&gt;   &lt;dbl&gt; &lt;int&gt;   &lt;dbl&gt;
+1 simple   Preprocessor1_Mode… formula logi… accura… binary  0.606    10 0.00593
+2 simple   Preprocessor1_Mode… formula logi… bal_ac… binary  0.568    10 0.00614
+3 two_pred Preprocessor1_Mode… recipe  logi… accura… binary  0.615    10 0.0136 
+4 two_pred Preprocessor1_Mode… recipe  logi… bal_ac… binary  0.576    10 0.0137 
+5 complex  Preprocessor1_Mode… recipe  logi… accura… binary  0.640    10 0.0125 
+6 complex  Preprocessor1_Mode… recipe  logi… bal_ac… binary  0.607    10 0.0132 
+# … with abbreviated variable name ¹​.estimator</code></pre>
+</div>
+</div>
+</div>
+</div>
 </div>
 </div>
 </section>
 <section>
-<section id="performance-metrics" class="title-slide slide level1 center">
-<h1>Performance metrics</h1>
+<section id="details-performance-metrics" class="title-slide slide level1 center">
+<h1>Details: Performance metrics</h1>
 
 </section>
 <section id="accuracy" class="slide level2">
 <h2>Accuracy</h2>
 <p><span class="math display">\[\text{accuracy} = \frac{\text{correct predictions}}{\text{total predictions}}\]</span></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>lr_fit2 <span class="sc">%&gt;%</span> </span>
-<span id="cb9-2"><a href="#cb9-2"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
-<span id="cb9-3"><a href="#cb9-3"></a>  <span class="fu">summarize</span>(<span class="at">acc =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> having_affair)<span class="sc">/</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>lr_fit3 <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
+<span id="cb24-3"><a href="#cb24-3"></a>  <span class="fu">summarize</span>(<span class="at">acc =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="cf">switch</span>)<span class="sc">/</span><span class="fu">n</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 1
     acc
   &lt;dbl&gt;
-1 0.742</code></pre>
+1 0.665</code></pre>
 </div>
 </div>
 </section>
 <section id="confusion-matrix" class="slide level2">
 <h2>Confusion Matrix</h2>
 
-<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-10-1.png" width="960" class="r-stretch"></section>
+<img data-src="m03-03_files/figure-revealjs/unnamed-chunk-24-1.png" width="960" class="r-stretch"></section>
 <section id="true-positives-and-true-negatives" class="slide level2">
 <h2>True positives and true negatives</h2>
+<div style="font-size: 65%;">
+<p><strong>Manual calculation</strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>lr_fit2 <span class="sc">%&gt;%</span> </span>
-<span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
-<span id="cb11-3"><a href="#cb11-3"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb11-4"><a href="#cb11-4"></a>    <span class="at">acc =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> having_affair)<span class="sc">/</span><span class="fu">n</span>(),</span>
-<span id="cb11-5"><a href="#cb11-5"></a>    <span class="at">TP =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="dv">1</span> <span class="sc">&amp;</span> having_affair <span class="sc">==</span><span class="dv">1</span>)<span class="sc">/</span><span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="dv">1</span>) ,</span>
-<span id="cb11-6"><a href="#cb11-6"></a>    <span class="at">TN =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="dv">0</span> <span class="sc">&amp;</span> having_affair <span class="sc">==</span><span class="dv">0</span>)<span class="sc">/</span><span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="dv">0</span>) ,</span>
-<span id="cb11-7"><a href="#cb11-7"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>lr_fit3 <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb26-4"><a href="#cb26-4"></a>    <span class="at">acc =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="cf">switch</span>)<span class="sc">/</span><span class="fu">n</span>(),</span>
+<span id="cb26-5"><a href="#cb26-5"></a>    <span class="at">TP =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="st">"Yes"</span> <span class="sc">&amp;</span> <span class="cf">switch</span> <span class="sc">==</span> <span class="st">"Yes"</span>)<span class="sc">/</span><span class="fu">sum</span>(<span class="cf">switch</span> <span class="sc">==</span> <span class="st">"Yes"</span>) ,</span>
+<span id="cb26-6"><a href="#cb26-6"></a>    <span class="at">TN =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="st">"No"</span> <span class="sc">&amp;</span> <span class="cf">switch</span> <span class="sc">==</span> <span class="st">"No"</span>)<span class="sc">/</span><span class="fu">sum</span>(<span class="cf">switch</span> <span class="sc">==</span> <span class="st">"No"</span>) ,</span>
+<span id="cb26-7"><a href="#cb26-7"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 1 × 3
     acc    TP    TN
   &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
-1 0.742 0.462 0.768</code></pre>
+1 0.665 0.835 0.435</code></pre>
+</div>
+</div>
+<p><strong><code>tidymodels</code> calculation</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>class_metrics <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(accuracy, bal_accuracy, sensitivity, specificity)</span>
+<span id="cb28-2"><a href="#cb28-2"></a></span>
+<span id="cb28-3"><a href="#cb28-3"></a>lr_fit3 <span class="sc">%&gt;%</span> </span>
+<span id="cb28-4"><a href="#cb28-4"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-5"><a href="#cb28-5"></a>  <span class="fu">class_metrics</span>(<span class="cf">switch</span>, <span class="at">estimate =</span> .pred_class, <span class="at">event_level =</span> <span class="st">"second"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  .metric      .estimator .estimate
+  &lt;chr&gt;        &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy     binary         0.665
+2 bal_accuracy binary         0.635
+3 sensitivity  binary         0.835
+4 specificity  binary         0.435</code></pre>
+</div>
 </div>
 </div>
 </section>
-<section id="loss-function" class="slide level2">
-<h2>Loss Function</h2>
-<p>For logistic regression, the loss function is based on <strong>likelihood</strong> of the data.</p>
-<p>Where <span class="math inline">\(y_i \in \{0, 1\}\)</span>:</p>
-<p><span class="math display">\[\mathcal{L(y_i, p_i)} = \prod_i p_i^{y_i} \prod_i (1-p_i)^{y_i}\]</span></p>
-<div class="callout callout-tip no-icon callout-captioned callout-style-default">
-<div class="callout-body">
-<div class="callout-caption">
-<p><strong>In words:</strong></p>
+<section id="accuracy-and-balanced-accuracy" class="slide level2">
+<h2>Accuracy and balanced accuracy</h2>
+<p><span class="math display">\[\text{balanced accuracy} = \frac{\text{TPR} + \text{TNR}}{2}\]</span></p>
+<div style="font-size: 50%;">
+<p><strong>Manual calculation</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>lr_fit3 <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb30-4"><a href="#cb30-4"></a>    <span class="at">acc =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="cf">switch</span>)<span class="sc">/</span><span class="fu">n</span>(),</span>
+<span id="cb30-5"><a href="#cb30-5"></a>    <span class="at">TP =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="st">"Yes"</span> <span class="sc">&amp;</span> <span class="cf">switch</span> <span class="sc">==</span> <span class="st">"Yes"</span>)<span class="sc">/</span><span class="fu">sum</span>(<span class="cf">switch</span> <span class="sc">==</span> <span class="st">"Yes"</span>) ,</span>
+<span id="cb30-6"><a href="#cb30-6"></a>    <span class="at">TN =</span> <span class="fu">sum</span>(.pred_class <span class="sc">==</span> <span class="st">"No"</span> <span class="sc">&amp;</span> <span class="cf">switch</span> <span class="sc">==</span> <span class="st">"No"</span>)<span class="sc">/</span><span class="fu">sum</span>(<span class="cf">switch</span> <span class="sc">==</span> <span class="st">"No"</span>) ,</span>
+<span id="cb30-7"><a href="#cb30-7"></a>    <span class="at">bal_acc =</span> (TP <span class="sc">+</span> TN)<span class="sc">/</span><span class="dv">2</span></span>
+<span id="cb30-8"><a href="#cb30-8"></a>    )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 4
+    acc    TP    TN bal_acc
+  &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;
+1 0.665 0.835 0.435   0.635</code></pre>
 </div>
-<div class="callout-content">
-<p>“The product of the model’s predicted probability of positive for all the positive cases times the product of the models predicted probability of negative for all negative cases.”</p>
+</div>
+<p><strong><code>tidymodels</code> calculation</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1"></a>class_metrics <span class="ot">&lt;-</span> <span class="fu">metric_set</span>(accuracy, sensitivity, specificity, bal_accuracy)</span>
+<span id="cb32-2"><a href="#cb32-2"></a></span>
+<span id="cb32-3"><a href="#cb32-3"></a>lr_fit3 <span class="sc">%&gt;%</span> </span>
+<span id="cb32-4"><a href="#cb32-4"></a>  <span class="fu">augment</span>(test) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-5"><a href="#cb32-5"></a>  <span class="fu">class_metrics</span>(<span class="cf">switch</span>, <span class="at">estimate =</span> .pred_class, <span class="at">event_level =</span> <span class="st">"second"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 3
+  .metric      .estimator .estimate
+  &lt;chr&gt;        &lt;chr&gt;          &lt;dbl&gt;
+1 accuracy     binary         0.665
+2 sensitivity  binary         0.835
+3 specificity  binary         0.435
+4 bal_accuracy binary         0.635</code></pre>
 </div>
 </div>
 </div>
-</section>
-<section id="cross-entropy-loss-1" class="slide level2">
-<h2>Cross-Entropy Loss <sup>1</sup></h2>
-<p>In log-space, multiplication becomes addition and exponentiation becomes multiplication.</p>
-<p>So, it is generally easier to define the loss <span class="math inline">\(\mathcal{l}\)</span> in terms of the log-likelihood:</p>
-<p><span class="math display">\[ \mathcal{l(y_i, p_i)} = \sum_i y_i log(p_i) + (1-y_i) log(1-p_i)\]</span></p>
-<aside><ol class="aside-footnotes"><li id="fn1" role="doc-endnote"><p>AKA: the binomial log likelihood loss</p></li></ol></aside></section></section>
+</section></section>
 <section>
 <section id="tidymodels-vs-glm" class="title-slide slide level1 center">
 <h1>tidymodels vs <code>glm()</code></h1>
@@ -556,27 +820,38 @@ $ having_affair &lt;fct&gt; 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, …</code></pre>
 </section>
 <section id="comparison-with-glm" class="slide level2">
 <h2>Comparison with <code>glm()</code></h2>
+<div style="font-size: 80%;">
 <p><strong><code>tidymodels</code></strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>lr_wflow2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
-<span id="cb13-2"><a href="#cb13-2"></a>  <span class="fu">add_formula</span>(having_affair <span class="sc">~</span> rating <span class="sc">+</span> gender <span class="sc">+</span> children) <span class="sc">%&gt;%</span> </span>
-<span id="cb13-3"><a href="#cb13-3"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
-<span id="cb13-4"><a href="#cb13-4"></a></span>
-<span id="cb13-5"><a href="#cb13-5"></a>fit_tm <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow2, <span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1"></a>lr_rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="cf">switch</span> <span class="sc">~</span> dist100 <span class="sc">+</span> arsenic <span class="sc">+</span> educ4, train) <span class="sc">%&gt;%</span></span>
+<span id="cb34-2"><a href="#cb34-2"></a>  <span class="fu">step_interact</span>(<span class="sc">~</span> <span class="fu">all_predictors</span>()<span class="sc">:</span><span class="fu">all_predictors</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb34-3"><a href="#cb34-3"></a>  <span class="fu">step_mutate</span>(</span>
+<span id="cb34-4"><a href="#cb34-4"></a>    <span class="at">low_arsenic =</span> <span class="fu">if_else</span>(arsenic <span class="sc">&lt;</span> .<span class="dv">6</span>, <span class="st">"negligible"</span>, <span class="st">"noticeable"</span>),</span>
+<span id="cb34-5"><a href="#cb34-5"></a>    <span class="at">no_educ =</span> <span class="fu">if_else</span>(educ4 <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>)</span>
+<span id="cb34-6"><a href="#cb34-6"></a>  )</span>
+<span id="cb34-7"><a href="#cb34-7"></a></span>
+<span id="cb34-8"><a href="#cb34-8"></a>lr_wflow3 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb34-9"><a href="#cb34-9"></a>  <span class="fu">add_recipe</span>(lr_rec) <span class="sc">%&gt;%</span></span>
+<span id="cb34-10"><a href="#cb34-10"></a>  <span class="fu">add_model</span>(<span class="fu">logistic_reg</span>())</span>
+<span id="cb34-11"><a href="#cb34-11"></a></span>
+<span id="cb34-12"><a href="#cb34-12"></a>fit_tm <span class="ot">&lt;-</span> <span class="fu">fit</span>(lr_wflow3, <span class="at">data =</span> train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><strong><code>glm()</code></strong></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>fit_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
-<span id="cb14-2"><a href="#cb14-2"></a>  having_affair <span class="sc">~</span> rating <span class="sc">+</span> gender <span class="sc">+</span> children,</span>
-<span id="cb14-3"><a href="#cb14-3"></a>  <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
-<span id="cb14-4"><a href="#cb14-4"></a>  <span class="at">data =</span> train</span>
-<span id="cb14-5"><a href="#cb14-5"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1"></a>fit_glm <span class="ot">&lt;-</span> <span class="fu">glm</span>(</span>
+<span id="cb35-2"><a href="#cb35-2"></a>  <span class="cf">switch</span> <span class="sc">~</span> dist100 <span class="sc">*</span> arsenic <span class="sc">*</span> educ4 <span class="sc">+</span> no_educ <span class="sc">+</span> low_arsenic,</span>
+<span id="cb35-3"><a href="#cb35-3"></a>  <span class="at">family =</span> <span class="st">"binomial"</span>,</span>
+<span id="cb35-4"><a href="#cb35-4"></a>  <span class="at">data =</span> train <span class="sc">%&gt;%</span> <span class="fu">mutate</span>(</span>
+<span id="cb35-5"><a href="#cb35-5"></a>    <span class="at">no_educ =</span> <span class="fu">if_else</span>(educ4 <span class="sc">==</span> <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>),</span>
+<span id="cb35-6"><a href="#cb35-6"></a>    <span class="at">low_arsenic =</span> <span class="fu">if_else</span>(arsenic <span class="sc">&lt;</span> .<span class="dv">6</span>, <span class="st">"negligible"</span>, <span class="st">"noticeable"</span>)</span>
+<span id="cb35-7"><a href="#cb35-7"></a>  )</span>
+<span id="cb35-8"><a href="#cb35-8"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </div>
 <div class="footer footer-default">
 
 </div>
 </section></section>
-
     </div>
   </div>
 

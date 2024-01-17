@@ -391,11 +391,13 @@
 <h2>Logistic Function</h2>
 <p>The <strong>Logistic</strong> function smooshes continuous values in the range <span class="math inline">\([-\infty, \infty]\)</span> to fall between zero and 1.</p>
 
-<img data-src="m03-02_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch"></section>
+<img data-src="m03-02_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch quarto-figure-center"></section>
 <section id="working-backwards" class="slide level2">
 <h2>Working backwards</h2>
-<p>To understand how it works, we’ll work backwards to consider how we might expand probabilities from zero to one onto the range <span class="math inline">\([-\infty, \infty]\)</span></p>
-<p>Then see how the logistic function does just the opposite of that.</p>
+<ul>
+<li>To understand how it works, we’ll work backwards to consider how we might expand probabilities from zero to one onto the range <span class="math inline">\([-\infty, \infty]\)</span></li>
+<li>Then we’ll see how the logistic function does just the opposite of that!</li>
+</ul>
 </section>
 <section id="odds" class="slide level2">
 <h2>Odds</h2>
@@ -488,14 +490,22 @@
 </section>
 <section id="log-odds-and-the-logit" class="slide level2">
 <h2>Log-odds and the logit</h2>
-<p><span class="math inline">\(\text{ln} \ x\)</span> is defined for all positive numbers and the resulting values fall in <span class="math inline">\([-\infty, \infty]\)</span></p>
+<ul>
+<li><span class="math inline">\(\text{ln} \ x\)</span> is defined for all positive numbers and the resulting values fall in <span class="math inline">\([-\infty, \infty]\)</span></li>
+<li>Odds are a method for expressing uncertainty in positive numbers</li>
+<li>So log-odds are a method for expressing uncertainty with real numbers</li>
+</ul>
+<div class="fragment">
 <p>The <strong>logit</strong> function:</p>
 <p><span class="math display">\[\text{logit}(p) =  \text{ln} \ \frac{p}{1-p}\]</span></p>
+</div>
 </section>
 <section id="the-inverse-logit-the-logistic-function" class="slide level2">
-<h2>The inverse-logit: the logistic function!</h2>
-<p>By transforming probabilities into log odds, we expand values from the range <span class="math inline">\([0, 1]\)</span> to the range <span class="math inline">\([-\infty, \infty]\)</span>.</p>
-<p>By doing just the opposite (inverse), we can smoosh our linear model predictions into the range of probabilities! And that’s the <strong>logistic</strong> function!</p>
+<h2>The inverse-logit: The logistic function!</h2>
+<ul>
+<li>By transforming probabilities into log odds, we expand values from the range <span class="math inline">\([0, 1]\)</span> to the range <span class="math inline">\([-\infty, \infty]\)</span>.</li>
+<li>By doing just the opposite (inverse), we can smoosh our linear model predictions into the range of probabilities! And that’s the <strong>logistic</strong> function!</li>
+</ul>
 <p><span class="math display">\[\text{logistic}(x) = \text{logit}^{-1}(x) = \frac{1}{1 + e^{x}}\]</span></p>
 </section>
 <section id="logistic-regression" class="slide level2">

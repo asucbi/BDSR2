@@ -13,6 +13,7 @@ The **Logistic** function smooshes continuous values in the range $[-\infty, \in
 
 ```{r}
 #| echo: false
+#| fig-align: center
 library(tidyverse)
 theme_set(theme_minimal(base_size = 20))
 
@@ -29,9 +30,8 @@ tibble(
 
 ## Working backwards
 
-To understand how it works, we'll work backwards to consider how we might expand probabilities from zero to one onto the range $[-\infty, \infty]$
-
-Then see how the logistic function does just the opposite of that.
+- To understand how it works, we'll work backwards to consider how we might expand probabilities from zero to one onto the range $[-\infty, \infty]$
+- Then we'll see how the logistic function does just the opposite of that!
 
 ## Odds
 
@@ -118,17 +118,21 @@ log(exp(2))
 
 ## Log-odds and the logit
 
-$\text{ln} \ x$ is defined for all positive numbers and the resulting values fall in $[-\infty, \infty]$
+- $\text{ln} \ x$ is defined for all positive numbers and the resulting values fall in $[-\infty, \infty]$
+- Odds are a method for expressing uncertainty in positive numbers
+- So log-odds are a method for expressing uncertainty with real numbers
 
+::: {.fragment}
 The **logit** function:
 
 $$\text{logit}(p) =  \text{ln} \ \frac{p}{1-p}$$
+:::
 
-## The inverse-logit: the logistic function!
 
-By transforming probabilities into log odds, we expand values from the range $[0, 1]$ to the range $[-\infty, \infty]$.
+## The inverse-logit: The logistic function!
 
-By doing just the opposite (inverse), we can smoosh our linear model predictions into the range of probabilities! And that's the **logistic** function!
+- By transforming probabilities into log odds, we expand values from the range $[0, 1]$ to the range $[-\infty, \infty]$.
+- By doing just the opposite (inverse), we can smoosh our linear model predictions into the range of probabilities! And that's the **logistic** function!
 
 $$\text{logistic}(x) = \text{logit}^{-1}(x) = \frac{1}{1 + e^{x}}$$
 ## Logistic Regression

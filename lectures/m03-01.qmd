@@ -144,5 +144,109 @@ tibble(
 ```
 
 
+## Loss Function & Likelihood
+
+For logistic regression, the loss function is based on **likelihood** of the data. 
+
+Where $y_i \in \{0, 1\}$:
+
+$$\mathcal{L(y_i, p_i)} = \prod_i p_i^{y_i} \prod_i (1-p_i)^{1 - y_i}$$
+
+::: {.callout-tip icon="false"}
+## In words:
+"The product of the model's predicted probability of positive for all the positive cases times the product of the models predicted probability of negative for all negative cases."
+:::
+
+## Cross-Entropy Loss [^1]
+
+- In log-space, multiplication becomes addition and exponentiation becomes multiplication.
+- So, it is generally easier to define the loss to be minimized ($\mathcal{l}$) in terms of the negative log-likelihood:
+
+$$ \mathcal{l(y_i, p_i)} = - \sum_i y_i log(p_i) + (1-y_i) log(1-p_i)$$
+
+[^1]: AKA: the binomial log likelihood loss
+
+## Likelihood: Hypothetical example
+
+:::: {.columns}
+::: {.column width="50%"}
+::: {style="font-size: 80%;"}
+Consider the following observations for `y` and predicted model probabilities from two models, `p1` and `p2`.
+:::
 
 
+:::
+::: {.column width="50%"}
+
+```{r}
+#| echo: false
+res <- tibble(
+  y = c(1,1,0,0),
+  p1 = c(.56, .61, .78, .45),
+  p2 = c(.48, .93, .06, .35)
+)
+res
+```
+
+:::
+::::
+
+The point-wise likelihood of the data is as follows:
+
+```{r}
+res %>% 
+  mutate(
+    likeli_pw1 = p1^y * (1-p1)^(1-y),
+    likeli_pw2 = p2^y * (1-p2)^(1-y)
+  )
+```
+
+## Likelihood: Hypothetical example
+
+The likelihood of the data is the product of those point-wise likelihoods:
+
+```{r}
+res %>% 
+  mutate(
+    likeli_pw1 = p1^y * (1-p1)^(1-y),
+    likeli_pw2 = p2^y * (1-p2)^(1-y)
+  ) %>% 
+  summarize(
+    likeli1 = prod(likeli_pw1),
+    likeli2 = prod(likeli_pw2)
+  )
+```
+
+
+## Cross-entropy loss: Hypothetical example {auto-animate="true"}
+
+For the cross-entropy loss, these same calculations take place in log-space:
+
+```{r}
+res %>% 
+  mutate(
+    likeli_pw1 = y*log(p1) + (1-y)*log(1 - p1),
+    likeli_pw2 = y*log(p2) + (1-y)*log(1- p2)
+  ) %>% 
+  summarize(
+    loss1 = -sum(likeli_pw1),
+    loss2 = -sum(likeli_pw2),
+  )
+```
+
+## Cross-entropy loss: Hypothetical example {auto-animate="true"}
+
+For the cross-entropy loss, these same calculations take place in log-space:
+
+```{r}
+res %>% 
+  mutate(
+    likeli_pw1 = y*log(p1) + (1-y)*log(1 - p1),
+    likeli_pw2 = y*log(p2) + (1-y)*log(1- p2)
+  ) %>% 
+  summarize(
+    loss1 = -sum(likeli_pw1),
+    loss2 = -sum(likeli_pw2),
+  ) %>% 
+  mutate_all(~exp(-.x))
+```

@@ -86,6 +86,25 @@
     code span.va { color: #111111; } /* Variable */
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }
   </style>
   <link rel="stylesheet" href="m03-03_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link rel="stylesheet" href="style.css">
@@ -389,10 +408,66 @@
 
 <section id="example-wells-in-bangladesh" class="slide level2">
 <h2>Example: Wells in Bangladesh</h2>
-<p>&lt; introduce this &gt;</p>
+
+<img data-src="../imgs/bangladeshi-wells-guardian.png" class="r-stretch quarto-figure-center"></section>
+<section id="arsenic-in-well-water" class="slide level2">
+<h2>Arsenic in well water</h2>
+<div style="font-size: 65%;">
+<ul>
+<li>Millions of people in Bangladesh get their water from hand-pumped tube wells</li>
+<li>A screening of 5 million wells from 2000 to 2003 found that wells of an estimated 20 million people had unsafe levels of arsenic (above 50 micrograms per liter)</li>
+<li>More recent screenings suggest that the government’s efforts have failed to address this problem</li>
+</ul>
+</div>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="../imgs/Bangla-map-contam-wells-HRW.jpg"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="../imgs/BangladeshArsenic_6_254.jpg"></p>
+</div>
+</div>
+</div>
 </section>
-<section id="the-data" class="slide level2">
-<h2>The data</h2>
+<section id="symptoms-of-arsenic-poisoning" class="slide level2">
+<h2>Symptoms of Arsenic poisoning</h2>
+
+<img data-src="../imgs/arsenic-symptoms.png" class="r-stretch quarto-figure-center"><div class="hidden">
+<ul>
+<li>Short-term symptoms:
+<ul>
+<li>Flu-like symptoms, shortness of breath, numbness</li>
+<li>Warts and lesions, hardening of skin, chronic sore throat and digestive issues</li>
+</ul></li>
+<li>Long-term symtoms:
+<ul>
+<li>Increased risk for liver, heart, bladder disease</li>
+<li>Neurotoxicity and neurosystem complications</li>
+<li>Increased risk for many cancers</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="health-decision-making-switching-wells" class="slide level2">
+<h2>Health decision-making: Switching wells</h2>
+<div style="font-size: 80%;">
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>The Bangladeshi water system is highly distibuted, each well serves on average 11 people</li>
+<li>Even though your well is unsafe, a neighbor’s well may be safe</li>
+<li><span class="citation" data-cites="gelman.etal2004">Gelman et al. (<a href="#/ref-gelman.etal2004" role="doc-biblioref" onclick="return false;">2004</a>)</span> analyzed a survey of users of several thousand wells to examine people’s decision-making: when will people with unsafe wells switch to using another neighbor’s well?</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><strong>Map of wells surveyed</strong></p>
+<p><img data-src="../imgs/bangladeshi-well-map.png"></p>
+</div>
+</div>
+</div>
+</section>
+<section id="the-wells-data" class="slide level2">
+<h2>The <code>wells</code> data</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(rosdata)</span>
 <span id="cb1-2"><a href="#cb1-2"></a></span>
@@ -542,7 +617,8 @@
 </div>
 </div>
 <ul>
-<li>increases log-odds blah blah</li>
+<li>A 1 point increase in <code>arsenic</code> (i.e.&nbsp;100 <span class="math inline">\(\mu g/L\)</span>) increases the log-odds of switching by <code>.38</code></li>
+<li>Makes the odds of switching <code>exp(.38)</code> = 1.468 <strong>times greater</strong></li>
 </ul>
 </section>
 <section id="plotting-model-predictions" class="slide level2">
@@ -551,6 +627,7 @@
 <img data-src="m03-03_files/figure-revealjs/unnamed-chunk-12-1.png" width="960" class="r-stretch"></section>
 <section id="adding-predictors" class="slide level2">
 <h2>Adding predictors</h2>
+<div style="font-size: 80%;">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>lr_wflow2 <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb13-2"><a href="#cb13-2"></a>  <span class="fu">add_formula</span>(<span class="cf">switch</span> <span class="sc">~</span> arsenic <span class="sc">+</span> dist100) <span class="sc">%&gt;%</span> </span>
@@ -568,18 +645,32 @@
 3 dist100      -0.863     0.114     -7.58  3.44e-14</code></pre>
 </div>
 </div>
+</div>
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="callout callout-note no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Think about it …</strong></p>
+</div>
+<div class="callout-content">
+<p>How would you interpret the coefficients for <code>arsenic</code> and <code>dist100</code>?</p>
+</div>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="fragment">
 <ul>
-<li>First look at sign:
-<ul>
-<li>As arsenic increases, <span class="math inline">\(p(switching)\)</span> increases</li>
-<li>As distance increases, <span class="math inline">\(p(switching)\)</span> decreases</li>
-</ul></li>
-<li>As distance increases, log odds blah blah</li>
+<li>As arsenic increases, <span class="math inline">\(p(switching)\)</span> increases, as distance increases, <span class="math inline">\(p(switching)\)</span> decreases</li>
+<li>An increase in 100m distance reduces log-odds by .863 or <strong>multiplies odds</strong> by <code>exp(-.863)</code> = 0.72</li>
 </ul>
+</div>
+</div>
+</div>
 </section>
 <section id="interpreting-predicted-probabilities" class="slide level2">
 <h2>Interpreting predicted probabilities</h2>
-<div style="font-size: 80%;">
+<div style="font-size: 65%;">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a>ex_data <span class="ot">&lt;-</span> <span class="fu">crossing</span>(</span>
 <span id="cb15-2"><a href="#cb15-2"></a>      <span class="at">arsenic =</span>  <span class="fu">quantile</span>(train<span class="sc">$</span>arsenic, <span class="fu">c</span>(.<span class="dv">1</span>, .<span class="dv">5</span>, .<span class="dv">9</span>)),</span>
@@ -848,8 +939,16 @@
 <span id="cb35-8"><a href="#cb35-8"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
+</section>
+<section id="references" class="slide level2 smaller scrollable">
+<h2>References</h2>
 <div class="footer footer-default">
 
+</div>
+<div id="refs" class="references csl-bib-body hanging-indent" role="doc-bibliography">
+<div id="ref-gelman.etal2004" class="csl-entry" role="doc-biblioentry">
+Gelman, Andrew, Matilde Trevisani, Hao Lu, and Alexander Van Geen. 2004. <span>“Direct <span>Data Manipulation</span> for <span>Local Decision Analysis</span> as <span>Applied</span> to the <span>Problem</span> of <span>Arsenic</span> in <span>Drinking Water</span> from <span>Tube Wells</span> in <span>Bangladesh</span>.”</span> <em>Risk Analysis</em> 24 (6): 1597–1612. <a href="https://doi.org/10.1111/j.0272-4332.2004.00553.x">https://doi.org/10.1111/j.0272-4332.2004.00553.x</a>.
+</div>
 </div>
 </section></section>
     </div>

@@ -29,3 +29,8 @@
 .highlight-blue {
   background-color: lightblue;
 }
+
+.scrolling {
+  max-height: 100px;
+  overflow-y: auto;
+}

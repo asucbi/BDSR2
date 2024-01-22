@@ -1,0 +1,531 @@
+---
+title: "(Classification) Model Evaluation Metrics"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+---
+
+## The ML Workflow
+
+![](../imgs/whole-game-final-performance.png){.absolute top="250" left="0"}
+
+## The ML Workflow
+
+-   How do we compare models and select the best one?
+
+![](../imgs/whole-game-final-performance2.png){.absolute top="250" left="0"}
+
+## The ML Workflow
+
+-   <p style="color: rgba(0, 0, 0, 0.5)">How do we compare models and select the best one?</p>
+
+-   How do we evaluate our final model?
+
+![](../imgs/whole-game-final-performance3.png){.absolute top="250" left="0"}
+
+## Model Evaluation Metrics
+
+::: columns
+::: {.column width="50%"}
+#### Regression models (continuous output)
+
+::: incremental
+-   Root mean squared error (RMSE)
+-   Mean absolute error (MAE)
+-   R<sup>2</sup>
+:::
+:::
+
+::: {.column width="50%"}
+#### Classification models (categorical output)
+
+::: incremental
+-   Accuracy
+-   Precision
+-   Recall
+-   F-score
+-   ROC Curve
+-   Confusion Matrix
+:::
+:::
+:::
+
+## A silly example: Classifying cats vs non-cats
+
+```{r}
+library(ggplot2)
+library(tidymodels)
+
+set.seed(123)
+
+n_observations = 5000
+
+full_df = tibble(fuzziness = rnorm(n_observations, mean = 0, sd = 2),
+                sleepiness = rnorm(n_observations, mean = 0, sd = 2),
+                noise = rnorm(n_observations,mean=0,sd=1)) %>% 
+  mutate(z = .5 + fuzziness + sleepiness + noise) %>% 
+  mutate(pr = 1/(1+exp(-z))) %>% 
+  mutate(is_cat = rbinom(n=n_observations,size=1,prob=pr)) %>% 
+  mutate(is_cat = ifelse(is_cat == 1, "yes", "no"))
+
+full_df$is_cat = factor(full_df$is_cat, levels = c("yes","no"))
+
+full_df <- full_df[,c(1,2,6)]
+
+cat_df <- rbind(full_df[which(full_df$is_cat == "yes")[1:250],], full_df[which(full_df$is_cat == "no")[1:250],])
+set.seed(123)
+cat_df <- cat_df[sample(1:nrow(cat_df)), ]
+```
+
+::: columns
+::: {.column width="40%"}
+```{r}
+#| echo: true
+head(cat_df)
+```
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: true
+ggplot(cat_df, aes(x = is_cat)) + geom_bar(stat="count")
+```
+:::
+:::
+
+## Let's fit a logistic regression model to our cat data
+
+```{r}
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+split <- initial_split(cat_df)
+train <- training(split)
+test <- testing(split)
+
+log_spec <- logistic_reg(
+  mode = "classification",
+  engine = "glm"
+)
+
+lr_fit <- workflow() %>% 
+  add_formula(is_cat ~ .) %>% 
+  add_model(log_spec) %>% 
+  fit(data = train)
+```
+
+## Use the model to make predictions about test data
+
+```{r}
+#| echo: true
+predictions <- lr_fit %>% 
+  augment(new_data = test) 
+
+head(predictions)
+```
+:::{.fragment}
+```{r}
+#| echo: true
+predictions %>% accuracy(truth= is_cat, estimate=.pred_class, event_level="first")
+```
+:::
+
+## A potential problem: Class imbalance
+
+What if most of our observations come from only one class? In this modified dataset, 90% of the rows are *not* cats.
+
+```{r}
+cat_df_imbalanced <- rbind(full_df[which(full_df$is_cat == "no")[1:450],], full_df[which(full_df$is_cat == "yes")[1:50],])
+set.seed(123)
+cat_df_imbalanced <- cat_df_imbalanced[sample(1:nrow(cat_df_imbalanced)), ]
+```
+
+```{r}
+#| echo: true
+ggplot(cat_df_imbalanced, aes(x = is_cat)) + geom_bar(stat="count")
+```
+
+## Our model is suddenly doing suspiciously well...
+
+```{r}
+#| echo: false
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+#| code-line-numbers: "1,13"
+split_imb <- initial_split(cat_df_imbalanced)
+train_imb <- training(split_imb)
+test_imb <- testing(split_imb)
+
+lr_imb_fit <- workflow() %>% 
+  add_formula(is_cat ~ .) %>% 
+  add_model(log_spec) %>% 
+  fit(data = train_imb)
+
+predictions_imb <- lr_imb_fit %>% 
+  augment(new_data = test_imb) 
+
+predictions_imb %>% accuracy(truth= is_cat, estimate=.pred_class, event_level="first")
+```
+
+## Accuracy isn't everything!
+
+There's more than one way to be (in)correct.
+
+![](../imgs/binaryconfusionmatrix.png){.absolute top="150" left="0" width="800"}
+
+::: {.absolute .fragment top="520" left="830" style="font-size:75%;"}
+$$
+Accuracy = \\
+\frac{(TP + TN)}{(TP + TN + FP + FN)}
+$$
+:::
+
+::: {.absolute .fragment top="260" left="850" style="font-size:75%;"}
+$$
+Precision = \frac{(TP)}{(TP + FP)}
+$$
+:::
+
+::: {.absolute .fragment top="500" left="220" style="font-size:75%;"}
+$$
+Recall = \frac{(TP)}{(TP + FN)}
+$$
+:::
+
+## Accuracy isn't everything!
+
+::: {.columns}
+
+::: {.column width=60%}
+![](../imgs/binaryconfusionmatrix.png){.absolute top="250" left="0" width=650}
+:::
+
+::: {.column width=40%}
+![](../imgs/PrecisionRecall.png){.absolute top="50" left="750" width=400}
+:::
+
+:::
+
+## The confusion matrix for our data
+
+```{r}
+#| echo: true
+predictions_imb %>% conf_mat(truth=is_cat, estimate = .pred_class)
+```
+
+
+## Confusion matrix for multiclass data
+::: {.columns}
+::: {.fragment .column width=60%}
+```{r}
+#| echo: false
+set.seed(123)
+
+n_observations = 500
+
+full_df = tibble(fuzziness = rnorm(n_observations, mean = 0, sd = 2),
+                sleepiness = rnorm(n_observations, mean = 0, sd = 2),
+                noise = rnorm(n_observations,mean=0,sd=1)) %>% 
+  mutate(lp_cat = .5 + 2*fuzziness + 2*sleepiness + noise,
+         lp_dog = .5 + 2*fuzziness - 2*sleepiness + noise,
+         lp_pig = .5 - 2*fuzziness + 2*sleepiness + noise) %>%
+  mutate(den = exp(lp_cat) +exp(lp_dog) + exp(lp_pig)) %>% 
+  mutate(p_cat = exp(lp_cat)/den,
+         p_dog = exp(lp_dog)/den,
+         p_pig = exp(lp_pig)/den) %>% 
+  mutate(P = p_cat+p_dog+p_pig) %>% 
+  rowwise() %>% 
+  mutate(animal = sample(c("cat","dog","pig"), size=1,prob = c(p_cat,p_dog,p_pig)))
+
+full_df$animal = factor(full_df$animal, levels=c("cat","dog","pig"))
+
+full_df <- full_df[,c(1,2,12)]
+
+ggplot(full_df, aes(x = fuzziness, y = sleepiness, color=animal)) + geom_point() +
+  theme(
+    text = element_text(size = 20)
+    )
+```
+:::
+
+:::{.fragment .column width=40% .absolute left="600" top="150"}
+```{r}
+#| echo: false
+
+split <- initial_split(full_df)
+train <- training(split)
+test <- testing(split)
+
+multi_log_spec <- multinom_reg(
+  mode = "classification",
+  engine = "nnet"
+)
+
+mn_lr_fit <- workflow() %>% 
+  add_formula(animal ~ .) %>% 
+  add_model(multi_log_spec) %>% 
+  fit(data = train)
+
+predictions_mn <- mn_lr_fit %>% 
+  augment(new_data = test) 
+
+predictions_mn %>% conf_mat(truth=animal, estimate = .pred_class)
+```
+:::
+:::
+
+## The confusion matrix for our data
+
+:::{style="font-size:75%;"}
+```{r}
+#| echo: true
+predictions_imb %>% conf_mat(truth=is_cat, estimate = .pred_class)
+```
+:::
+
+::: {.fragment style="font-size:70%;"}
+$Accuracy = \frac{(TP + TN)}{(TP + TN + FP + FN)} = \frac{(3 + 113)}{(3 + 113 + 1 + 8)} = .928$
+:::
+
+::: {.fragment style="font-size:70%;"}
+$Precision = \frac{(TP)}{(TP + FP)} = \frac{(3)}{(3 + 1)} = .75$
+:::
+
+::: {.fragment style="font-size:70%;"}
+$Recall = \frac{(TP)}{(TP + FN)} = \frac{(3)}{(3 + 8)} = .27$
+\
+:::
+
+::: {.fragment style="font-size:75%;"}
+```{r}
+#| echo: true
+#| eval: false
+predictions_imb %>% accuracy(truth= is_cat, estimate=.pred_class, event_level="first")
+predictions_imb %>% precision(truth= is_cat, estimate=.pred_class, event_level="first")
+predictions_imb %>% recall(truth= is_cat, estimate=.pred_class, event_level="first")
+```
+:::
+
+::: {.fragment style="font-size:75%;"}
+```{r}
+#| echo: true
+multi_metric <- metric_set(accuracy, precision, recall)
+
+predictions_imb %>% multi_metric(truth= is_cat, estimate=.pred_class, event_level="first")
+```
+:::
+
+## F-measure
+
+::: {#text style="font-size:70%;"}
+- Accuracy can be problematic, but we still may want one number to summarize performance. 
+- Rather than pick between recall and precision, we can use the *F-measure*, which is the harmonic mean of precision and recall.
+:::
+
+$$
+F = \frac{2 * Precision * Recall}{Precision + Recall}
+$$
+
+::: {.fragment}
+```{r}
+#| echo: true
+predictions_imb %>% f_meas(truth= is_cat, estimate=.pred_class, event_level="first")
+```
+:::
+
+## Receiver-Operator Characteristic (ROC) Curves
+
+![](../imgs/binaryconfusionmatrix.png){.absolute top="150" left="0" width="800"}
+
+::: {.absolute .fragment top="500" left="260" style="font-size:50%;"}
+$$
+Recall = \frac{(TP)}{(TP + FN)}
+$$
+:::
+
+## Receiver-Operator Characteristic (ROC) Curves
+
+![](../imgs/binaryconfusionmatrix.png){.absolute top="150" left="0" width="800"}
+
+::: {.absolute top="500" left="250" style="font-size:50%;"}
+$$
+\color{red}{Sensitivity} = \frac{(TP)}{(TP + FN)}
+$$
+:::
+::: {.absolute .fragment top="500" left="550" style="font-size:50%;"}
+$$
+Specificity = \frac{(TN)}{(FP + TN)}
+$$
+:::
+
+## Receiver-Operator Characteristic (ROC) Curves
+
+::: {.columns}
+::: {.column width=50%}
+![](../imgs/ROCcurve.png)
+:::
+
+::: {.column width=50% style="font-size:75%;"}
+```{r, fig.width=4,fig.height=4}
+#| echo: true
+
+predictions_imb %>% 
+  roc_curve(truth = is_cat, .pred_yes) %>% 
+  autoplot()
+
+```
+:::
+:::
+
+## Decision thresholds
+
+:::{style="font-size:75%;"}
+```{r}
+#| echo: true
+ggplot(predictions_imb, aes(x = fuzziness + sleepiness, y = is_cat)) + geom_point()
+```
+:::
+
+## Decision thresholds
+
+Boundary = -2
+
+```{r}
+tmp <- predictions_imb %>% 
+  mutate(val = fuzziness + sleepiness) %>% 
+  mutate(.pred_class = factor(ifelse(val > -2, "yes","no"))) %>% 
+  mutate(correct = factor(ifelse(.pred_class == is_cat, 1, 0)))
+
+ggplot(tmp, aes(x = fuzziness + sleepiness, y = is_cat, color = correct)) + geom_point() + geom_vline(xintercept=-2) +
+    annotate(geom="text", x=-3.5, y=.5, label="predicted 'no'",
+              color="red") +
+  annotate(geom="text", x=-.5, y=.5, label="predicted 'yes'",
+              color="darkgreen") 
+```
+
+## Decision thresholds
+
+Boundary = +1 (more conservative)
+
+```{r}
+tmp <- predictions_imb %>% 
+  mutate(val = fuzziness + sleepiness) %>% 
+  mutate(.pred_class = factor(ifelse(val > 1, "yes","no"))) %>% 
+  mutate(correct = factor(ifelse(.pred_class == is_cat, 1, 0)))
+
+ggplot(tmp, aes(x = fuzziness + sleepiness, y = is_cat, color = correct)) + geom_point() + 
+  geom_vline(xintercept=1) +
+  annotate(geom="text", x=-.5, y=.5, label="predicted 'no'",
+              color="red") +
+  annotate(geom="text", x=2.5, y=.5, label="predicted 'yes'",
+              color="darkgreen") 
+```
+
+## Decision thresholds
+
+Boundary = -5 (less conservative)
+
+```{r}
+tmp <- predictions_imb %>% 
+  mutate(val = fuzziness + sleepiness) %>% 
+  mutate(.pred_class = factor(ifelse(val > -5, "yes","no"))) %>% 
+  mutate(correct = factor(ifelse(.pred_class == is_cat, 1, 0)))
+
+ggplot(tmp, aes(x = fuzziness + sleepiness, y = is_cat, color = correct)) + geom_point() + 
+  geom_vline(xintercept=-5) +
+  annotate(geom="text", x=-6.5, y=.5, label="predicted 'no'",
+              color="red") +
+  annotate(geom="text", x=-3.5, y=.5, label="predicted 'yes'",
+              color="darkgreen") 
+```
+
+## ROC - Area under the curve (AUC)
+
+::: {.columns}
+:::: {.column width=50%}
+![](../imgs/ROCcurve.png)
+::::
+
+:::: {.column width=50% .absolute top="100" left="500"}
+```{r, fig.width=4,fig.height=4}
+#| echo: false
+predictions_imb %>% 
+  roc_curve(truth = is_cat, .pred_yes, event_level="first") %>% 
+  autoplot()
+```
+
+:::{style="font-size:75%;"}
+```{r}
+#| echo: true
+predictions_imb %>% 
+  roc_auc(truth = is_cat, .pred_yes, event_level="first")
+```
+:::
+::::
+:::
+
+## Log-Likelihood
+
+```{r}
+#| echo: true
+lr_imb_fit %>% extract_fit_engine() %>% logLik()
+```
+
+- The degrees of freedom (df) is 3 because there are 3 parameters to be fit:
+  - Intercept
+  - Coefficient for predictor 1 (fuzziness)
+  - Coefficient for predictor 2 (sleepiness)
+
+## Akaike Information Criterion (1)
+
+:::{style="font-size:75%;"}
+$$
+AIC = 2k - 2ln(\hat{L})
+$$
+$k$ = number of variables \
+$\hat{L}$ = maximum likelihood
+:::
+
+::: {.incremental style="font-size: 60%;"}
+* A measure of model fit, with penalization for more parameters
+    + Useful when you care about getting the *simplest* model that captures the data
+* Lower values are better.
+* As a rule of thumb:
+    + $\Delta$AIC of ~2 is considered *moderate* improvement
+    + $\Delta$AIC of ~4 is considered *substantial* improvement
+* Most often used when we *don't* have a test set, to *estimate* the out-of-sample performance
+    + When we have a test set, we can just test performance on that directly 
+* Similar metrics that penalize model complexity include:
+    + Bayesian Information Criteron (BIC)
+    + Minimum Description Length (MDL)
+:::
+
+## Akaike Information Criterion (2)
+
+```{r}
+#| echo: true
+lr_imb_fit %>% extract_fit_engine() %>% logLik()
+```
+
+::: {.fragment style="font-size:75%;"}
+$$
+AIC = \\
+2k - 2ln(\hat{L}) = \\
+2*3 - 2*-86.51231 = \\
+179.0246
+$$
+:::
+
+::: {.fragment}
+```{r}
+#| echo: true
+lr_imb_fit %>% extract_fit_engine() 
+```
+:::
+

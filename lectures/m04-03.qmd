@@ -1,0 +1,645 @@
+---
+title: "Model Comparison: Real Data Example"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+---
+
+```{r}
+#| echo: false
+library(tidymodels)
+library(modeldata)
+library(broom)
+library(broom.mixed)
+
+load('~/Documents/Github/BDSR2/data/preprocessed_data.Rda')
+
+df = data %>% select(c(language, ClickedOn, newstep, subject))
+rm(data)
+
+colnames(df)<-c("lang_cond", "resp", "vot_step", "subj_id")
+df$resp=factor(df$resp, levels = c("B","P"))
+df$subj_id = factor(df$subj_id)
+
+set.seed(123)
+df <- df[sample(1:nrow(df)), ]
+rownames(df) <- NULL
+```
+
+## Example data: 
+
+### A phoneme categorization experiment with Spanish-English bilinguals
+
+
+::: {style="font-size:75%;" .incremental}
+- **Voice-onset time (VOT)**: In speech production, the time interval between the opening of the lips and the vibration of the vocal chords
+- A primary acoustic cue for the contrast between:
+:::
+
+:::{.fragment}
+:::{.columns style="font-size:50%;" .center}
+
+::::{.column width="25%;"}
+- **Voiced** consonants:
+  - /b/ 
+  - /d/
+  - /g/
+  - /v/
+  - /z/
+
+::::
+
+::::{.column width="25%;"}
+- **Voiceless** consonants:
+  - /p/
+  - /t/
+  - /k/
+  - /f/
+  - /s/
+
+::::
+
+
+:::: {.column width="50%;"}
+![](../imgs/VOT1.png)
+::::
+
+:::
+:::
+
+##
+### Phoneme categorization response curves
+
+::: {style="font-size:50%;"}
+- Assume that our brain's "speech processing system" implements a categorization function with:
+    - Input: VOT
+    - Output: Class label (/b/ or /p/)
+    
+:::
+
+![](../imgs/VOT2.png)
+
+##
+#### Different languages have different categorization functions for the "same" contrast
+
+:::{.columns style="font-size:60%;" .center}
+:::: {.column width="50%;" .incremental}
+- Both English and Spanish speakers use VOT to distinguish /b/ vs /p/
+- **But** the two languages differ in where they put each phoneme on the VOT continuum
+    - Spanish has *negatively-shifted* VOTs relative to English
+- **Leads to cross-language ambiguity:** The Spanish /p/ sounds very similar to the English /b/
+
+:::{.fragment}
+![](../imgs/VOT3.png){width=80%}
+:::
+::::
+
+::::{.column width="50%;"}
+![Typical response curves for English and Spanish monolinguals](../imgs/VOT4.png){width=80%}
+
+
+::::
+
+:::
+
+## 
+
+### Hypothesis:
+
+:::::{.fragment}
+English-Spanish bilinguals need to be sensitive to whether a speaker is using English or Spanish in order to categorize speech sounds correctly.
+:::::
+
+\
+
+:::::{.fragment}
+### Research question:
+
+Do English-Spanish bilinguals' categorization functions differ depending upon whether they're in an English-speaking or Spanish-speaking context?
+:::::
+
+
+
+## The experiment and dataset
+
+:::{.columns style="font-size:60%;"}
+:::: {.column width="50%;"}
+
+:::{.fragment}
+- Participants: 
+  - Monolingual English speakers
+  - Spanish-English bilinguals, randomly assigned to:
+    - English-speaking context
+    - Spanish-speaking context
+
+:::
+
+:::{.fragment}    
+- Stimuli:
+  - Sounds from VOT continuum
+  - 9 equal steps from -20ms VOT to +40ms VOT 
+
+:::
+
+:::{.fragment}
+- Task:
+  - Categorize each stimulus as /b/ or /p/
+  - 432 trials per participant
+    - 48 repetitions of each stimulus (randomized order)
+
+:::
+
+::::
+
+::::{.column width="50%;" .fragment}
+```{r}
+#| echo: true
+head(df)
+```
+::::
+:::
+
+## Exploratory Data Visualization (1)
+
+:::{style="font-size:80%;"}
+```{r}
+#| echo: true
+ggplot(df, aes(x = factor(vot_step), fill = lang_cond)) + geom_bar(stat = "count", position="dodge") 
+```
+:::
+
+## Exploratory Data Visualization (2)
+
+:::{style="font-size:80%;"}
+```{r}
+#| echo: true
+ggplot(df, aes(x = resp, fill=lang_cond)) + geom_bar(stat = "count", position="dodge") 
+```
+:::
+
+## Exploratory Data Visualization (3)
+
+:::{style="font-size:80%;"}
+```{r}
+#| echo: true
+ggplot(df, aes(x = factor(vot_step), y = factor(resp), color=lang_cond)) + 
+  geom_jitter(width = .2, height = .2, alpha = .01) + 
+  facet_wrap(~factor(lang_cond))
+```
+:::
+
+## Exploratory Data Visualization (4)
+:::{style="font-size:80%;"}
+```{r}
+#| echo: true
+df %>% group_by(vot_step, lang_cond) %>% 
+  summarise(propP = sum(resp == "P")/n()) %>% 
+  ggplot(aes(x = vot_step, y = propP, color=lang_cond, group=lang_cond)) +
+  geom_point() +
+  geom_line()
+```
+:::
+
+## Train/Test Split
+
+Since we're interested in the difference between bilinguals in the Spanish vs English contexts, we will filter out the monolingual data.
+
+:::{style="font-size:80%;"}
+```{r}
+#| echo: true
+split <- df %>% 
+  filter(lang_cond != "Monolingual English") %>% 
+  mutate(lang_cond = factor(lang_cond, levels=c("Bilingual English","Bilingual Spanish"))) %>% 
+  group_initial_split(group=subj_id)
+
+train <- training(split)
+test <- testing(split)
+```
+:::
+
+## Build the model specification and workflow
+
+:::{style="font-size:80%;"}
+```{r}
+#| echo: true
+
+log_spec <- logistic_reg(
+  mode = "classification",
+  engine = "glm"
+)
+
+lr_wf <- workflow() %>% 
+  add_variables(outcomes = resp, predictors = c(vot_step, lang_cond)) %>% 
+  step_normalize(all_numeric_predictors())
+```
+:::
+
+## Train a series of increasingly-complex models
+
+:::: {.panel-tabset style="font-size:25px"}
+
+## 1 main effect
+
+::: {style="font-size:30px"}
+- First, let's train a model with just an effect of ```lang_cond```
+
+```{r}
+#| echo: false
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+lr_fit_1 <- lr_wf %>% 
+  add_model(log_spec, formula = resp ~ lang_cond) %>%
+  fit(data = train)
+
+lr_fit_1 %>% extract_fit_engine() %>% tidy()
+```
+
+:::
+
+## 2 main effects
+
+::: {style="font-size:30px"}
+- Next, let's include TWO main effects, for ```lang_cond``` *and* ```vot_step```
+
+```{r}
+#| echo: false
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+
+lr_fit_2 <- lr_wf %>% 
+  add_model(log_spec, formula = resp ~ lang_cond + vot_step) %>%
+  fit(data = train)
+
+lr_fit_2 %>% extract_fit_engine() %>% tidy()
+```
+
+:::
+
+## 2 main effects + interaction 
+
+::: {style="font-size:30px"}
+- Then, we can include everything from the previous model, but additionally add an interaction term
+
+```{r}
+#| echo: false
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+
+lr_fit_3 <- lr_wf %>% 
+  add_model(log_spec, formula = resp ~ lang_cond + vot_step + lang_cond:vot_step) %>%
+  fit(data = train)
+
+lr_fit_3 %>% extract_fit_engine() %>% tidy()
+```
+
+:::
+::::
+
+## Multi-level model
+
+::: {style="font-size:25px"}
+- An even more complex model we can build is a **multi-level** (a.k.a. mixed-effects model), which includes a random intercept and random slope for the effect of ```vot_step``` for each subject
+
+- Allows us to capture individual differences in categorization boundaries
+
+```{r}
+#| echo: true
+library(multilevelmod)
+
+mlm_spec <- 
+  logistic_reg() %>% 
+  set_engine("glmer")
+
+mlm_wf <- workflow() %>% 
+  add_variables(outcomes = resp, predictors = c(vot_step, lang_cond, subj_id)) %>% 
+  step_normalize(all_numeric_predictors())
+
+mlm_fit <- mlm_wf %>%
+  add_model(mlm_spec, formula = resp ~ lang_cond + vot_step + lang_cond:vot_step +
+              (1 + vot_step|subj_id)) %>%
+  fit(data = train)
+
+mlm_fit %>% extract_fit_engine() %>% tidy()
+```
+:::
+
+## Multi-level model
+
+::: {style="font-size:25px"}
+- An even more complex model we can build is a **multi-level** (a.k.a. mixed-effects model), which includes a random intercept and random slope for the effect of ```vot_step``` for each subject
+
+- Allows us to capture individual differences in categorization boundaries
+
+```{r}
+#| echo: true
+#| code-line-numbers: "5,13"
+library(multilevelmod)
+
+mlm_spec <- 
+  logistic_reg() %>% 
+  set_engine("glmer")
+
+mlm_wf <- workflow() %>% 
+  add_variables(outcomes = resp, predictors = c(vot_step, lang_cond, subj_id)) %>% 
+  step_normalize(all_numeric_predictors())
+
+mlm_fit <- mlm_wf %>%
+  add_model(mlm_spec, formula = resp ~ lang_cond + vot_step + lang_cond:vot_step +
+              (1 + vot_step|subj_id)) %>%
+  fit(data = train)
+
+mlm_fit %>% extract_fit_engine() %>% tidy()
+```
+:::
+
+## Naive Bayes as a baseline model
+
+:::{style="font-size:75%;"}
+
+- Let's also throw in a Naive Bayes model, which is often a useful baseline.
+
+```{r}
+#| echo: false
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+library(discrim)
+
+nb_spec <- naive_Bayes(mode = "classification",
+                       engine ="naivebayes") 
+
+nb_wf <- workflow() %>% 
+  add_variables(outcomes = resp, predictors = c(vot_step, lang_cond)) %>% 
+  step_normalize(all_numeric_predictors())
+
+nb_fit <- nb_wf %>% 
+  add_model(nb_spec, formula = resp ~ vot_step + lang_cond) %>%
+  fit(data = train)
+
+```
+:::
+
+## Evaluation metrics
+
+:::{.fragment style="font-size:60%;"}
+- We'll make a ```metric_set()``` including balanced accuracy, the F-measure, and ROC-AUC
+```{r}
+#| echo: true
+multi_metric <- metric_set(bal_accuracy, f_meas, roc_auc)
+```
+:::
+
+:::{.fragment style="font-size:70%;"}
+- Then, we can get the model's predictions on the training data and compute our metrics
+```{r, warning=FALSE}
+#| echo: true
+lr_fit_1 %>% 
+  augment(new_data = train) %>% 
+  multi_metric(truth=resp, estimate=.pred_class, .pred_P, event_level = "second")
+```
+:::
+
+:::{.fragment style="font-size:70%;"}
+- We'll also get the AIC
+  - Note: we need to do this manually for the naive Bayes model
+```{r, warning=FALSE}
+#| echo: true
+
+lr_fit_1 %>% extract_fit_engine() %>% glance() %>% select(AIC)
+```
+::::
+
+:::{.fragment style="font-size:70%;"}
+Do this for all of our models and compile the results into a tibble...
+:::
+
+## Compare all of our models
+
+```{r, warning=FALSE}
+#| echo: false
+comparison <- tibble(model="lr_1",
+                        bal_accuracy = lr_fit_1 %>%
+                          augment(new_data = train) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = lr_fit_1 %>%
+                          augment(new_data = train) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = lr_fit_1 %>%
+                          augment(new_data = train) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate),
+                        AIC = lr_fit_1 %>%
+                          extract_fit_engine() %>%
+                          glance() %>%
+                          pull(AIC)
+                        )
+
+comparison <- add_row(comparison,
+                      model="lr_2",
+                        bal_accuracy = lr_fit_2 %>%
+                          augment(new_data = train) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = lr_fit_2 %>%
+                          augment(new_data = train) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = lr_fit_2 %>%
+                          augment(new_data = train) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate),
+                        AIC = lr_fit_2 %>%
+                          extract_fit_engine() %>%
+                          glance() %>%
+                          pull(AIC)
+                        )
+
+comparison <- add_row(comparison,
+                      model="lr_3",
+                        bal_accuracy = lr_fit_3 %>%
+                          augment(new_data = train) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = lr_fit_3 %>%
+                          augment(new_data = train) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = lr_fit_3 %>%
+                          augment(new_data = train) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate),
+                        AIC = lr_fit_3 %>%
+                          extract_fit_engine() %>%
+                          glance() %>%
+                          pull(AIC)
+                        )
+
+comparison <- add_row(comparison,
+                      model="mlm",
+                        bal_accuracy = mlm_fit %>%
+                          augment(new_data = train) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = mlm_fit %>%
+                          augment(new_data = train) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = mlm_fit %>%
+                          augment(new_data = train) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate),
+                        AIC = mlm_fit %>%
+                          extract_fit_engine() %>%
+                          glance() %>%
+                          pull(AIC)
+                        )
+
+tmp <- nb_fit %>% 
+  augment(new_data = train) %>% 
+  mutate(logLik = ifelse(resp == "B", log(.pred_B), log(.pred_P))) %>% 
+  summarise(sumLogLik = sum(logLik)) %>% 
+  mutate(AIC = -2*sumLogLik + 2*4)
+  
+comparison <- add_row(comparison,
+                      model="nb",
+                        bal_accuracy = nb_fit %>%
+                          augment(new_data = train) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = nb_fit %>%
+                          augment(new_data = train) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = nb_fit %>%
+                          augment(new_data = train) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate),
+                        AIC = tmp$AIC
+                        )
+
+colnames(comparison) <-c("model","bal_accuracy","f_meas","roc_auc","AIC")
+```
+
+```{r}
+comparison
+```
+
+## Evaluate the models on the *test* data
+
+:::{style="font-size:80%;"}
+```{r}
+#| echo: true
+lr_fit_1 %>% 
+  augment(new_data = test) %>% 
+  multi_metric(truth=resp, estimate=.pred_class, .pred_P, event_level = "second")
+```
+
+:::{.fragment}
+Do this for every model and compile the results...
+
+```{r, warning=FALSE}
+#| echo: false
+test_res <- tibble(model="lr_1",
+                      bal_accuracy = lr_fit_1 %>%
+                        augment(new_data = test) %>%
+                        bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                        pull(.estimate),
+                      f_meas = lr_fit_1 %>%
+                        augment(new_data = test) %>%
+                        f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                        pull(.estimate),
+                      roc_auc = lr_fit_1 %>%
+                        augment(new_data = test) %>%
+                        roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                        pull(.estimate)
+                      )
+
+test_res <- add_row(test_res,
+                      model="lr_2",
+                        bal_accuracy = lr_fit_2 %>%
+                          augment(new_data = test) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = lr_fit_2 %>%
+                          augment(new_data = test) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = lr_fit_2 %>%
+                          augment(new_data = test) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate)
+                        )
+
+test_res <- add_row(test_res,
+                      model="lr_3",
+                        bal_accuracy = lr_fit_3 %>%
+                          augment(new_data = test) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = lr_fit_3 %>%
+                          augment(new_data = test) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = lr_fit_3 %>%
+                          augment(new_data = test) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate)
+                        )
+
+test_res <- add_row(test_res,
+                      model="mlm",
+                        bal_accuracy = mlm_fit %>%
+                          augment(new_data = test) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = mlm_fit %>%
+                          augment(new_data = test) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = mlm_fit %>%
+                          augment(new_data = test) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate)
+                        )
+
+test_res <- add_row(test_res,
+                      model="nb",
+                        bal_accuracy = nb_fit %>%
+                          augment(new_data = test) %>%
+                          bal_accuracy(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        f_meas = nb_fit %>%
+                          augment(new_data = test) %>%
+                          f_meas(truth=resp, estimate=.pred_class, event_level = "second") %>%
+                          pull(.estimate),
+                        roc_auc = nb_fit %>%
+                          augment(new_data = test) %>%
+                          roc_auc(truth=resp, .pred_P, event_level = "second") %>%
+                          pull(.estimate)
+                        )
+
+colnames(test_res) <-c("model","bal_accuracy","f_meas","roc_auc")
+```
+
+```{r}
+#| echo: true
+test_res
+```
+:::
+:::
+
+

@@ -177,6 +177,7 @@ lr_wflow1 <- workflow() %>%
 lr_fit1 <- fit(lr_wflow1, data = train)
 
 ```
+
 ## Evaluating the simple model
 
 ```{r}
@@ -186,6 +187,98 @@ lr_fit1 %>%
   augment(test) %>% 
   metrics_unbalanced(truth = switch, estimate = .pred_class)
 ```
+
+
+## Metrics: Accuracy
+
+$$\text{accuracy} = \frac{\text{correct predictions}}{\text{total predictions}}$$
+
+```{r}
+#| echo: true
+lr_fit1 %>% 
+  augment(test) %>% 
+  summarize(acc = sum(.pred_class == switch)/n())
+```
+
+## Confusion Matrix
+
+```{r}
+#| echo: false
+tibble(
+  actual = factor(c("+", "-", "+", "-"), ordered = TRUE, levels = c("+", "-")),
+  predicted = factor(c("+", "-", "-", "+")),
+  label = c("True Positive", "True Negative", "False Negative", "False Positive")
+) %>% 
+  ggplot(aes(x=actual, y = predicted, label = label)) +
+  geom_tile(fill = "white", color = "black") +
+  geom_text(size = 9) +
+  theme_minimal(base_size = 24) +
+  theme(
+    panel.grid = element_blank(),
+    ) +
+  labs(x = "Actual", y = "Predicted") +
+  scale_x_discrete(position = "top") 
+  
+```
+
+## Metrics: TPR and TNR
+
+::: {style="font-size: 65%;"}
+
+**Manual calculation**
+
+```{r}
+lr_fit1 %>% 
+  augment(test) %>% 
+  summarize(
+    acc = sum(.pred_class == switch)/n(),
+    TP = sum(.pred_class == "Yes" & switch == "Yes")/sum(switch == "Yes") ,
+    TN = sum(.pred_class == "No" & switch == "No")/sum(switch == "No") ,
+    )
+```
+
+**`tidymodels` calculation**
+
+```{r}
+class_metrics <- metric_set(accuracy, bal_accuracy, sensitivity, specificity)
+
+lr_fit1 %>% 
+  augment(test) %>% 
+  class_metrics(switch, estimate = .pred_class, event_level = "second") 
+```
+:::
+
+
+## Metrics: Balanced accuracy
+
+$$\text{balanced accuracy} = \frac{\text{TPR} + \text{TNR}}{2}$$
+
+::: {style="font-size: 50%;"}
+
+
+**Manual calculation**
+```{r}
+lr_fit1 %>% 
+  augment(test) %>% 
+  summarize(
+    acc = sum(.pred_class == switch)/n(),
+    TP = sum(.pred_class == "Yes" & switch == "Yes")/sum(switch == "Yes") ,
+    TN = sum(.pred_class == "No" & switch == "No")/sum(switch == "No") ,
+    bal_acc = (TP + TN)/2
+    )
+```
+
+**`tidymodels` calculation**
+
+```{r}
+class_metrics <- metric_set(accuracy, sensitivity, specificity, bal_accuracy)
+
+lr_fit1 %>% 
+  augment(test) %>% 
+  class_metrics(switch, estimate = .pred_class, event_level = "second") 
+```
+:::
+
 
 ## Interpreting model coefficients
 
@@ -415,100 +508,6 @@ collect_metrics(cv_res)
 :::
 
 :::
-
-
-# Details: Performance metrics
-
-## Accuracy
-
-$$\text{accuracy} = \frac{\text{correct predictions}}{\text{total predictions}}$$
-
-```{r}
-#| echo: true
-lr_fit3 %>% 
-  augment(test) %>% 
-  summarize(acc = sum(.pred_class == switch)/n())
-```
-
-## Confusion Matrix
-
-```{r}
-#| echo: false
-tibble(
-  actual = factor(c("+", "-", "+", "-"), ordered = TRUE, levels = c("+", "-")),
-  predicted = factor(c("+", "-", "-", "+")),
-  label = c("True Positive", "True Negative", "False Negative", "False Positive")
-) %>% 
-  ggplot(aes(x=actual, y = predicted, label = label)) +
-  geom_tile(fill = "white", color = "black") +
-  geom_text(size = 9) +
-  theme_minimal(base_size = 24) +
-  theme(
-    panel.grid = element_blank(),
-    ) +
-  labs(x = "Actual", y = "Predicted") +
-  scale_x_discrete(position = "top") 
-  
-```
-
-## True positives and true negatives
-
-::: {style="font-size: 65%;"}
-
-**Manual calculation**
-
-```{r}
-lr_fit3 %>% 
-  augment(test) %>% 
-  summarize(
-    acc = sum(.pred_class == switch)/n(),
-    TP = sum(.pred_class == "Yes" & switch == "Yes")/sum(switch == "Yes") ,
-    TN = sum(.pred_class == "No" & switch == "No")/sum(switch == "No") ,
-    )
-```
-
-**`tidymodels` calculation**
-
-```{r}
-class_metrics <- metric_set(accuracy, bal_accuracy, sensitivity, specificity)
-
-lr_fit3 %>% 
-  augment(test) %>% 
-  class_metrics(switch, estimate = .pred_class, event_level = "second") 
-```
-:::
-
-
-## Accuracy and balanced accuracy
-
-$$\text{balanced accuracy} = \frac{\text{TPR} + \text{TNR}}{2}$$
-
-::: {style="font-size: 50%;"}
-
-
-**Manual calculation**
-```{r}
-lr_fit3 %>% 
-  augment(test) %>% 
-  summarize(
-    acc = sum(.pred_class == switch)/n(),
-    TP = sum(.pred_class == "Yes" & switch == "Yes")/sum(switch == "Yes") ,
-    TN = sum(.pred_class == "No" & switch == "No")/sum(switch == "No") ,
-    bal_acc = (TP + TN)/2
-    )
-```
-
-**`tidymodels` calculation**
-
-```{r}
-class_metrics <- metric_set(accuracy, sensitivity, specificity, bal_accuracy)
-
-lr_fit3 %>% 
-  augment(test) %>% 
-  class_metrics(switch, estimate = .pred_class, event_level = "second") 
-```
-:::
-
 
 # tidymodels vs `glm()`
 

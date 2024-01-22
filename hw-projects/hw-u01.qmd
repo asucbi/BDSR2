@@ -1,9 +1,10 @@
 ---
-title: "Homework U01: Who will stay together and who will call it splits?"
-author: "Derek Powell"
-bibliography: ../references.bib
+title: "Homework U01: NIJ Recidivism Challenge"
+format: html
 editor: source
 ---
+
+![](../imgs/Angola-prison1.jpg)
 
 ::: {.callout-caution icon="false"}
 ## Learning Objectives
@@ -13,189 +14,326 @@ Our learning objectives for this homework are:
 - Apply the fundamental machine learning workflow from start to finish
 - Use data munging skills to conduct feature engineering for machine learning
 - Gain hands-on experience with building and applying logistic regression models
-- Use model visualizations to gain insight into the dynamics of romantic relationships
+- Use model visualizations to gain insight into the dynamics of criminality and rehabilitation
 :::
+
+In this homework, we'll take on the National Institute of Justice’s (NIJ) [Recidivism Forecasting Challenge](https://nij.ojp.gov/funding/recidivism-forecasting-challenge) that challenged data scientists to forecast the probability that parolees would recidivate within one, two, or three years.
+
+Here's how the NIJ described it:
+
+> The Challenge uses data on roughly 26,000 individuals from the State of Georgia released from Georgia prisons on discretionary parole to the custody of the Georgia Department of Community Supervision (GDCS) for the purpose of post-incarceration supervision between January 1, 2013 and December 31, 2015. 
+
+> The Challenge aims to improve the ability to forecast recidivism using person- and place-based variables with the goal of improving outcomes for those serving a community supervision sentence. We hope through the Challenge to encourage discussion on the topics of reentry, bias/fairness, measurement, and algorithm advancement.
+
+ With one of the highest incarceration rates in the world, U.S. prisons house a vast population of inmates, many of whom are serving time for non-violent offenses. This system, characterized by overcrowding and limited access to effective rehabilitation programs, tends to create a cycle of recidivism rather than offering a path to societal reintegration. The lack of rehabilitative focus not only challenges the prospects of successful reentry for former inmates but also raises significant questions about the broader goals and effectiveness of the penal system in the United States. This systemic issue underscores the need for a paradigm shift towards more rehabilitative and restorative approaches in addressing crime and punishment.
+
+The parole system in Georgia is designed as a means of reintegrating offenders back into society under supervised release, after they have served a portion of their prison sentence. The decision to grant parole is based on several factors, including the nature of the crime, the inmate's behavior while incarcerated, their rehabilitation efforts, and the potential risk to public safety.
+
+Once granted parole, the individual is released into the community but must comply with specific conditions set by the parole board. These conditions often include regular meetings with a parole officer, drug testing, employment requirements, and sometimes restrictions on travel and association. Violating these conditions can result in the revocation of parole and a return to prison.
+
+**Here, we will apply logistic regression to this dataset to predict recidivism among people formerly incarcerated in the Georgia prison system.**
+
+
+## The data
+
+The data for this homework comes from the National Institute for Justice Georgia's “Recidivism Forecasting Challenge.” 
+
+
+> The Challenge uses data on roughly 26,000 individuals from the State of Georgia released from Georgia prisons on discretionary parole to the custody of the Georgia Department of Community Supervision (GDCS) for the purpose of post-incarceration supervision between January 1, 2013 and December 31, 2015. 
+
+
+Before you begin, please take note of the data's terms of use:
+
+> **Privacy and Confidentiality of Data**
+>
+> Any intentional identification of a individuals or unauthorized disclosure of his or her confidential information violates the promise of confidentiality given to the providers of the information. Therefore, users of data agree:  
+>
+> - To use these datasets solely for research or statistical purposes and not for investigation of specific individuals
+> - To make no use of the identity of any individual discovered inadvertently, and to advise NIJ of any such discovery (NIJRecidivismChallenge@usdoj.gov)
+
+I've downloaded the data and performed some initial data munging to get you started (copy and paste this to load the data).
 
 ```{r}
 #| message: false
 library(tidyverse)
 library(tidymodels)
 
-hcmst <- read_csv("data/hcmst.csv") %>% 
-  filter(w1_q21b_year < 2018)
+to_numeric <- function(x){
+  suppressWarnings(y <- as.numeric(x))
+  if_else(is.na(y), max(y+1, na.rm=T), y)
+}
+
+nij <- read_csv("data/NIJ_s_Recidivism_Challenge_Full_Dataset_20240112.csv") %>% 
+  mutate(recidivated = factor(if_else(Recidivism_Within_3years, "Yes", "No"))) %>% 
+  mutate_at(vars(matches("_Arrest_|_Conviction_|Program_Attendances")), to_numeric) %>%
+  mutate_if(is.character, factor) %>% 
+  select(-contains("Recidivism"), -Gang_Affiliated, -Training_Sample, -Supervision_Level_First, - Residence_PUMA) %>% 
+  mutate_if(is.logical, factor)
 
 ```
-Relationships are important!
-
-![](../imgs/ambiguous-couple.jpeg)
-
-Romantic relationships are central to human experience, offering deep connections, companionship, and love. Romantic relationships play a pivotal role in shaping our emotional well-being and overall life satisfaction From the exhilarating rush of falling in love to the profound impact of a break-up, the dynamic emotions, thoughts, and behaviors that characterize romantic relationships hold profound importance in people's lives, significantly influencing their overall happiness and well-being.
-
-Research consistently shows that individuals in satisfying romantic partnerships report higher levels of life satisfaction, mental health, and physical well-being.
-
-However, romantic relationships are not without their challenges. Break-ups, or the dissolution of romantic relationships are major life stressors that can have profound impacts on an individual's psychological and emotional state. Break-ups can lead to feelings of grief, sadness, anger, and even physical symptoms, akin to mourning the loss of a loved one.
-
-For many people, finding and maintaining healthy romantic relationships is an essential component of their overall life fulfillment and emotional stability. So what kinds of romantic relationships remain successful? If a break-up is imminent, can it be forseen?
-
-**In this homework, we will use machine learning to predict whether couples will remain together in 2020 based on demographic and survey information collected in 2017.**
-
-## The data
-
-The data for this homework comes from Stanford University's [How Couples Meet and Stay Together (HCMST) study](https://data.stanford.edu/hcmst2017). This survey features a set of 3,510 survey respondents first surveyed in 2017, who were then followed up with in 2020 (2,107 subjects) and in 2022 (1,722) subjects. We will focus on the participants who were involved in a romantic relationship in 2017 and who responded again to questions in 2020.
 
 
 ## Exercise 1
 
-We want to predict which couples will stay together and which will break up. First, let's see how many breakups we have in our dataset.
+We want to predict which parolees will recidivate within 3 years of release. First, let's see how many recidivists vs non-recidivists we have in our dataset.
 
 ::: {.callout-note icon="false"}
 ## Exercise 1
 
-First, load the data from `data/hcmst.csv`. Then, examine the balance of the classes (0 = broken up, 1 = together) coded by the `w2_brokeup` variable.
+First, load the data using the code show nabove. Then, examine the balance of the classes (1 = recidivated, 0 = no recidivation) coded by the `recidivated` variable. Calculate the proportion who recidivated.
 :::
 
 ## Exercise 2
 
-Before we make a model, let's do some more exploratory data analysis. One variable that seems likely to be highly predictive of whether couples break up is relationship quality. This quality measure is reverse-coded, as shown in the codebook entry below (note: it has been renamed for clarity).
-
-![](../imgs/hcmst-rel-qual-code.png)
+Before we make a model, let's do some further exploratory data analysis. We'll take a look at the Supervision Risk score (`Supervision_Risk_Score_First`). This is a composite score based on a formula considering inmates' prior offenses, age, behavior in prison, and other variables.
 
 ::: {.callout-note icon="false"}
 ## Exercise 2
-
-Make a plot of the **proportion** of couples who broke up by relationship quality. Then, make a plot of the **number** of couples who broke up, plotted by relationship quality. Compare and interpret the two plots. Briefly discuss what this might mean for our ability to predict breakups from just this variable.
+Make a line-plot of the proportion of parolees who recidivated across supervision risk scores, with the proportion on the y-axis and risk scores alon the x-axis.
 :::
 
 
 ## Exercise 3
 
-Let's zoom back out and look at all the variables present in the dataset. A few notes on the variable name formatting:
-
--   `id` indicates respondent id number
--   `w1_` indicates wave 1 (2017); `w2_` indicates wave 2 (2020)
--   `*_p_` indicates a value for the respondent's partner (otherwise, for the respondent)
-
-```{r}
-glimpse(hcmst)
-```
-
-All of these (except `id` and `w2_brokeup`) are variables we might use as **features** in our model. To make sure they are used appropriately, we need to pay attention to the type of feature they are. 
-
-Some of these features are **continuous** (or at least ordered) and some are categorical (or **discrete**). Look through the list of variables and think about which might be continuous, at least in principle. Then complete the exercise below. 
+Let's begin our machine-learning workflow! 
 
 ::: {.callout-note icon="false"}
 ## Exercise 3
-
-Modify the `hcmst` dataset to translate discrete, cateogrical predictors into `factors` and keep continuous variables left as `numeric`. Expand the hint below to see which variables should be kept `numeric`.
-
-::: {.callout-note icon="false" collapse="true"}
-## Hint
-Continuous variables: `w1_age`, `w1_p_age`, `w1_yrsed`, `w1_p_yrsed`, `w1_q21b_year`, `w1_rel_qual`, `w1_sex_frequency`, `w1_polparty`, `w1_p_polparty`, `w1_fam_seen_monthly`, `w1_hh_income`, `w2_shelter_combo_months`
+Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `ID` column before making these splits. Make sure to stratify the train/test splits by our outcome to ensure a representative class balance for our predictions. Call your training and testing splits `train` and `test`
 :::
-:::
-
-::: callout-important
-This is a good place to save your notebook, render it, and confirm that it looks as you expect.
-:::
-
-
 
 ## Exercise 4
 
-Now we can begin our machine-learning workflow!
+We'll begin with a simple model using a single predictor: The initial supervision risk assessment score assigned upon release (`Supervision_Risk_Score_First`). This will let us see how diagnostic the existing parole methodology is.
 
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
-Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `id` column before making these splits. Make sure to stratify the train/test splits by our outcome to ensure a representative class balance for our predictions. Call your training and testing splits `train` and `test`
+Create a workflow and fit a model predicting `recidivated` from `Supervision_Risk_Score_First`. You can add the formula directly to the workflow.
+
 :::
 
 
 ## Exercise 5
 
+Let's examine this model in a few ways. 
+
 ::: {.callout-note icon="false"}
 ## Exercise 5
 
-We will build several models and we'll use k-fold cross-validation to compare them. Set up cross validation with 10 folds. Remember, `tidymodels` calls this "v-fold cross validation".
+1. First, `tidy()` the model and examine the coefficient for `Supervision_Risk_Score_First`. How would you interpret the coefficient? Compare the odds of recidivating for a parolee with a score of 2 to a score of 9.
+2. Calculate the probability of recidivating for parolees with a score of 2 versus 9:  
+    - using `augment()` or `predict()`
+    - manually using `plogis()`
 :::
+
 
 ## Exercise 6
 
-Let's start building our first model. Our first model will use all the available features from Wave 1 (2017) to predict breakups in Wave 2 (2020).
+Consider what you should make of the accuracy score you observe in light of the balance of recidivism you calculated in Exercise 1.
 
 ::: {.callout-note icon="false"}
 ## Exercise 6
 
-Build a workflow to train a logistic regression model. As part of the workflow, create a recipe that selects only the Wave 1 features as predictors.
+Calculate the expected accuracy of a "classifier" that operates by guessing based on the overall probability of recidivism. How does such a "null" model compare to our model in terms of accuracy?
 :::
 
-::: callout-important
-This is a good place to save your notebook, render it, and confirm that it looks as you expect.
-:::
 
 ## Exercise 7
 
-Now let's fit our model in our cross-validation folds and evaluate its performance.
-
-::: {.callout-note icon="false"}
-## Exercise 7
-
-Fit the model to the 10 cross-validation folds and examine its performance with the `collect_metrics()` function.
-:::
-
-
-## Exercise 8
-
-Consider what you should make of the accuracy score you observe in light of the balance of broken-up and together couples you calculated in Exercise 1. 
-
-::: {.callout-note icon="false"}
-## Exercise 8
-
-Calculate the expected accuracy of a "classifier" that operates by guessing based on the overall probability of break-ups. How does such a "null" model compare to our model in terms of accuracy?
-:::
-
-## Exercise 9
-
-To better evaluate our model, we need to employ a metric other than simple accuracy. One option for evaluating classifiers in cases with unbalanced outcome classes is **Balanced Accuracy**. 
+Accuracy can be misleading when there are uneven numbers of positive and negative cases or classes in our data. To better evaluate our model, we need to employ a metric other than simple accuracy. One option for evaluating classifiers in cases with unbalanced outcome classes is **Balanced Accuracy**. 
 
 Balanced accuracy is the average of the model's true positive rate (TPR) and its true negative rate (TNR). Unlike simple accuracy, it is "balanced" because it gives equal weight to positive and negative cases.
 
 ::: {.callout-note icon="false"}
+## Exercise 7
+Calculate the performance of the model. Since the classes are not perfectly balanced, calculate both accuracy and balanced accuracy. In addition, calculate the `sensitivity` (TPR) and `specificity` (TNR) of the model, making sure to use the `event_level = "second"` flag. 
+
+Briefly consider how the TPR and TNR might influence the use of such a model.
+:::
+
+
+::: callout-tip
+The `metric_set()` function can help you do this without coding things up manually.
+
+:::
+
+
+
+
+## Exercise 8
+
+Can we do better with machine learning? 
+
+Let's build a model that brings to bear all of the data we have available from this challenge dataset. Unfortunately, some of the data is missing, so the first thing we will need to do is build a pre-processing recipe to handle these cases.
+
+There are many missing data approaches we might take, but we'll take a relatively simple approach here.
+
+- Where factor variables are missing we will replace them with a new "unknown" factor level
+- Where numeric variables are missing we will 1) create a new binary variable to indicate the case's variable is missing and 2) replace the `NA` with zero.
+
+
+::: callout-tip
+The `Recipes` package includes two helpful functions for previewing the results of a recipe. `prep()` and `bake()` can help you see what your recipe steps will accomplish, without having to train and fit a model. First you `prep()` the recipe, then you `bake()` the data using the prepped recipe.
+
+The schema is:
+
+```r
+the_recipe %>% 
+  prep() %>% 
+  bake(the_data)
+```
+:::
+
+
+::: {.callout-note icon="false"}
+## Exercise 8
+
+Build a recipe to complete the following steps. Use `?` to read the help for each of these new functions to see how they should be used.
+
+1. Add an "unknown" level to any factor variables that are missing data (`step_unknown()`)
+2. Create new columns to indicate where continuous predictors are missing data (`step_indicate_na()`)
+3. Replace `NA` values for continuous predictors with zeroes
+4. Remove the `Supervision_Risk_Score_First` variable (`step_rm()`) -- we just want to ignore this for our machine learning model for comparison purposes.
+
+Then, use `prep()` and `bake()` to see what this does to the training data.
+:::
+
+
+::: {.hidden}
+THIS NEEDS WORK
+::: {.callout-note icon="false" collapse="true"}
+## Deeper dive
+
+Why add a variable indicating the missingness?
+
+If we don't add this variable, imputing the missing values with zero will bias our models' parameters and could reduce its predictive performance.
+
+```{r}
+#| echo: false
+set.seed(123433)
+tibble(
+  x = rnorm(20),
+  y = .7*x + rnorm(20),
+  miss = rbernoulli(20, .2)
+) %>% 
+  mutate(miss = if_else(x < -1.5, "missing", "obs")) %>%
+  ggplot(aes(x=x, y=y)) +
+  geom_point(aes(color = miss)) +
+  geom_smooth(method="lm")
+
+set.seed(123433)
+tibble(
+  x = rnorm(20),
+  y = .7*x + rnorm(20),
+  miss = rbernoulli(20, .2)
+) %>% 
+  mutate(miss = if_else(x < -1.5, "missing", "obs")) %>%
+  mutate(x = if_else(miss=="missing", 0, x)) %>% 
+  ggplot(aes(x=x, y=y)) +
+  geom_point(aes(color = miss)) +
+  geom_smooth(method="lm")
+```
+
+
+
+:::
+:::
+
+
+
 ## Exercise 9
 
-Retrain the model passing `metric_set(accuracy, bal_accuracy)` to the `metrics` argument of `fit_resamples` to calculate accuracy and balanced accuracy.
+If you fit a model using the recipe you have created so far, you will receive at some point a warning that you have a "rank-deficient" model. What does this mean?
 
-What kind of balanced accuracy could we expect from our "null" classifier? How does this compare?
+The term comes from linear algebra, where the **rank** of a matrix is (informally) the number of columns that provide distinct information, i.e. that are not linear combinations of any of the other columns. 
+
+With regression and logistic regression, we can end up with a rank-deficient model whenever:
+
+- any number of predictors have zero variance (i.e. are all the same value)
+- any predictor variables are **exactly** identical to some linear combination of other predictor variables
+
+The two hypothetical datasets below show rank-deficient predictors (`x`): in the first, there is zero variance and in the second, `x3` is exactly equal to two times `x1` plus `x2`.
+
+
+:::: {.columns}
+::: {.column width="40%"}
+
+```{r}
+#| echo: false
+
+tibble(
+  x1 = c(1,1,1,1,1),
+  y = rnorm(5)
+) %>% 
+  mutate(y = round(y, 2)) %>% 
+  knitr::kable()
+  
+```
+:::
+
+::: {.column width="10%"}
+
+:::
+
+::: {.column width="40%"}
+
+```{r}
+#| echo: false
+tibble(
+  x1 = c(1,1.5,3,2,-1),
+  x2 = c(1,1.5,-2,3,5),
+  x3 = 2*x1 + x2,
+  y = rnorm(5)
+) %>% 
+  mutate(y = round(y, 2)) %>% 
+  knitr::kable()
+``` 
+:::
+::::
+
+::: {.callout-note icon="false"}
+## Exercise 9
+Expand the recipe to prevent producing a rank-deficient model, i.e. remove all zero variance predictors and any variables that are linear combinations of one another. I won't tell you exactly how, so look up the help or Google to find the right functions for this purpose.
+
+One set of variables that would cause issues are the `na_ind_...` variables created for the missing drug test values. The reason is structural---if a parolee is missing drug test data for any particular drug it is because they are missing this data for all drugs. Would this produce a rank-deficient model due to zero variance predictors or predictors that are linear combinations of one another?
 :::
 
 ## Exercise 10
 
-Finally, let's close by training a final model and testing its performance on the test set. Typically, we would train multiple models and pick the best based on its cross validation performance. But here, let's consider our ability to predict to future cases with our one model.
-
 ::: {.callout-note icon="false"}
 ## Exercise 10
-
-Retrain the model on the full training data set. Then, use the final model to generate predictions for the testing data.
+Fit and calculate the performance of a model using this recipe. Compare this to the model using just the traditional supervision risk score assessment in terms of accuracy, balanced accuracy, and TPR/TNR.
 :::
 
+
+
 ## Exercise 11
+
+Let's dive in to interpreting the model a bit, by considering two potentially important variables that might be somewhat under a parolee or the parole system and programming control: employment and program attendance. 
+
+We'll examine the relative importance of these two predictors.
 
 ::: {.callout-note icon="false"}
 ## Exercise 11
 
-Using these predictions and the true observed values, calculate the final model's accuracy, true positive rate, true negative rate, and balanced accuracy on the testing set. 
-
-If the model predicts a couple will breakup, what is the expected probability that they actually do? If we compare two couples, one the model predicts will break up and another it predicts will stay together, how many times more likely should we believe it is that couple predicted to break up will do so?
-
+- `tidy()` the model and filter the result to display just the coefficients for these two predictors. Look at the codebook to ensure you are interpeting them correctly in terms of their original predictors. Can you tell which is more important?
+- Interpeting the relative importance of coefficients is easier with standardized predictors. Re-fit the model adding a `step_normalize()` to the recipe and then compare thes coefficients again.
+- Make two line plots to explore the proportion of recidivists across `Program_Attendances` and a binned version of `Percent_Days_Employed` (use 10 bins). Put proportion of recidivists on the y-axis and the predictor on the x-axis. Compare the plots to the relative importance you determined based on the model coefficients---do these two ways of exploring this correspond well?
 
 :::
 
 ## Exercise 12
+
+What does it all mean?
+
+Do employement and/or program attendance reduce the risk of recidivism? Or do other factors that reduce the risk of recidivism support consistency in employment and attendance (e.g. relationships, social support, financial safety)? 
+
+More generally, how do you think should parole decisions should incorporate these kinds of predictive models to support both community safety but also justice and fairness? What does this level of accuracy support? What if you imagine we could make these predictions more accurately (e.g. 95% or 99%)?
+
 ::: {.callout-note icon="false"}
 ## Exercise 12
-
-Having made these calculations, consider what sort of usefulness the model might have, given its predictive performance. Are there applications where it might be put to use (for good or ill)? Write a paragraph or so on your thoughts.
-
+Reflect on the questions above and write 1-2 paragraphs discussing your thoughts.
 :::
 
 
@@ -208,3 +346,4 @@ When you are finished, knit your Quarto document to a PDF file.
 :::
 
 When you are sure it looks good, submit it on Canvas in the appropriate assignment page.
+

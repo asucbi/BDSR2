@@ -3,4 +3,4 @@ format:
     toc: true
     toc-expand: 2
     embed-resources: true
-theme: darkly
+theme: cosmo

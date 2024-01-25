@@ -52,6 +52,7 @@ head(moralDecisions)
 ```
 
 
+# Exercise 1
 ::: {.callout-note icon="false"}
 ## Exercise 1
 
@@ -82,7 +83,7 @@ You may want to jitter your points and adjust the alpha level to make all of the
 
 ```
 
-
+# Exercise 2
 ::: {.callout-note icon="false"}
 ## Exercise 2
 
@@ -95,6 +96,7 @@ Once you've answered that question, use `geom_smooth()` to add smoothed conditio
 
 ```
 
+# Exercise 3
 ::: {.callout-note icon="false"}
 ## Exercise 3
 
@@ -104,7 +106,7 @@ Make your train/test split of the data. Rather than using `initial_split()`, use
 
 ```
 
-
+# Exercise 4
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
@@ -115,6 +117,7 @@ Build one or more model specifications and workflows, depending upon which model
 
 ```
 
+# Exercise 5
 ::: {.callout-note icon="false"}
 ## Exercise 5
 
@@ -125,6 +128,7 @@ Fit one or more very simple model(s) to the training data, predicting `chose_tar
 
 ```
 
+# Exercise 6
 ::: {.callout-note icon="false"}
 ## Exercise 6
 
@@ -135,7 +139,7 @@ Fit one or more complex model(s) to the training data, predicting `chose_targ` f
 
 ```
 
-
+# Exercise 7
 ::: {.callout-note icon="false"}
 ## Exercise 7
 
@@ -146,6 +150,7 @@ Based on your result above, which model do you think will do best on the test se
 
 ```
 
+# Exercise 8
 ::: {.callout-note icon="false"}
 ## Exercise 8
 
@@ -156,6 +161,7 @@ Next, let's see if we can predict reaction times. As a first step, make a histog
 
 ```
 
+# Exercise 9
 ::: {.callout-note icon="false"}
 ## Exercise 9
 
@@ -168,6 +174,7 @@ Make a new variable, `logRT`, and plot the histograms again for that variable.
 
 ```
 
+# Exercise 10
 ::: {.callout-note icon="false"}
 ## Exercise 10
 
@@ -188,6 +195,7 @@ Rather than plotting the raw data, plot the means for each level of the variable
 
 ```
 
+# Exercise 11
 ::: {.callout-note icon="false"}
 ## Exercise 11
 
@@ -205,6 +213,7 @@ What kind of model(s) that you've learned so far would be appropriate for predic
 
 ```
 
+# Exercise 12
 ::: {.callout-note icon="false"}
 ## Exercise 12
 

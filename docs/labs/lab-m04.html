@@ -81,6 +81,18 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a></li>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">Exercise 4</a></li>
+  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5">Exercise 5</a></li>
+  <li><a href="#exercise-6" id="toc-exercise-6" class="nav-link" data-scroll-target="#exercise-6">Exercise 6</a></li>
+  <li><a href="#exercise-7" id="toc-exercise-7" class="nav-link" data-scroll-target="#exercise-7">Exercise 7</a></li>
+  <li><a href="#exercise-8" id="toc-exercise-8" class="nav-link" data-scroll-target="#exercise-8">Exercise 8</a></li>
+  <li><a href="#exercise-9" id="toc-exercise-9" class="nav-link" data-scroll-target="#exercise-9">Exercise 9</a></li>
+  <li><a href="#exercise-10" id="toc-exercise-10" class="nav-link" data-scroll-target="#exercise-10">Exercise 10</a></li>
+  <li><a href="#exercise-11" id="toc-exercise-11" class="nav-link" data-scroll-target="#exercise-11">Exercise 11</a></li>
+  <li><a href="#exercise-12" id="toc-exercise-12" class="nav-link" data-scroll-target="#exercise-12">Exercise 12</a></li>
   </ul>
 </nav>
 </div>
@@ -191,6 +203,9 @@ Learning Objectives
 6:                             Yes                             No</code></pre>
 </div>
 </div>
+</section>
+<section id="exercise-1" class="level1">
+<h1>Exercise 1</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -242,6 +257,9 @@ Tip
 </div>
 </div>
 </div>
+</section>
+<section id="exercise-2" class="level1">
+<h1>Exercise 2</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -256,6 +274,9 @@ Exercise 2
 <p>Once you’ve answered that question, use <code>geom_smooth()</code> to add smoothed conditional means to your plot. Set the <code>method</code> and <code>method.args</code> accordingly, depending upon which model type you think is most appropriate. Additionally, use different colors for each level of <code>Q_type</code> and different linetypes for each level of <code>lastfix_item</code>.</p>
 </div>
 </div>
+</section>
+<section id="exercise-3" class="level1">
+<h1>Exercise 3</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -269,6 +290,9 @@ Exercise 3
 <p>Make your train/test split of the data. Rather than using <code>initial_split()</code>, use <code>group_initial_split()</code> with <code>group</code> set to <code>subj_id</code>. This will make sure that data from an individual subject stays together, and goes into <em>either</em> the test or the train split.</p>
 </div>
 </div>
+</section>
+<section id="exercise-4" class="level1">
+<h1>Exercise 4</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -282,6 +306,9 @@ Exercise 4
 <p>Build one or more model specifications and workflows, depending upon which model(s) you think could be applied to this type of data. Our goal will be to predict whether, on each trial, the participant chose the target or the non-target.</p>
 </div>
 </div>
+</section>
+<section id="exercise-5" class="level1">
+<h1>Exercise 5</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -295,6 +322,9 @@ Exercise 5
 <p>Fit one or more very simple model(s) to the training data, predicting <code>chose_targ</code> from just <code>lastfix_item</code>. Assess the performance on the training data by getting the balanced accuracy, F-measure, and ROC-AUC.</p>
 </div>
 </div>
+</section>
+<section id="exercise-6" class="level1">
+<h1>Exercise 6</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -308,6 +338,9 @@ Exercise 6
 <p>Fit one or more complex model(s) to the training data, predicting <code>chose_targ</code> from just <code>lastfix_item</code>, <code>targ_fix_bias</code> and <code>Q_type</code>. Assess the performance on the training data by getting the balanced accuracy, F-measure, and ROC-AUC.</p>
 </div>
 </div>
+</section>
+<section id="exercise-7" class="level1">
+<h1>Exercise 7</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -321,6 +354,9 @@ Exercise 7
 <p>Based on your result above, which model do you think will do best on the test set? Evaluate all of your models on the test set and see if your expectations were correct.</p>
 </div>
 </div>
+</section>
+<section id="exercise-8" class="level1">
+<h1>Exercise 8</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -334,6 +370,9 @@ Exercise 8
 <p>Next, let’s see if we can predict reaction times. As a first step, make a histogram of reaction times, with separate facets for each <code>Q_type</code></p>
 </div>
 </div>
+</section>
+<section id="exercise-9" class="level1">
+<h1>Exercise 9</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -348,6 +387,9 @@ Exercise 9
 <p>Make a new variable, <code>logRT</code>, and plot the histograms again for that variable.</p>
 </div>
 </div>
+</section>
+<section id="exercise-10" class="level1">
+<h1>Exercise 10</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -372,6 +414,9 @@ Exercise 10
 </ul>
 </div>
 </div>
+</section>
+<section id="exercise-11" class="level1">
+<h1>Exercise 11</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
@@ -393,6 +438,9 @@ Exercise 11
 </ol>
 </div>
 </div>
+</section>
+<section id="exercise-12" class="level1">
+<h1>Exercise 12</h1>
 <div class="callout callout-style-default callout-note no-icon callout-titled">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">

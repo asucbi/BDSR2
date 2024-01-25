@@ -10,7 +10,7 @@
 <link href="m04-02_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.3.433">
 
-  <title>Model Comparison: Simulated Data Example</title>
+  <title>quarto-inpute7f81624</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -390,8 +390,11 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Model Comparison: Simulated Data Example</h1>
-  <p class="subtitle">Behavioral Data Science in R II</p>
+  <h1 class="title"><p>Model Comparison:<br>
+<span style="font-size:75%;">Simulated Data Example</span></p></h1>
+  <p class="subtitle"></p><p>Behavioral Data Science in R II<br>
+Unit 2<br>
+Module 4</p><p></p>
 
 <div class="quarto-title-authors">
 </div>
@@ -399,12 +402,19 @@
 </section>
 <section id="lets-simulate-some-data" class="slide level2">
 <h2>Let’s simulate some data!</h2>
+<div class="cell">
+<style type="text/css">
+.title {
+  font-size: 70px !important;
+}
+</style>
+</div>
 <div style="font-size:75%;">
 <ul>
 <li class="fragment">Simulation exercises are useful because:
 <ul>
 <li class="fragment">It forces us to think about the data-generating process</li>
-<li class="fragment">We can consider how different models perform when we know the ground truth</li>
+<li class="fragment">We can consider how different models/metrics perform when we know the <strong>ground truth</strong></li>
 </ul></li>
 </ul>
 </div>
@@ -531,7 +541,7 @@
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">ggplot</span>(df_sim, <span class="fu">aes</span>(<span class="at">x =</span> x1, <span class="at">y =</span> <span class="fu">as.numeric</span>(Class)<span class="sc">-</span><span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb7-2"><a href="#cb7-2"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'glm'</span>, <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-8-1.png" width="576"></p>
+<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-9-1.png" width="576"></p>
 </div>
 </div>
 </div>
@@ -540,7 +550,7 @@
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">ggplot</span>(df_sim, <span class="fu">aes</span>(<span class="at">x =</span> x2, <span class="at">y =</span> <span class="fu">as.numeric</span>(Class)<span class="sc">-</span><span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb8-2"><a href="#cb8-2"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'glm'</span>, <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-9-1.png" width="576"></p>
+<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-10-1.png" width="576"></p>
 </div>
 </div>
 </div>
@@ -549,7 +559,7 @@
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">ggplot</span>(df_sim, <span class="fu">aes</span>(<span class="at">x =</span> x3, <span class="at">y =</span> <span class="fu">as.numeric</span>(Class)<span class="sc">-</span><span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb9-2"><a href="#cb9-2"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'glm'</span>, <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-10-1.png" width="576"></p>
+<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-11-1.png" width="576"></p>
 </div>
 </div>
 </div>
@@ -558,7 +568,7 @@
 <div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">ggplot</span>(df_sim, <span class="fu">aes</span>(<span class="at">x =</span> x4, <span class="at">y =</span> <span class="fu">as.numeric</span>(Class)<span class="sc">-</span><span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb10-2"><a href="#cb10-2"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'glm'</span>, <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-11-1.png" width="576"></p>
+<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-12-1.png" width="576"></p>
 </div>
 </div>
 </div>
@@ -567,7 +577,7 @@
 <div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a><span class="fu">ggplot</span>(df_sim, <span class="fu">aes</span>(<span class="at">x =</span> x5, <span class="at">y =</span> <span class="fu">as.numeric</span>(Class)<span class="sc">-</span><span class="dv">1</span>)) <span class="sc">+</span> <span class="fu">geom_point</span>(<span class="at">alpha =</span> .<span class="dv">1</span>) <span class="sc">+</span></span>
 <span id="cb11-2"><a href="#cb11-2"></a>    <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">'glm'</span>, <span class="at">method.args =</span> <span class="fu">list</span>(<span class="at">family =</span> <span class="st">"binomial"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-12-1.png" width="576"></p>
+<p><img data-src="m04-02_files/figure-revealjs/unnamed-chunk-13-1.png" width="576"></p>
 </div>
 </div>
 </div>

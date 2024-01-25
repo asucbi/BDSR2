@@ -1,6 +1,11 @@
 ---
-title: "Model Comparison: Real Data Example"
-subtitle: Behavioral Data Science in R II
+title: |
+  | Model Comparison:
+  | <span style="font-size:75%;">Real Data Example</span>
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 4
 format: 
   revealjs:
     css: style.css
@@ -28,6 +33,12 @@ rownames(df) <- NULL
 ```
 
 ## Example data: 
+
+```{css, echo=FALSE}
+.title {
+  font-size: 70px !important;
+}
+```
 
 ### A phoneme categorization experiment with Spanish-English bilinguals
 

@@ -10,7 +10,7 @@
 <link href="m04-01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.3.433">
 
-  <title>(Classification) Model Evaluation Metrics</title>
+  <title>quarto-inputc9ea33eb</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -390,8 +390,11 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">(Classification) Model Evaluation Metrics</h1>
-  <p class="subtitle">Behavioral Data Science in R II</p>
+  <h1 class="title"><p>Model Evaluation Metrics*<br>
+<span style="font-size:75%;">*<em>mostly for classification models</em></span></p></h1>
+  <p class="subtitle"></p><p>Behavioral Data Science in R II<br>
+Unit 2<br>
+Module 4</p><p></p>
 
 <div class="quarto-title-authors">
 </div>
@@ -399,6 +402,13 @@
 </section>
 <section id="the-ml-workflow" class="slide level2">
 <h2>The ML Workflow</h2>
+<div class="cell">
+<style type="text/css">
+.title {
+  font-size: 70px !important;
+}
+</style>
+</div>
 <p><img data-src="../imgs/whole-game-final-performance.png" class="absolute" style="top: 250px; left: 0px; "></p>
 </section>
 <section id="the-ml-workflow-1" class="slide level2">
@@ -418,28 +428,56 @@ How do we compare models and select the best one?
 </ul>
 <p><img data-src="../imgs/whole-game-final-performance3.png" class="absolute" style="top: 250px; left: 0px; "></p>
 </section>
+<section id="loss-function-vs.-evaluation-metric" class="slide level2">
+<h2>Loss Function vs.&nbsp;Evaluation Metric</h2>
+<div class="columns" style="font-size:80%;">
+<div class="fragment column" style="width:50%;">
+<ul>
+<li><span style="font-size:150%"><strong>Loss function</strong></span>
+<ul>
+<li>Minimized when fitting a single model</li>
+<li>Choice of model usually restricts you to one or a small number of options
+<ul>
+<li>Can’t always compare across different model types</li>
+</ul></li>
+</ul></li>
+</ul>
+</div><div class="fragment column" style="width:50%;">
+<ul>
+<li><span style="font-size:150%"><strong>Evaluation Metric</strong></span>
+<ul>
+<li>Minimized/maximized for your <em>final</em> model</li>
+<li>Can be chosen freely depending upon what you’re using a model for
+<ul>
+<li>Can compare different types of models</li>
+</ul></li>
+</ul></li>
+</ul>
+</div>
+</div>
+</section>
 <section id="model-evaluation-metrics" class="slide level2">
 <h2>Model Evaluation Metrics</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <h4 id="regression-models-continuous-output">Regression models (continuous output)</h4>
-<div>
+<div class="fragment">
 <ul>
-<li class="fragment">Root mean squared error (RMSE)</li>
-<li class="fragment">Mean absolute error (MAE)</li>
-<li class="fragment">R<sup>2</sup></li>
+<li>Root mean squared error (RMSE)</li>
+<li>Mean absolute error (MAE)</li>
+<li>R<sup>2</sup></li>
 </ul>
 </div>
 </div><div class="column" style="width:50%;">
 <h4 id="classification-models-categorical-output">Classification models (categorical output)</h4>
-<div>
+<div class="fragment">
 <ul>
-<li class="fragment">Accuracy</li>
-<li class="fragment">Precision</li>
-<li class="fragment">Recall</li>
-<li class="fragment">F-score</li>
-<li class="fragment">ROC Curve</li>
-<li class="fragment">Confusion Matrix</li>
+<li>Accuracy</li>
+<li>Precision</li>
+<li>Recall</li>
+<li>F-score</li>
+<li>ROC Curve</li>
+<li>Confusion Matrix</li>
 </ul>
 </div>
 </div>
@@ -447,8 +485,8 @@ How do we compare models and select the best one?
 </section>
 <section id="a-silly-example-classifying-cats-vs-non-cats" class="slide level2">
 <h2>A silly example: Classifying cats vs non-cats</h2>
-<div class="columns">
-<div class="column" style="width:40%;">
+<div class="columns" style="font-size:65%;">
+<div class="column" style="width:55%;">
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">head</span>(cat_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
@@ -463,11 +501,17 @@ How do we compare models and select the best one?
 6   -0.871      -2.81  no    </code></pre>
 </div>
 </div>
-</div><div class="column" style="width:60%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">ggplot</span>(cat_df, <span class="fu">aes</span>(<span class="at">x =</span> is_cat)) <span class="sc">+</span> <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
+<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-4-1.png" width="960"></p>
+</div>
+</div>
+</div><div class="column" style="width:45%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">ggplot</span>(cat_df, <span class="fu">aes</span>(<span class="at">x =</span> is_cat)) <span class="sc">+</span> </span>
+<span id="cb3-2"><a href="#cb3-2"></a>  <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-5-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -529,7 +573,7 @@ How do we compare models and select the best one?
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a><span class="fu">ggplot</span>(cat_df_imbalanced, <span class="fu">aes</span>(<span class="at">x =</span> is_cat)) <span class="sc">+</span> <span class="fu">geom_bar</span>(<span class="at">stat=</span><span class="st">"count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
-<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-9-1.png" width="960" class="r-stretch"></section>
+<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-11-1.png" width="960" class="r-stretch"></section>
 <section id="our-model-is-suddenly-doing-suspiciously-well" class="slide level2">
 <h2>Our model is suddenly doing suspiciously well…</h2>
 <div class="cell">
@@ -603,7 +647,7 @@ Prediction yes  no
 <div class="fragment column" style="width:60%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-13-1.png" width="960"></p>
+<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-15-1.png" width="960"></p>
 </div>
 </div>
 </div><div class="fragment column absolute" style="top: 150px; left: 600px; width: 40%; ">
@@ -722,7 +766,7 @@ Specificity = \frac{(TN)}{(FP + TN)}
 <span id="cb22-2"><a href="#cb22-2"></a>  <span class="fu">roc_curve</span>(<span class="at">truth =</span> is_cat, .pred_yes) <span class="sc">%&gt;%</span> </span>
 <span id="cb22-3"><a href="#cb22-3"></a>  <span class="fu">autoplot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-19-1.png" width="384"></p>
+<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-21-1.png" width="384"></p>
 </div>
 </div>
 </div>
@@ -734,7 +778,7 @@ Specificity = \frac{(TN)}{(FP + TN)}
 <div class="cell">
 <div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a><span class="fu">ggplot</span>(predictions_imb, <span class="fu">aes</span>(<span class="at">x =</span> fuzziness <span class="sc">+</span> sleepiness, <span class="at">y =</span> is_cat)) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-20-1.png" width="960"></p>
+<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-22-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -743,17 +787,17 @@ Specificity = \frac{(TN)}{(FP + TN)}
 <h2>Decision thresholds</h2>
 <p>Boundary = -2</p>
 
-<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-21-1.png" width="960" class="r-stretch"></section>
+<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-23-1.png" width="960" class="r-stretch"></section>
 <section id="decision-thresholds-2" class="slide level2">
 <h2>Decision thresholds</h2>
 <p>Boundary = +1 (more conservative)</p>
 
-<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-22-1.png" width="960" class="r-stretch"></section>
+<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-24-1.png" width="960" class="r-stretch"></section>
 <section id="decision-thresholds-3" class="slide level2">
 <h2>Decision thresholds</h2>
 <p>Boundary = -5 (less conservative)</p>
 
-<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-23-1.png" width="960" class="r-stretch"></section>
+<img data-src="m04-01_files/figure-revealjs/unnamed-chunk-25-1.png" width="960" class="r-stretch"></section>
 <section id="roc---area-under-the-curve-auc" class="slide level2">
 <h2>ROC - Area under the curve (AUC)</h2>
 <div class="columns">
@@ -762,7 +806,7 @@ Specificity = \frac{(TN)}{(FP + TN)}
 </div><div class="column absolute" style="top: 100px; left: 500px; width: 50%; ">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-24-1.png" width="384"></p>
+<p><img data-src="m04-01_files/figure-revealjs/unnamed-chunk-26-1.png" width="384"></p>
 </div>
 </div>
 <div style="font-size:75%;">
@@ -779,23 +823,15 @@ Specificity = \frac{(TN)}{(FP + TN)}
 </div>
 </div>
 </div>
-</section>
-<section id="log-likelihood" class="slide level2">
-<h2>Log-Likelihood</h2>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>lr_imb_fit <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span> <span class="fu">logLik</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>'log Lik.' -86.51231 (df=3)</code></pre>
-</div>
-</div>
-<ul>
-<li>The degrees of freedom (df) is 3 because there are 3 parameters to be fit:
-<ul>
-<li>Intercept</li>
-<li>Coefficient for predictor 1 (fuzziness)</li>
-<li>Coefficient for predictor 2 (sleepiness)</li>
-</ul></li>
-</ul>
+<!-- ## Log-Likelihood -->
+<!-- ```{r} -->
+<!-- #| echo: true -->
+<!-- lr_imb_fit %>% extract_fit_engine() %>% logLik() -->
+<!-- ``` -->
+<!-- - The degrees of freedom (df) is 3 because there are 3 parameters to be fit: -->
+<!--   - Intercept -->
+<!--   - Coefficient for predictor 1 (fuzziness) -->
+<!--   - Coefficient for predictor 2 (sleepiness) -->
 </section>
 <section id="akaike-information-criterion-1" class="slide level2">
 <h2>Akaike Information Criterion (1)</h2>
@@ -805,7 +841,7 @@ AIC = 2k - 2ln(\hat{L})
 \]</span> <span class="math inline">\(k\)</span> = number of variables<br>
 <span class="math inline">\(\hat{L}\)</span> = maximum likelihood</p>
 </div>
-<div style="font-size: 60%;">
+<div style="font-size: 50%;">
 <ul>
 <li class="fragment">A measure of model fit, with penalization for more parameters
 <ul>
@@ -817,22 +853,15 @@ AIC = 2k - 2ln(\hat{L})
 <li class="fragment"><span class="math inline">\(\Delta\)</span>AIC of ~2 is considered <em>moderate</em> improvement</li>
 <li class="fragment"><span class="math inline">\(\Delta\)</span>AIC of ~4 is considered <em>substantial</em> improvement</li>
 </ul></li>
-<li class="fragment">Most often used when we <em>don’t</em> have a test set, to <em>estimate</em> the out-of-sample performance
-<ul>
-<li class="fragment">When we have a test set, we can just test performance on that directly</li>
-</ul></li>
-<li class="fragment">Similar metrics that penalize model complexity include:
-<ul>
-<li class="fragment">Bayesian Information Criteron (BIC)</li>
-<li class="fragment">Minimum Description Length (MDL)</li>
-</ul></li>
+<li class="fragment">Most often used when we <em>don’t</em> have a test set, to <em>estimate</em> the out-of-sample performance</li>
+<li class="fragment">Similar metrics that penalize model complexity include Bayesian Information Criteron (BIC) and Minimum Description Length (MDL)</li>
 </ul>
 </div>
 </section>
 <section id="akaike-information-criterion-2" class="slide level2">
 <h2>Akaike Information Criterion (2)</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>lr_imb_fit <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span> <span class="fu">logLik</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>lr_imb_fit <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>() <span class="sc">%&gt;%</span> <span class="fu">logLik</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>'log Lik.' -86.51231 (df=3)</code></pre>
 </div>
@@ -847,7 +876,7 @@ AIC = \\
 </div>
 <div class="fragment">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1"></a>lr_imb_fit <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>lr_imb_fit <span class="sc">%&gt;%</span> <span class="fu">extract_fit_engine</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:  stats::glm(formula = ..y ~ ., family = stats::binomial, data = data)

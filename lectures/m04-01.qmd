@@ -1,12 +1,22 @@
 ---
-title: "(Classification) Model Evaluation Metrics"
-subtitle: Behavioral Data Science in R II
-format: 
-  revealjs:
-    css: style.css
+title: | 
+  | Model Evaluation Metrics*
+  | <span style="font-size:75%;">&ast;*mostly for classification models*</span>
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 4
+format: revealjs
+css: style.css
 ---
 
 ## The ML Workflow
+
+```{css, echo=FALSE}
+.title {
+  font-size: 70px !important;
+}
+```
 
 ![](../imgs/whole-game-final-performance.png){.absolute top="250" left="0"}
 
@@ -24,13 +34,32 @@ format:
 
 ![](../imgs/whole-game-final-performance3.png){.absolute top="250" left="0"}
 
+## Loss Function vs. Evaluation Metric
+
+:::{.columns style="font-size:80%;"}
+::: {.fragment .column width="50%"}
+- <span style="font-size:150%">**Loss function**</span>
+  - Minimized when fitting a single model
+  - Choice of model usually restricts you to one or a small number of options
+    - Can't always compare across different model types
+  
+:::
+::: {.fragment .column width="50%"}
+- <span style="font-size:150%">**Evaluation Metric**</span>
+  - Minimized/maximized for your *final* model
+  - Can be chosen freely depending upon what you're using a model for
+    - Can compare different types of models
+  
+:::
+:::
+
 ## Model Evaluation Metrics
 
 ::: columns
 ::: {.column width="50%"}
 #### Regression models (continuous output)
 
-::: incremental
+::: {.fragment}
 -   Root mean squared error (RMSE)
 -   Mean absolute error (MAE)
 -   R<sup>2</sup>
@@ -40,7 +69,7 @@ format:
 ::: {.column width="50%"}
 #### Classification models (categorical output)
 
-::: incremental
+:::{.fragment}
 -   Accuracy
 -   Precision
 -   Recall
@@ -78,18 +107,25 @@ set.seed(123)
 cat_df <- cat_df[sample(1:nrow(cat_df)), ]
 ```
 
-::: columns
-::: {.column width="40%"}
+::: {.columns style="font-size:65%;"}
+::: {.column width="55%"}
 ```{r}
 #| echo: true
 head(cat_df)
 ```
+
+```{r}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point()
+```
+
 :::
 
-::: {.column width="60%"}
+::: {.column width="45%"}
 ```{r}
 #| echo: true
-ggplot(cat_df, aes(x = is_cat)) + geom_bar(stat="count")
+ggplot(cat_df, aes(x = is_cat)) + 
+  geom_bar(stat="count")
 ```
 :::
 :::
@@ -470,17 +506,17 @@ predictions_imb %>%
 ::::
 :::
 
-## Log-Likelihood
+<!-- ## Log-Likelihood -->
 
-```{r}
-#| echo: true
-lr_imb_fit %>% extract_fit_engine() %>% logLik()
-```
+<!-- ```{r} -->
+<!-- #| echo: true -->
+<!-- lr_imb_fit %>% extract_fit_engine() %>% logLik() -->
+<!-- ``` -->
 
-- The degrees of freedom (df) is 3 because there are 3 parameters to be fit:
-  - Intercept
-  - Coefficient for predictor 1 (fuzziness)
-  - Coefficient for predictor 2 (sleepiness)
+<!-- - The degrees of freedom (df) is 3 because there are 3 parameters to be fit: -->
+<!--   - Intercept -->
+<!--   - Coefficient for predictor 1 (fuzziness) -->
+<!--   - Coefficient for predictor 2 (sleepiness) -->
 
 ## Akaike Information Criterion (1)
 
@@ -492,7 +528,7 @@ $k$ = number of variables \
 $\hat{L}$ = maximum likelihood
 :::
 
-::: {.incremental style="font-size: 60%;"}
+::: {.incremental style="font-size: 50%;"}
 * A measure of model fit, with penalization for more parameters
     + Useful when you care about getting the *simplest* model that captures the data
 * Lower values are better.
@@ -500,10 +536,8 @@ $\hat{L}$ = maximum likelihood
     + $\Delta$AIC of ~2 is considered *moderate* improvement
     + $\Delta$AIC of ~4 is considered *substantial* improvement
 * Most often used when we *don't* have a test set, to *estimate* the out-of-sample performance
-    + When we have a test set, we can just test performance on that directly 
-* Similar metrics that penalize model complexity include:
-    + Bayesian Information Criteron (BIC)
-    + Minimum Description Length (MDL)
+* Similar metrics that penalize model complexity include Bayesian Information Criteron (BIC) and Minimum Description Length (MDL)
+
 :::
 
 ## Akaike Information Criterion (2)

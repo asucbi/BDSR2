@@ -1,6 +1,11 @@
 ---
-title: "Model Comparison: Simulated Data Example"
-subtitle: Behavioral Data Science in R II
+title: |
+  | Model Comparison:
+  | <span style="font-size:75%;">Simulated Data Example</span>
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 4
 format: 
   revealjs:
     css: style.css
@@ -14,10 +19,16 @@ library(tidyverse)
 
 ## Let's simulate some data!
 
+```{css, echo=FALSE}
+.title {
+  font-size: 70px !important;
+}
+```
+
 ::: {.incremental style="font-size:75%;"}
 -   Simulation exercises are useful because:
     -   It forces us to think about the data-generating process
-    -   We can consider how different models perform when we know the ground truth
+    -   We can consider how different models/metrics perform when we know the **ground truth**
 :::
 
 ## Let's simulate some data!

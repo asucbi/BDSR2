@@ -20,7 +20,7 @@ Our learning objectives for this module are:
 
 Imagine that Jane has made a moral commitment to not eating veal anymore, despite the fact that veal parmigiana is her favorite dish. She sits down at her favorite Italian restaurant and peruses the menu. Her eyes flit back and forth between her old favorite, veal parmigiana, and her new replacement, chicken parmigiana. She wants to adhere to her new moral code, but the veal is tempting. Just as her eyes happen to have settled on the veal for about 1 s, suddenly the waiter walks up and asks what she would like to order. If the waiter had shown up a second or two later, she might have managed to settle her eyes, and her mind, back on the chicken. But, in that moment, her decision is prompted and she caves, ordering the veal.
 
-The dataset for this lab comes from an experiment in which we tested the idea that our decisions could be swayed by the timing of when we are asked for a response. In the experiment, participants heard moral questions, such as "Is murder ever justifiable?", and non-moral questions, such as "Is Denmark larger than Sweden?" For each question, there were two possible response options, and participants were instructed to click on their preferred choice. 
+The dataset for this lab comes from an experiment in which we (Falandays, Spevack, Pärnamets, & Spivey, 2021) tested the idea that decisions could be swayed by the timing of when one is asked for a response. In the experiment, participants heard moral questions, such as "Is murder ever justifiable?", and non-moral questions, such as "Is Denmark larger than Sweden?" For each question, there were two possible response options, and participants were instructed to click on their preferred choice. 
 
 Unbeknownst to participants, the experiment software was trying to get them to choose one of the two options on each trial. For each question, one of the two responses was randomly designated as the "target" response, and the experimenters used an eye tracker to record the amount of time the participant spent looking at the target response, versus the other response. Only once the participant spent at least 750ms looking at the target option were they prompted to respond. The experimenters hypothesized that participants would be more likely to choose the target when (1) they spent more time looking at the target, relative to the other response, (2) the target was the *last* thing they looked at before being prompted to respond.
 
@@ -132,7 +132,7 @@ Fit one or more very simple model(s) to the training data, predicting `chose_tar
 ::: {.callout-note icon="false"}
 ## Exercise 6
 
-Fit one or more complex model(s) to the training data, predicting `chose_targ` from just `lastfix_item`, `targ_fix_bias` and `Q_type`. Assess the performance on the training data by getting the balanced accuracy, F-measure, and ROC-AUC.
+Fit one or more complex model(s) to the training data, predicting `chose_targ` from `lastfix_item`, `targ_fix_bias` and `Q_type`. Assess the performance on the training data by getting the balanced accuracy, F-measure, and ROC-AUC.
 :::
 
 ```{r}

@@ -13,195 +13,216 @@ editor: source
 Our learning objectives for this module are:
 
 -   Understand basic metrics of model fit, including accuracy, precision, recall, and AIC
--   Use metrics to compare models
--   Understand how model evaluation and comparison is used to select parameters, tune models, and avoid overfitting.
+-   Understand how model evaluation and comparison is used to select and tune models
 :::
 
-In this course, you are going to learn how to build a variety of different machine-learning models--you've already learned linear and logistic regression, as well as the Naive Bayes algorithm, and there will be many more to come. As a data scientist, your goal in every situation is to select an _appropriate_ model for the task at hand. This includes not only figuring out what _type_ of model to use, but also what _variables_ to put in your model as predictors, as well as how to set any model _parameters_.
+![Please don't eat me, Jane!](../imgs/babycow.jpeg){width=75%}
 
-In order to make these choices, we first need some ways to assess how appropriate a given model is--we need to use performance metrics. If we're using a classification model, a simple performance metric is _accuracy_--how often your model correctly classifies new data from the test set. But metrics can get more complicated than that, as we'll see in this module.
+Imagine that Jane has made a moral commitment to not eating veal anymore, despite the fact that veal parmigiana is her favorite dish. She sits down at her favorite Italian restaurant and peruses the menu. Her eyes flit back and forth between her old favorite, veal parmigiana, and her new replacement, chicken parmigiana. She wants to adhere to her new moral code, but the veal is tempting. Just as her eyes happen to have settled on the veal for about 1 s, suddenly the waiter walks up and asks what she would like to order. If the waiter had shown up a second or two later, she might have managed to settle her eyes, and her mind, back on the chicken. But, in that moment, her decision is prompted and she caves, ordering the veal.
 
-```{r}
+The dataset for this lab comes from an experiment in which we (Falandays, Spevack, Pärnamets, & Spivey, 2021) tested the idea that decisions could be swayed by the timing of when one is asked for a response. In the experiment, participants heard moral questions, such as "Is murder ever justifiable?", and non-moral questions, such as "Is Denmark larger than Sweden?" For each question, there were two possible response options, and participants were instructed to click on their preferred choice. 
+
+Unbeknownst to participants, the experiment software was trying to get them to choose one of the two options on each trial. For each question, one of the two responses was randomly designated as the "target" response, and the experimenters used an eye tracker to record the amount of time the participant spent looking at the target response, versus the other response. Only once the participant spent at least 750ms looking at the target option were they prompted to respond. The experimenters hypothesized that participants would be more likely to choose the target when (1) they spent more time looking at the target, relative to the other response, (2) the target was the *last* thing they looked at before being prompted to respond.
+
+The variables in this dataset include:
+
+- `subj_id`: a unique identifier for each participant
+- `trialnum`: an identifier for which trial each row corresponds to (in terms of order within the study)
+- `Q_type`: whether the question was a moral or non-moral one
+- `targ_loc`: whether the "target" response was on the left or right side of the screen
+- `choice_loc`: whether the participant chose the response on the left or right side of the screen
+- `RT`: reaction time
+- `left_fixTime_ms`: time (in milliseconds) spent looking at the response option on the left side of the screen
+- `right_fixTime_ms`: time (in milliseconds) spent looking at the response option on the right side of the screen
+- `Q_id`: a unique identifier for each question
+- `lastfix`: whether the participant looked at the left or right response option last (just before they were prompted to respond)
+- `Q_text`: the text of question they heard
+- `option1_text`: the text of the first response option
+- `option2_text`: the text of the second response option
+
+Start by loading the key libraries and the dataset.
+```{r, eval=FALSE}
 #| message = FALSE
+
 library(tidymodels)
 library(tidyverse)
-library(MASS)
+load("moralDecisions.Rdata") 
 ```
 
-# Data
 
-In this module, we will explore a common situation data scientists encounter, in which they have numerous _potential_ predictor variables, and need to decide which variables to include in a model. We could simply throw all of the data we have into our model and hope for the best, but we often prefer to have the _simplest_ model that captures the data. There are several reasons for this preference, including that more complex models (having more predictors or other parameters to fit) can require much more time and/or data to compute, and that overfitting becomes a bigger risk with more complex models, especially if the training data is small.
-
-To illustrate this point, we will use simulated data. This will let us examine a situation in which we _already know_ which predictor variables are useful, and see how metrics could be used to guide our modeling choices in future situations where we _don't know_ which variables matter.
-
-We will simulate data appropriate for a logistic regression model, which you have been introduced to in earlier modules. First, we generate 5 potential predictor variables, `x1`-`x5`, by drawing samples from a normal distribution with. We will imagine a situation in which we have limited data--`n_observations` is set to just 50.
-
-```{r}
-set.seed(123)
-
-n_observations = 50
-
-df_sim = tibble(x1 = rnorm(n_observations, mean = 0, sd = 2),
-                x2 = rnorm(n_observations, mean = 0, sd = 2),
-                x3 = rnorm(n_observations, mean = 0, sd = 2),
-                x4 = rnorm(n_observations, mean = 0, sd = 2),
-                x5 = rnorm(n_observations, mean = 0, sd = 2)
-                )
-```
-
-In logistic regression, the response variable (below called `z`) represents the log-odds (logit) of the probability of success. We will make `z` a function of the first two predictor variables only, `x1` and `x2`, while `x3`-`x5` will be irrelevant. 
-```{r}
-df_sim = df_sim %>% 
-  mutate(z = .5 + 2*x1 + 3*x2)
-```
-
-Because the response variable is in log-odds units, we next convert it to a standard probability
-```{r}
-df_sim = df_sim %>% 
-  mutate(pr = 1/(1+exp(-z)))
-```
-
-Finally, we can simulate a binary outcome variable, `Class`, by sampling from a binomial distribution using the `rbinom()` function.
-```{r}
-df_sim = df_sim %>%
-  mutate(Class = rbinom(n=nrow(df_sim),size=1,prob=pr)) 
-
-df_sim$Class = factor(df_sim$Class)
-```
-
-# Data Exploration
-
+# Exercise 1
 ::: {.callout-note icon="false"}
 ## Exercise 1
-Let's start by plotting the data a bit to understand what we're dealing with. First, make a scatterplot of variables `x1` and `x2` on the x- and y-axes of the plot, and points colored by `Class`. 
-:::
-```{r}
-ggplot(df_sim, aes(x = x1, y = x2, color = Class)) + geom_point()
-```
-Next, we'll plot the outcome variable, `Class`, as a function of `x1` and `x2` separately, and fit a logistic curve to the data.
-```{r}
-ggplot(df_sim, aes(x = x1, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
-    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
 
-ggplot(df_sim, aes(x = x2, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
-    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+Our first goal will be to make a plot that shows...
+
+- On the y-axis: whether or not the participant chose the target
+- On the x-axis: the time spent fixating the target, minus the time spent fixating the other option
+
+To do this, we will first need to make some new variables:
+
+1. Make a new variable called `chose_targ`, which will be equal to 1 if the participant chose the target, or 0 otherwise
+  - You will need to use `targ_loc` and `choice_loc` to make this variable
+2. Make two new variables, `targ_fixTime` and `nontarg_fixTime`, giving the time spent fixating the target or non-target, respectively. 
+  - You will need to use `left_fixTime_ms`, `right_fixTime_ms`, and `targ_loc`
+3. Make a variable called `targ_fix_bias`, giving the time spent fixating the target *minus* the time spent fixating the non-target
+4. Make a variable called `lastfix_item`, which identifies whether the last fixation before prompting was to the target or non-target
+  - You will need to use `lastfix` and `targ_loc`
+  
+Once you have all the variables, set up your initial plot. 
+
+::: {.callout-tip}
+You may want to jitter your points and adjust the alpha level to make all of the datapoints visible.
+
+:::
+:::
+
+```{r}
+
 ```
+
+# Exercise 2
 ::: {.callout-note icon="false"}
 ## Exercise 2
 
-Make the same plot as above, for variables `x3`, `x4` and `x5`. Explain how the logistic curves are different from above, and why.
+So far, you've learned about three different models: linear regression, and naive Bayes, logistic regression. Which model(s) do you think would be appropriate for this dataset?
+
+Once you've answered that question, use `geom_smooth()` to add smoothed conditional means to your plot. Set the `method` and `method.args` accordingly, depending upon which model type you think is most appropriate. Additionally, use different colors for each level of `Q_type` and different linetypes for each level of `lastfix_item`.
 :::
+
 ```{r}
-ggplot(df_sim, aes(x = x3, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
-    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
 
-ggplot(df_sim, aes(x = x4, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
-    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
-
-ggplot(df_sim, aes(x = x5, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
-    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
 ```
+
+# Exercise 3
 ::: {.callout-note icon="false"}
 ## Exercise 3
 
-Using the normal procedure, split df_sim into testing and training sets. Then, build a model specification for a logistic regression model, with `mode` set to "classification", `engine` set to "glm", and `penalty` and `mixture` set to `NULL`.
+Make your train/test split of the data. Rather than using `initial_split()`, use `group_initial_split()` with `group` set to `subj_id`. This will make sure that data from an individual subject stays together, and goes into *either* the test or the train split.
 :::
 ```{r}
-df_split <- initial_split(df_sim)
-df_train <- training(df_split)
-df_test <- testing(df_split)
+
 ```
 
-```{r}
-log_spec <- logistic_reg(
-  mode = "classification",
-  engine = "glm",
-  penalty = NULL,
-  mixture = NULL
-)
-```
-
+# Exercise 4
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
-Next, build two different formulas for logistic regression models. The first, `f_all` is an overly-complex formula containing all of variables `x1`-`x5`, as well as their interaction terms. Build a second formula, `f_real`, containing just two terms for `x1` and `x2`. Then, fit two models to the training data using each formula
+Build one or more model specifications and workflows, depending upon which model(s) you think could be applied to this type of data. Our goal will be to predict whether, on each trial, the participant chose the target or the non-target.
 :::
-```{r}
-f_all <- formula(Class ~ x1 * x2 * x3 * x4 * x5)
-
-f_real <- formula(Class ~ x1 + x2)
-```
 
 ```{r}
-m_real <- workflow() %>% 
-  add_model(log_spec) %>% 
-  add_formula(f_real) %>% 
-  fit(data = df_train)
 
-m_all <- workflow() %>% 
-  add_model(log_spec) %>% 
-  add_formula(f_all) %>% 
-  fit(data = df_train) 
-```
-We will create a metric set, `multi_metric`, which will pull the accuracy, precision, recall, and F-score for each model.
-
-```{r}
-multi_metric <- metric_set(accuracy,precision,recall)
 ```
 
+# Exercise 5
 ::: {.callout-note icon="false"}
 ## Exercise 5
 
-As you've done previously, augment the training data with predictions from the model, and then extract the metrics.
+Fit one or more very simple model(s) to the training data, predicting `chose_targ` from just `lastfix_item`. Assess the performance on the training data by getting the balanced accuracy, F-measure, and ROC-AUC.
 :::
+
 ```{r}
-m_real %>% augment(df_train) %>% multi_metric(truth=Class, estimate=.pred_class)
+
 ```
 
-Another useful model metric is called Aikaike Information Criterion, or AIC. AIC is influenced by model fit, but also by model complexity. As such, this metric can help us to choose the simplest model that captures the data effectively. Models with a worse fit, or with more terms than necessary, will make the AIC go up, so lower scores are better.
-
-To get the AIC of the model, we can extract the model fit using `extract_fit_engine()` and pipe it to the `AIC()` command.
-```{r}
-m_real %>% extract_fit_engine() %>% AIC()
-```
-
+# Exercise 6
 ::: {.callout-note icon="false"}
 ## Exercise 6
 
-Now, repeat the steps above for the more complex model, `m_all`
+Fit one or more complex model(s) to the training data, predicting `chose_targ` from `lastfix_item`, `targ_fix_bias` and `Q_type`. Assess the performance on the training data by getting the balanced accuracy, F-measure, and ROC-AUC.
 :::
 
 ```{r}
-m_all %>% augment(df_train) %>% multi_metric(truth=Class, estimate=.pred_class)
 
 ```
 
-```{r}
-m_all %>% extract_fit_engine() %>% AIC()
-```
-
-From fitting the models to the training data, we can see that `m_real` (the model with only the real predictors, `x1` and `x2`) does very well. The model with every possible predictor, `m_all` does _perfectly_, but we can see that its AIC value is much higher--64, relative to 29 in the simpler model. This suggests that `m_all` is overly complex, and perhaps our perfect performance is actually an indication that our model is overfit! We can confirm this by evaluating model performance on the test data.
-
+# Exercise 7
 ::: {.callout-note icon="false"}
 ## Exercise 7
 
-Repeat the model evaluation for `m_all` and `m_real`, but this time on the testing data.
+Based on your result above, which model do you think will do best on the test set? Evaluate all of your models on the test set and see if your expectations were correct.
 :::
-```{r}
-m_all %>% augment(df_test) %>% multi_metric(truth=Class, estimate=.pred_class)
-
-```
-The much more complex model, which did perfectly on the training set, only gets around 38% accuracy on the test data!
 
 ```{r}
-m_real %>% augment(df_test) %>% multi_metric(truth=Class, estimate=.pred_class)
 
 ```
 
-On the other hand, the model with only the real predictors, `m_real`, still does quite well on the training data. 
+# Exercise 8
+::: {.callout-note icon="false"}
+## Exercise 8
 
-# Takeaway Lesson
+Next, let's see if we can predict reaction times. As a first step, make a histogram of reaction times, with separate facets for each `Q_type`
+:::
 
-This exercise illustrates the importance of thinking carefully about model building. If we don't know which variables are useful for predicting an outcome, and we simply throw everything into our model, we can run into problems when there is limited data. In this example, the overly-complex model does perfectly on the training set, but we can see how this is a result of overfitting--the same model does very poorly on the test set. Meanwhile, the simpler model has slightly worse accuracy on the training set, but turns out to be the best model overall. 
+```{r}
 
-In this situation, we knew in advance what the better model would be, because we used simulated data that came from a known function. Of course, in most situations that won't be true. As such, you'll need to use performance metrics to evaluate and compare models as you build them. 
+```
+
+# Exercise 9
+::: {.callout-note icon="false"}
+## Exercise 9
+
+Reaction times are not typically normally distributed, because they have a minimum at 0, and tend to have a long tail (a small number of trials with very long RTs). We can use a log transformation to try to make them closer to normal distribution, which will allow the data to fit the assumptions of our models.
+
+Make a new variable, `logRT`, and plot the histograms again for that variable.
+:::
+
+```{r}
+
+```
+
+# Exercise 10
+::: {.callout-note icon="false"}
+## Exercise 10
+
+Next, we'll make three plots. In each case, the y-axis will be `logRT`, and the x-axes will be:
+
+1. `Q_type`
+2. `chose_targ`
+3. `trialnum`
+
+Rather than plotting the raw data, plot the means for each level of the variable on the x-axis. You can do this in a few ways:
+
+- Use `group_by()` and `summarise()` to get the means in a separate dataframe before plotting
+- In your plot, use `stat_summary()` instead of `geom_point()` (Tip: with `stat_summary`, set `group = 1` if you get an error about each group having only one observation)
+- In your plot, use `geom_smooth()` to plot smoothed conditional means.
+:::
+
+```{r}
+
+```
+
+# Exercise 11
+::: {.callout-note icon="false"}
+## Exercise 11
+
+What kind of model(s) that you've learned so far would be appropriate for predicting reaction time? Pick an appropriate model type and follow the same basic steps you did before:
+
+1. Make the train/test split (we need to redo this, since we didn't have `logRT` in our dataset before)
+2. Make the model specification and workflow
+3. Build one model predicting `logRT` from just `Q_type`
+4. Build a second model predicting `logRT` from `Q_type`, `chose_targ` and `trialnum`
+5. Pick appropriate metrics and evaluate your models on the training data. Which do you think will be best?
+6. Evaluate your models on the test data. Was your guess correct?
+:::
+
+```{r}
+
+```
+
+# Exercise 12
+::: {.callout-note icon="false"}
+## Exercise 12
+
+Make one last model with all predictors from the previous model, but also include `subj_id` as a predictor. 
+
+- Does this model perform better or worse on the **training** set?
+- Does it perform better or worse on the **test** set? Why?
+:::
+
+```{r}
+
+```
+
+

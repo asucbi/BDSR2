@@ -1,0 +1,312 @@
+---
+title: |
+  | Model Comparison:
+  | <span style="font-size:75%;">Simulated Data Example</span>
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 4
+format: 
+  revealjs:
+    css: style.css
+---
+
+```{r}
+#| message = FALSE
+library(tidymodels)
+library(tidyverse)
+```
+
+## Let's simulate some data!
+
+```{css, echo=FALSE}
+.title {
+  font-size: 70px !important;
+}
+```
+
+::: {.incremental style="font-size:75%;"}
+-   Simulation exercises are useful because:
+    -   It forces us to think about the data-generating process
+    -   We can consider how different models/metrics perform when we know the **ground truth**
+:::
+
+## Let's simulate some data!
+
+::: {.incremental style="font-size:75%;"}
+-   We'll make some data appropriate for logistic regression, with:
+    -   A binary `Class` variable
+    -   Five predictor variables, `x1`-`x5`
+        -   Two of these (`x1` & `x2`) will be **real** predictors (they actually contribute to the outcome)
+        -   The other three will be red herrings (they have nothing to do with the outcome; they're pure noise)
+:::
+
+## Steps to make our data
+
+::: {style="font-size:75%;"}
+Recall the general form of the logistic regression equation:
+
+$$\hat{p(y)} = \frac{1}{1 + e^{-(\alpha + \beta x)}}$$
+:::
+
+## Steps to make our data
+
+::: {style="font-size:75%;"}
+With two predictors it would look like this:
+
+$$\hat{p(y)} = \frac{1}{1 + e^{-(\alpha + \beta_1 x_1 + \beta_2 x_2)}}$$
+:::
+
+::: {.incremental style="font-size:60%;"}
+1.  Randomly generate observations for 5 predictor variables
+    -   by sampling from a normal distribution
+2.  Generate the *linear* component, as a function of an intercept ($\alpha$) and **two** of our predictor variables ($x_1$ & $x_2$)
+    -   $\alpha + \beta_1 x_1 + \beta_2 x_2$
+3.  Plug the linear component into the logistic function
+    -   This gives us $\hat{p(y)}$
+4.  Use $\hat{p(y)}$ to get actual values for $y$
+    -   by sampling from the binomial distribution
+:::
+
+## 
+
+### 1. Generate 5 predictors
+
+```{r}
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+n_observations = 50
+
+df_sim = tibble(x1 = rnorm(n_observations, mean = 0, sd = 2),
+                x2 = rnorm(n_observations, mean = 0, sd = 2),
+                x3 = rnorm(n_observations, mean = 0, sd = 2),
+                x4 = rnorm(n_observations, mean = 0, sd = 2),
+                x5 = rnorm(n_observations, mean = 0, sd = 2),
+                noise = rnorm(n_observations, mean = 0, sd = 1)
+                )
+```
+
+## 
+
+### 2. Make the linear component
+
+Remember that the linear outcome variable `z` represents the *log odds* of "success" (meaning $y = 1$)
+
+```{r}
+#| echo: true
+df_sim = df_sim %>% 
+  mutate(z = .5 + 2*x1 + 3*x2 + noise)
+```
+
+## 
+
+### 3. Convert log odds to $\hat{p(y)}$
+
+```{r}
+#| echo: true
+df_sim = df_sim %>% 
+  mutate(pr = 1/(1+exp(-z)))
+```
+
+## 
+
+### 4. Generate actual observations $y_i$ from $\hat{p(y_i)}$
+
+```{r}
+#| echo: true
+df_sim = df_sim %>%
+  mutate(Class = rbinom(n=nrow(df_sim),size=1,prob=pr)) 
+
+df_sim$Class = factor(df_sim$Class)
+```
+
+## Finalize our simulated dataset
+
+```{r}
+#| echo: true
+df_sim <- df_sim %>% 
+  select(-c(noise,z,pr))
+
+head(df_sim)
+```
+
+## Data Exploration
+
+::: {.panel-tabset style="font-size:75%;"}
+## x1
+
+```{r, fig.width=6,fig.height=4}
+#| echo: true
+ggplot(df_sim, aes(x = x1, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+```
+
+## x2
+
+```{r, fig.width=6,fig.height=4}
+#| echo: true
+ggplot(df_sim, aes(x = x2, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+```
+
+## x3
+
+```{r, fig.width=6,fig.height=4}
+#| echo: true
+ggplot(df_sim, aes(x = x3, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+```
+
+## x4
+
+```{r, fig.width=6,fig.height=4}
+#| echo: true
+ggplot(df_sim, aes(x = x4, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+```
+
+## x5
+
+```{r, fig.width=6,fig.height=4}
+#| echo: true
+ggplot(df_sim, aes(x = x5, y = as.numeric(Class)-1)) + geom_point(alpha = .1) +
+    geom_smooth(method = 'glm', method.args = list(family = "binomial"))
+```
+:::
+
+## Make train-test split
+
+```{r}
+#| echo: true
+df_split <- initial_split(df_sim)
+df_train <- training(df_split)
+df_test <- testing(df_split)
+```
+
+## Make a specification for a logistic regression model
+
+```{r}
+#| echo: true
+log_spec <- logistic_reg(
+  mode = "classification",
+  engine = "glm",
+  penalty = NULL,
+  mixture = NULL
+)
+```
+
+## Train two models
+
+::: {style="font-size:75%;"}
+-   First, we'll make two model formulas:
+    -   A simple (and true) formula with just `x1` and `x2` as predictors
+    -   An overly complex model with `x1`-`x5`
+
+```{r}
+#| echo: true
+f_real <- formula(Class ~ x1 + x2)
+
+f_all <- formula(Class ~ x1 * x2 * x3 * x4 * x5)
+```
+
+::: fragment
+-   Then, we'll fit both models on the training data
+
+```{r, warning=FALSE}
+#| echo: true
+fit_real <- workflow() %>% 
+  add_model(log_spec) %>% 
+  add_formula(f_real) %>% 
+  fit(data = df_train)
+
+fit_all <- workflow() %>% 
+  add_model(log_spec) %>% 
+  add_formula(f_all) %>% 
+  fit(data = df_train) 
+```
+:::
+:::
+
+## 
+
+### Evaluate performance on the training set
+
+```{r}
+#| echo: true
+multi_metric <- metric_set(bal_accuracy, f_meas, roc_auc)
+```
+
+::: fragment
+::: panel-tabset
+## Real model
+
+::: {style="font-size:75%;"}
+```{r}
+#| echo: true
+fit_real %>% 
+  augment(df_train) %>% 
+  multi_metric(truth=Class, estimate=.pred_class, .pred_1, event_level="second")
+```
+
+\
+
+```{r}
+#| echo: true
+fit_real %>% 
+  extract_fit_engine() %>% 
+  AIC()
+```
+:::
+
+## Full model
+
+::: {style="font-size:75%;"}
+```{r}
+#| echo: true
+fit_all %>% 
+  augment(df_train) %>% 
+  multi_metric(truth=Class, estimate=.pred_class, .pred_1, event_level="second")
+```
+
+\
+
+```{r}
+#| echo: true
+fit_all %>% 
+  extract_fit_engine() %>% 
+  AIC()
+```
+:::
+:::
+:::
+
+## 
+
+### Evaluate performance on the test set
+
+::: panel-tabset
+## Real model
+
+::: {style="font-size:75%;"}
+```{r}
+#| echo: true
+fit_real %>% 
+  augment(df_test) %>% 
+  multi_metric(truth=Class, estimate=.pred_class, .pred_1, event_level="second")
+```
+:::
+
+## Full model
+
+::: {style="font-size:75%;"}
+```{r}
+#| echo: true
+fit_all %>% 
+  augment(df_test) %>% 
+  multi_metric(truth=Class, estimate=.pred_class, .pred_1, event_level="second")
+```
+:::
+:::

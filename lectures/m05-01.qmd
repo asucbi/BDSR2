@@ -1,0 +1,794 @@
+---
+title: | 
+  | Introducing the 
+  | <U>K-Nearest Neighbors (kNN)</U> 
+  | Algorithm
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 5
+format: 
+  revealjs:
+    css: style.css
+---
+
+## "Birds of a feather flock together"
+
+```{css, echo=FALSE}
+.title {
+  font-size: 90px !important;
+}
+```
+
+:::{.r-stack}
+![](../imgs/birdsofafeather.png){width="600" .absolute top="81.15" left="200"}
+
+![](../imgs/birdsofafeather2.png){.fragment width="600" .absolute top="80" left="200"}
+![](../imgs/birdsofafeather3.png){.fragment width="600" .absolute top="80" left="200"}
+
+:::
+
+## <span style="font-size:90%;">The K-Nearest Neighbors (kNN) Algorithm</span>
+### <span style="font-size:90%;text-decoration:underline">for Classification</span>
+```{r}
+library(ggplot2)
+library(tidymodels)
+
+set.seed(123)
+
+n_observations = 5000
+
+full_df = tibble(fuzziness = rnorm(n_observations, mean = 0, sd = 2),
+                sleepiness = rnorm(n_observations, mean = 0, sd = 2),
+                noise = rnorm(n_observations,mean=0,sd=1)) %>% 
+  mutate(z = .5 + fuzziness + sleepiness + noise) %>% 
+  mutate(pr = 1/(1+exp(-z))) %>% 
+  mutate(is_cat = rbinom(n=n_observations,size=1,prob=pr)) %>% 
+  mutate(is_cat = ifelse(is_cat == 1, "yes", "no")) 
+
+full_df$is_cat = factor(full_df$is_cat, levels = c("yes","no"))
+
+full_df <- full_df[,c(1,2,6)]
+
+cat_df <- rbind(full_df[which(full_df$is_cat == "yes")[1:101],], full_df[which(full_df$is_cat == "no")[1:100],]) 
+
+set.seed(123)
+cat_df <- cat_df[sample(1:nrow(cat_df)), ]
+
+cat_df = cat_df %>% 
+  mutate(euc_dist = sqrt((fuzziness - 3.125)^2 + (sleepiness - -1.2)^2)) %>% 
+  arrange(euc_dist) %>% 
+  mutate(highlight_pt1 = ifelse(euc_dist <= euc_dist[7],1,0)) %>% 
+  mutate(fuzziness_dist = abs(fuzziness - 3.125)) %>% 
+  arrange(fuzziness_dist) %>% 
+  mutate(highlight_pt2 = ifelse(fuzziness_dist <= fuzziness_dist[7], 1, 0)) 
+
+```
+
+:::{.columns}
+
+::: {.column width="60%"}
+
+::::{.r-stack}
+
+::::: {.fragment fragment-index=1}
+```{r, fig.width=6, fig.height=5}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point()
+```
+:::::
+
+::::: {.fragment fragment-index=4}
+```{r,fig.width=6, fig.height=5}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point() +
+  geom_point(aes(x = 3.125, y = -1.2), color='black', shape = "X", size=5)
+```
+:::::
+
+::::: {.fragment fragment-index=5}
+```{r,fig.width=6, fig.height=5}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point(alpha=.4) +
+  geom_point(aes(x = 3.125, y = -1.2), color='black', shape = "X", size=5) +
+  geom_point(data = cat_df %>% filter(highlight_pt1 == 1), aes(x=fuzziness, y = sleepiness, fill=is_cat), size=3, color="black",pch=21)+
+  guides(fill=FALSE)
+```
+:::::
+
+::::
+
+:::
+
+::: {.column width="40%" .absolute top="125" left="600"}
+::::{style="font-size:65%;"}
+::: {.fragment fragment-index=3 .fade-in-then-semi-out}
+- Store all training data
+  
+:::
+::: {.fragment fragment-index=4 .fade-in-then-semi-out}
+- Get new observation of unknown class that we want to predict
+
+:::
+::: {.fragment fragment-index=5 .fade-in-then-semi-out}
+- Find the *k* nearest points ("neighbors") in training data
+  - Here, *k* = 7
+  
+:::
+::: {.fragment fragment-index=6}
+- Each neighbor gets a "vote" as to the new point's class label and majority wins
+  - Here, "yes" wins with ~71% (5/7) of the vote
+
+:::
+:::::
+:::
+:::
+
+
+## <span style="font-size:90%;">kNN can also be used for <span style="text-decoration:underline;">regression</span></span>
+### <span style="font-size:90%;opacity:0.0;">linebreak</span>
+
+:::{.columns}
+
+::: {.column width="60%"}
+::::{.r-stack}
+
+```{r, fig.width=6, fig.height=5}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point()
+```
+
+::::: {.fragment fragment-index=1}
+```{r,fig.width=6, fig.height=5}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point() +
+  geom_vline(xintercept = 3.125, linetype = "dashed")
+```
+:::::
+
+::::: {.fragment fragment-index=2}
+```{r,fig.width=6, fig.height=5}
+rng = .4
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point(alpha=.4) +
+  geom_vline(xintercept = 3.125, linetype = "dashed") +
+  annotate("rect",xmin = 3.125-rng, xmax = 3.125+rng, ymin=-Inf, ymax = +Inf, alpha=.2, fill="yellow") +
+  geom_point(data = cat_df %>% filter(highlight_pt2 == 1), aes(x=fuzziness, y = sleepiness, fill=is_cat), size=3, color="black",pch=21)+
+  guides(fill=FALSE)
+```
+:::::
+
+::::: {.fragment fragment-index=3}
+```{r,fig.width=6, fig.height=5}
+
+tmp = cat_df %>% filter(highlight_pt2 == 1) %>% summarise(mean_sleepiness = mean(sleepiness))
+rng = .4
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point(alpha=.4) +
+  geom_vline(xintercept = 3.125, linetype = "dashed") +
+  annotate("rect",xmin = 3.125-rng, xmax = 3.125+rng, ymin=-Inf, ymax = +Inf, alpha=.2, fill="yellow") +
+  geom_point(data = cat_df %>% filter(highlight_pt2 == 1), aes(x=fuzziness, y = sleepiness, fill=is_cat), size=3, color="black",pch=21)+
+  geom_point(aes(x = 3.125, y = tmp$mean_sleepiness), color='black', shape = "X", size=5)+
+  guides(fill=FALSE)
+```
+:::::
+::::
+:::
+
+:::{.column width="40%"}
+
+::::{style="font-size:60%;"}
+::::: {.fragment fragment-index=1 .fade-in-then-semi-out}
+- Get a *partial* observation of new data, e.g.:
+  - <span style="font-size:90%;">We **observe** the `fuzziness` score of the new point</span>
+  - <span style="font-size:90%;">We want to **predict** the `sleepiness` score</span>
+  
+:::::
+
+::::: {.fragment fragment-index=2 .fade-in-then-semi-out}
+- Find the *k* nearest points (this time just w.r.t the `fuzziness` dimension)
+:::::
+
+::::: {.fragment fragment-index=3}
+- Take their mean `sleepiness` score as a **prediction** of the new point's `sleepiness` score
+  
+:::::
+::::
+:::
+
+:::
+
+## What does "nearest" mean?
+
+::: {.fragment .fade-in-then-semi-out fragment-index=1}
+- We need to choose a **distance metric**
+:::
+::: {.fragment .fade-in fragment-index=2}
+- Euclidean distance ($d$) is a common choice
+:::
+:::{.fragment .fade-in fragment-index=3}
+<span style="font-size:75%;">For two points $p$ and $q$ in $N$-dimensional space:</span>
+
+$$
+d(p,q) = \sqrt{\sum_{i=1}^{N} (p_i - q_i)^2}
+$$
+
+:::
+
+## What does "nearest" mean?
+
+:::{.r-stack}
+:::: {.fragment .fade-out fragment-index=1}
+E.g. in two dimensions, $x$ and $y$
+
+![](../imgs/eucdist.png){width="500" .absolute top="150" left="250"}
+::::
+
+:::: {.fragment .fade-in fragment-index=1}
+E.g. in three dimensions, $x$ and $y$ and $z$
+
+![](../imgs/3dDist.png){width="500" .absolute top="150" left="250"}
+::::
+:::
+
+## Attributes of kNN
+
+::::{style="font-size:80%;"}
+:::{.fragment .fade-in-then-semi-out}
+- <span style="font-size:120%;">**Supervised**</span>
+  - Requires class labels for training
+
+:::
+
+:::{.fragment .fade-in-then-semi-out}
+- <span style="font-size:120%;">**Non-parametric**</span>
+  - Makes no assumptions about the distribution of the data
+
+:::
+
+:::{.fragment .fade-in-then-semi-out}
+- <span style="font-size:120%;">**Lazy**</span>
+  - Doesn't learn a function
+  - Instead, it memorizes the training data, and generalization of training data doesn't happen until we query for a prediction
+  
+:::
+
+:::{.fragment}
+- <span style="font-size:120%;">**Non-linear decision boundary**</span>
+
+:::
+::::
+
+## Linear vs Non-linear classifiers
+
+```{r}
+# First make a grid
+set.seed(123)
+n <- 1000
+pred.mat <- expand.grid(
+  fuzziness = with(cat_df, seq(min(fuzziness), max(fuzziness), length.out = n)),
+  sleepiness = with(cat_df, seq(min(sleepiness), max(sleepiness), length.out = n))
+)
+
+rec <- recipe(is_cat ~ fuzziness + sleepiness, cat_df)
+```
+
+:::{.columns}
+
+::: {.column width="60%"}
+::::{.r-stack}
+
+```{r, fig.width=6, fig.height=5}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point()+
+  ggtitle(" ")
+```
+
+::::: {.fragment fragment-index=1}
+```{r}
+set.seed(123)
+
+lr_spec <- logistic_reg()
+
+lr_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(lr_spec)
+
+lr_fit <-
+  lr_wf %>% 
+  fit(data = cat_df)
+
+tmp <- lr_fit %>% 
+  augment(new_data = pred.mat)
+```
+
+```{r,fig.width=6, fig.height=5}
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
+                   fill = "no"), alpha=.2) +
+  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE)+
+  ggtitle("Logistic Regression Decision Boundary")
+```
+:::::
+
+::::: {.fragment fragment-index=2}
+```{r}
+library(discrim)
+
+set.seed(123)
+
+nb_spec <- 
+  naive_Bayes() %>%
+  set_mode("classification") %>%
+  set_engine("naivebayes")
+
+nb_wf <- workflow() %>%
+  add_recipe(rec) %>% 
+  add_model(nb_spec)
+
+nb_fit <-
+  nb_wf %>% 
+  fit(data = cat_df)
+
+tmp <- nb_fit %>% 
+  augment(new_data = pred.mat)
+```
+
+```{r,fig.width=6, fig.height=5}
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
+                   fill = "no"), alpha=.2) +
+  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE) +
+  ggtitle("Naive Bayes Decision Boundary")
+```
+:::::
+
+::::: {.fragment fragment-index=3}
+
+```{r}
+set.seed(123)
+
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = 7,
+  weight_func = "rectangular"
+)
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = cat_df)
+
+
+tmp <- knn_fit %>% 
+  augment(new_data = pred.mat)
+```
+
+```{r, fig.width=6, fig.height=5}
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
+                   fill = "no"), alpha=.2) +
+  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE)+
+  ggtitle("kNN Decision Boundary with k = 7")
+```
+:::::
+::::
+:::
+
+:::{.column width="40%"}
+::::{.r-stack}
+
+::::: {.fragment .fade-in-then-out fragment-index=1 style="font-size:85%;"}
+\
+
+- The decision boundary for **logistic regression** will always be a <U>line</U>
+  - <span style="font-size:75%;">Technically a *hyperplane*, if we generalize to >2 dimensions</span>
+  
+:::::
+
+::::: {.fragment .fade-in-then-out fragment-index=2 style="font-size:85%;"}
+\
+
+- **Naive Bayes** can produce <U>non-linear</U> decision boundaries
+:::::
+
+::::: {.fragment fragment-index=3 style="font-size:85%;"}
+\
+
+- **kNN** can also produce <U>non-linear</U> decision boundaries
+  
+:::::
+
+::::
+:::
+:::
+
+## Choosing *k*
+
+:::{.columns}
+
+:::: {.column width="50%"}
+
+::::: {.panel-tabset style="font-size:50%;"}
+## k = 1
+
+```{r, fig.width=6, fig.height=5}
+k = 1
+
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = k,
+  weight_func = "rectangular"
+)
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = cat_df)
+
+
+tmp <- knn_fit %>% 
+  augment(new_data = pred.mat)
+
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
+                   fill = "no"), alpha=.2) +
+  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE)+
+  ggtitle(paste("kNN Decision Boundary with k = ", k))
+```
+
+## k = 7
+
+```{r, fig.width=6, fig.height=5}
+k = 7
+
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = k,
+  weight_func = "rectangular"
+)
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = cat_df)
+
+
+tmp <- knn_fit %>% 
+  augment(new_data = pred.mat)
+
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
+                   fill = "no"), alpha=.2) +
+  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE)+
+  ggtitle(paste("kNN Decision Boundary with k = ", k))
+```
+
+## k = 17
+
+```{r, fig.width=6, fig.height=5}
+k = 17
+
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = k,
+  weight_func = "rectangular"
+)
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = cat_df)
+
+
+tmp <- knn_fit %>% 
+  augment(new_data = pred.mat)
+
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
+                   fill = "no"), alpha=.2) +
+  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE)+
+  ggtitle(paste("kNN Decision Boundary with k = ", k))
+```
+
+## k = 67
+
+```{r, fig.width=6, fig.height=5}
+k = 67
+
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = k,
+  weight_func = "rectangular"
+)
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = cat_df)
+
+
+tmp <- knn_fit %>% 
+  augment(new_data = pred.mat)
+
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
+                   fill = "no"), alpha=.2) +
+  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE)+
+  ggtitle(paste("kNN Decision Boundary with k = ", k))
+```
+
+## k = nrow(df)
+
+```{r, fig.width=6, fig.height=5}
+library(kknn)
+k = nrow(cat_df)
+
+#knn_fit <- train.kknn(is_cat ~ fuzziness + sleepiness, cat_df, kmax=nrow(cat_df), k = k, kernel = "rectangular")
+
+knn_fit <- kknn(is_cat ~ fuzziness + sleepiness, cat_df, pred.mat, k = k, kernel = "rectangular")
+
+tmp = pred.mat %>% mutate(.pred_class = knn_fit$fitted.values)
+
+ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
+  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
+                   fill = "yes"), alpha=.2) +
+  geom_point(data = cat_df, aes(color = is_cat)) +
+  guides(fill = FALSE)+
+  ggtitle("kNN Decision Boundary with k = nrow(df)")
+```
+
+:::::
+::::
+
+:::: {.column width="50%" .absolute top="120" left="560" .incremental style="font-size:60%;"}
+- *k* should always be an **odd** number to avoid ties in voting
+- <U>Observe what happens as we increase *k*:</U>
+  - Decision boundary gets smoother
+    
+::::
+:::::
+
+## Choosing *k*
+### <span style="font-size:90%;opacity:0.0;">linebreak</span>
+
+:::{.columns}
+:::: {.column width="55%"}
+
+```{r}
+
+set.seed(123)
+
+n_observations = 5000
+
+full_df = tibble(fuzziness = rnorm(n_observations, mean = 0, sd = 2),
+                sleepiness = rnorm(n_observations, mean = 0, sd = 2),
+                noise = rnorm(n_observations,mean=0,sd=1)) %>% 
+  mutate(z = .5 + fuzziness + sleepiness + noise) %>% 
+  mutate(pr = 1/(1+exp(-z))) %>% 
+  mutate(is_cat = rbinom(n=n_observations,size=1,prob=pr)) %>% 
+  mutate(is_cat = ifelse(is_cat == 1, "yes", "no")) 
+
+full_df$is_cat = factor(full_df$is_cat, levels = c("yes","no"))
+
+full_df <- full_df[,c(1,2,6)]
+
+cat_df <- rbind(full_df[which(full_df$is_cat == "yes")[1:500],], full_df[which(full_df$is_cat == "no")[1:500],])
+
+split <- initial_split(cat_df, strata = is_cat)
+train <- training(split)
+test <- testing(split)
+
+for(i in 1:10){
+  err_rates = tibble(k=numeric(), train_err=numeric(),test_err=numeric())
+  for(k in seq(1, 59, 2)){
+
+    #set.seed(123)
+    knn_fit <- train.kknn(is_cat ~ fuzziness + sleepiness, train, kmax=nrow(train), k = k, kernel = "rectangular")
+    train_preds <- train %>% mutate(.pred_class = predict(knn_fit, train))
+    test_preds <- test %>% mutate(.pred_class = predict(knn_fit, test))
+  
+    train_err = mean(train_preds$is_cat != train_preds$.pred_class)
+    test_err = mean(test_preds$is_cat != test_preds$.pred_class)
+    
+    err_rates = err_rates %>% add_row(k = k, train_err = train_err, test_err = test_err)
+  }
+  
+  if(i == 1){
+    res <- err_rates
+  }else{
+    res$train_err = res$train_err + err_rates$train_err
+    res$test_err = res$test_err + err_rates$test_err
+  }
+}
+res <- res %>% mutate(train_err = train_err / i, test_err = test_err/ i)
+
+res <- res %>% 
+  pivot_longer(cols=ends_with("err"), names_to = "Train/Test", values_to = "Error") %>% 
+  mutate(`Train/Test` = ifelse(`Train/Test` == "train_err", "Train","Test"))
+```
+
+```{r, fig.width=7, fig.height=4.5}
+ggplot(res, aes(x = k, y = Error, color=`Train/Test`)) + geom_line()
+```
+
+::::
+
+:::: {.column width="50%" .absolute top="120" left="560" style="font-size:60%;"}
+- *k* should always be an **odd** number to avoid ties in voting
+- <U>Observe what happens as we increase *k*:</U>
+  - Decision boundary gets smoother
+  - Training error increases asymptotically
+  
+  ::: {.incremental}
+  - Test error decreases until reaching a minima, then gets worse
+    - $k$ = 1 is maximally **overfitting**
+    - $k$ = nrow(df) is maximally **underfitting**
+  :::
+  
+:::{.fragment style="font-size:120%;"}
+- **We'll need a way to search for the optimal value of *k* **
+:::
+    
+::::
+:::::
+
+
+
+## Pros and Cons of kNN
+
+::: {.columns}
+
+:::{style="font-size:60%;"}
+
+::::{.column width="45%" .incremental .absolute left="0" top="100"}
+- <span style="font-size:150%;"><U>**Pros:**</U></span>
+  - Simple & intuitive
+    - Two main hyperparameters
+      - K
+      - Distance metric
+    - But there are more complex versions
+  - Non-parametric
+  - Incremental adaptation 
+    - Adjusts as you add new data
+  - Can be used for both classification and regression
+  - Fast to train
+::::
+
+::::{.column width="45%" .incremental .absolute left="575" top="100"}
+- <span style="font-size:150%;"><U>**Cons:**</U></span>
+  - Doesn't scale well
+    - Need to store entire training set
+    - Slow to predict when data gets large
+  - "Curse of dimensionality"
+    - Prediction gets worse as number of variables gets large
+  - Prone to overfitting
+  - Sensitive to outliers
+  - Bad with imbalanced data
+  - Needs homogenous features for distance calculation
+    - Don't forget to scale your predictors!
+::::
+
+:::
+
+:::
+  
+## kNN with `tidymodels`
+
+```{r}
+set.seed(123)
+
+n_observations = 5000
+
+full_df = tibble(fuzziness = rnorm(n_observations, mean = 0, sd = 2),
+                sleepiness = rnorm(n_observations, mean = 0, sd = 2),
+                noise = rnorm(n_observations,mean=0,sd=1)) %>% 
+  mutate(z = .5 + fuzziness + sleepiness + noise) %>% 
+  mutate(pr = 1/(1+exp(-z))) %>% 
+  mutate(is_cat = rbinom(n=n_observations,size=1,prob=pr)) %>% 
+  mutate(is_cat = ifelse(is_cat == 1, "yes", "no")) 
+
+full_df$is_cat = factor(full_df$is_cat, levels = c("yes","no"))
+
+full_df <- full_df[,c(1,2,6)]
+
+cat_df <- rbind(full_df[which(full_df$is_cat == "yes")[1:101],], full_df[which(full_df$is_cat == "no")[1:100],]) 
+
+set.seed(123)
+cat_df <- cat_df[sample(1:nrow(cat_df)), ]
+
+cat_df = cat_df %>% 
+  mutate(euc_dist = sqrt((fuzziness - 3.125)^2 + (sleepiness - -1.2)^2)) %>% 
+  arrange(euc_dist) %>% 
+  mutate(highlight_pt1 = ifelse(euc_dist <= euc_dist[7],1,0)) %>% 
+  mutate(fuzziness_dist = abs(fuzziness - 3.125)) %>% 
+  arrange(fuzziness_dist) %>% 
+  mutate(highlight_pt2 = ifelse(fuzziness_dist <= fuzziness_dist[7], 1, 0)) 
+```
+
+
+:::{style="font-size:65%;"}
+```{r}
+#| echo: true
+library(kknn)
+
+split <- initial_split(cat_df)
+train <- training(split)
+test <- testing(split)
+
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = 7,
+)
+# - Note: see the documentation for `nearest_neighbor`, because there are additional 
+#   hyperparameters you can set, including options for :
+#   - weighting influence of neighbors by distance
+#   - adjusting the distance metric
+
+knn_wf <- workflow() %>% 
+  add_formula(is_cat ~ fuzziness + sleepiness) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = train)
+
+knn_fit %>% 
+  augment(test) %>% 
+  accuracy(truth= is_cat, estimate=.pred_class, event_level="first")
+```
+
+:::
+
+
+
+

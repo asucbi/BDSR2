@@ -40,15 +40,13 @@ The variables in this dataset include:
 - `option1_text`: the text of the first response option
 - `option2_text`: the text of the second response option
 
-```{r}
+Start by loading the key libraries and the dataset.
+```{r, eval=FALSE}
 #| message = FALSE
+
 library(tidymodels)
 library(tidyverse)
-load("~/Documents/Github/BDSR2/data/moralDecisions.Rdata") 
-```
-
-```{r}
-head(moralDecisions)
+load("moralDecisions.Rdata") 
 ```
 
 

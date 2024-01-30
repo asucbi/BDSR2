@@ -1,0 +1,11 @@
+---
+title: | 
+  | The Bias-Variance Tradeoff
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 5
+format: 
+  revealjs:
+    css: style.css
+---

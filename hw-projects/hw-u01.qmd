@@ -147,7 +147,7 @@ Balanced accuracy is the average of the model's true positive rate (TPR) and its
 
 ::: {.callout-note icon="false"}
 ## Exercise 7
-Calculate the performance of the model. Since the classes are not perfectly balanced, calculate both accuracy and balanced accuracy. In addition, calculate the `sensitivity` (TPR) and `specificity` (TNR) of the model, making sure to use the `event_level = "second"` flag. 
+Calculate the performance of the model on the test data. Since the classes are not perfectly balanced, calculate both accuracy and balanced accuracy. In addition, calculate the `sensitivity` (TPR) and `specificity` (TNR) of the model, making sure to use the `event_level = "second"` flag. 
 
 Briefly consider how the TPR and TNR might influence the use of such a model.
 :::
@@ -235,10 +235,8 @@ tibble(
   geom_smooth(method="lm")
 ```
 
-
-
 :::
-:::
+
 
 
 
@@ -303,7 +301,7 @@ One set of variables that would cause issues are the `na_ind_...` variables crea
 
 ::: {.callout-note icon="false"}
 ## Exercise 10
-Fit and calculate the performance of a model using this recipe. Compare this to the model using just the traditional supervision risk score assessment in terms of accuracy, balanced accuracy, and TPR/TNR.
+Fit and calculate the performance on the test data for a model using this recipe. Compare this to the model using just the traditional supervision risk score assessment in terms of accuracy, balanced accuracy, and TPR/TNR.
 :::
 
 

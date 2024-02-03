@@ -14,6 +14,10 @@ format:
 
 ## "Birds of a feather flock together"
 
+```{r setup}
+knitr::opts_chunk$set(engine = 'R')
+```
+
 ```{css, echo=FALSE}
 .title {
   font-size: 90px !important;
@@ -264,7 +268,7 @@ E.g. in three dimensions, $x$ and $y$ and $z$
 ```{r}
 # First make a grid
 set.seed(123)
-n <- 1000
+n <- 200
 pred.mat <- expand.grid(
   fuzziness = with(cat_df, seq(min(fuzziness), max(fuzziness), length.out = n)),
   sleepiness = with(cat_df, seq(min(sleepiness), max(sleepiness), length.out = n))
@@ -283,7 +287,6 @@ ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) +
   geom_point()+
   ggtitle(" ")
 ```
-
 ::::: {.fragment fragment-index=1}
 ```{r}
 set.seed(123)
@@ -387,6 +390,7 @@ ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
   guides(fill = FALSE)+
   ggtitle("kNN Decision Boundary with k = 7")
 ```
+
 :::::
 ::::
 :::
@@ -419,6 +423,304 @@ ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
 :::
 :::
 
+## <span style="font-size:85%;">When do we need a non-linear classifier?</span>
+
+:::{.columns}
+
+::: {.column width="60%"}
+
+::::{.r-stack}
+
+```{r, fig.width=6, fig.height=5}
+ggplot(cat_df, aes(x = fuzziness, y = sleepiness, color=is_cat)) + 
+  geom_point()+
+  ggtitle(" ")
+```
+
+::::: {.fragment fragment-index=1}
+
+```{r,fig.width=6}
+
+library(ggmap)
+register_stadiamaps(key = "44e7ed1d-754f-464a-a99b-c7958ea8fb66")
+ 
+map<-get_stadiamap(
+  bbox = c(left = 110, bottom = -40, right = 160, top = -10), 
+  zoom = 4, 
+  maptype = "stamen_terrain_background",
+  #color = "bw",
+  force=TRUE)
+
+bb = attr(map, "bb")
+
+make_gold <- function(n, noise_rate){
+  set.seed(123)
+
+  # Generate random data
+  x <- runif(n, -1, 1) # x-coordinates
+  y <- runif(n, -1, 1) # y-coordinates
+  radius <- 0.75 # radius of the circle
+  
+  # Classify points based on whether they are inside or outside the circle
+  labels <- ifelse(x^2 + y^2 <= radius^2, "yes", "no")
+  
+  # Create a data frame
+  gold_df <- data.frame(lon = x, lat = y, found_gold = labels)
+  
+  noisy_indices <- sample(1:n, size = floor(noise_rate * n))
+  
+  gold_df$found_gold[noisy_indices]<-ifelse(gold_df$found_gold[noisy_indices]=="yes","no","no")
+  
+  gold_df$found_gold<- factor(gold_df$found_gold, levels = c("yes","no"))
+  
+  ll.lat_sim <- min(gold_df$lat)
+  ll.lon_sim <- min(gold_df$lon)
+  ur.lat_sim <- max(gold_df$lat)
+  ur.lon_sim <- max(gold_df$lon)
+  
+  gold_df <- gold_df %>% 
+  mutate(lon = bb$ll.lon + (lon - ll.lon_sim) * (bb$ur.lon - bb$ll.lon) / (ur.lon_sim - ll.lon_sim),
+         lat = bb$ll.lat + (lat - ll.lat_sim) * (bb$ur.lat - bb$ll.lat) / (ur.lat_sim - ll.lat_sim))
+  
+  return(gold_df)
+}
+
+gold_df <- make_gold(201, 0.0)
+
+# Plot
+ggmap(map) +
+  annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                   xmax=bb$ur.lon, ymax=bb$ur.lat,
+           fill="black", alpha=0.4)+
+  geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+  scale_color_manual(values=c("gold", "black"))+
+  ggtitle("Locations where gold deposits were found")
+```
+
+:::::
+
+::::: {.fragment fragment-index=2}
+```{r}
+set.seed(123)
+
+n <- 200
+pred.mat2 <- expand.grid(
+  lon = with(gold_df, seq(min(lon), max(lon), length.out = n)),
+  lat = with(gold_df, seq(min(lat), max(lat), length.out = n))
+)
+
+rec2 <- recipe(found_gold ~ lon + lat, gold_df) %>% 
+  step_normalize(all_predictors())
+
+lr_spec <- logistic_reg()
+
+lr_wf <- workflow() %>% 
+  add_recipe(rec2) %>% 
+  add_model(lr_spec)
+
+lr_fit <-
+  lr_wf %>% 
+  fit(data = gold_df)
+
+tmp <- lr_fit %>% 
+  augment(new_data = pred.mat2)
+```
+
+```{r,fig.width=6}
+ggmap(map) +
+  annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                   xmax=bb$ur.lon, ymax=bb$ur.lat,
+           fill="black", alpha=0.4)+
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+  geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+  geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+  scale_color_manual(values=c("gold", "black"))+
+  guides(fill = FALSE)+
+  ggtitle("Logistic Regression Decision Boundary")
+```
+
+:::::
+
+::::: {.fragment fragment-index=3}
+
+```{r,fig.width=6}
+gold_df <- make_gold(201, .3)
+
+lr_fit2 <-
+  lr_wf %>% 
+  fit(data = gold_df)
+
+tmp <- lr_fit2 %>% 
+  augment(new_data = pred.mat2)
+```
+
+```{r,fig.width=6}
+ggmap(map) +
+  annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                   xmax=bb$ur.lon, ymax=bb$ur.lat,
+           fill="black", alpha=0.4)+
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+  geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+  geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+  scale_color_manual(values=c("gold", "black"))+
+  guides(fill = FALSE)+
+  ggtitle("Logistic Regression Decision Boundary")
+```
+
+:::::
+
+::::: {.fragment fragment-index=4}
+```{r}
+library(discrim)
+
+set.seed(123)
+
+nb_spec <- 
+  naive_Bayes() %>%
+  set_mode("classification") %>%
+  set_engine("naivebayes")
+
+nb_wf <- workflow() %>%
+  add_recipe(rec2) %>% 
+  add_model(nb_spec)
+
+nb_fit <-
+  nb_wf %>% 
+  fit(data = gold_df)
+
+tmp <- nb_fit %>% 
+  augment(new_data = pred.mat2)
+```
+
+```{r,fig.width=6}
+ggmap(map) +
+  annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                   xmax=bb$ur.lon, ymax=bb$ur.lat,
+           fill="black", alpha=0.4)+
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+  geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+  geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+  scale_color_manual(values=c("gold", "black"))+
+  guides(fill = FALSE) +
+  ggtitle("Naive Bayes Decision Boundary")
+```
+
+:::::
+
+::::: {.fragment fragment-index=5}
+
+```{r}
+set.seed(123)
+
+knn_spec <- nearest_neighbor(
+  mode = "classification",
+  engine = "kknn",
+  neighbors = 7,
+  weight_func = "rectangular"
+  )
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec2) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = gold_df)
+
+tmp <- knn_fit %>% 
+  augment(new_data = pred.mat2)
+```
+
+```{r, fig.width=6}
+ggmap(map) +
+  annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                   xmax=bb$ur.lon, ymax=bb$ur.lat,
+           fill="black", alpha=0.4)+
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+  stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+  geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+  geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+  scale_color_manual(values=c("gold", "black"))+
+  guides(fill = FALSE) +
+  ggtitle("kNN Decision Boundary with k = 7")
+```
+
+:::::
+::::
+:::
+
+:::{.column width="40%"}
+
+::::: {.fragment fragment-index=1}
+\
+
+- <span style="font-size:85%;">Whenever the class boundary is non-linear!</span>
+
+:::::{style="font-size:70%;"}
+::::{.r-stack}
+
+:::{.fragment fragment-index=2}
+
+```{r}
+
+lr_fit %>% 
+  augment(new_data = gold_df) %>% 
+  bal_accuracy(truth=found_gold, estimate = .pred_class)
+
+```
+
+:::
+
+:::{.fragment fragment-index=3}
+
+```{r}
+
+lr_fit2 %>% 
+  augment(new_data = gold_df) %>% 
+  bal_accuracy(truth=found_gold, estimate = .pred_class)
+
+```
+
+:::
+
+:::{.fragment fragment-index=4}
+
+```{r}
+
+nb_fit %>% 
+  augment(new_data = gold_df) %>% 
+  bal_accuracy(truth=found_gold, estimate = .pred_class)
+
+```
+
+:::
+
+:::{.fragment fragment-index=5}
+
+```{r}
+
+knn_fit %>% 
+  augment(new_data = gold_df) %>% 
+  bal_accuracy(truth=found_gold, estimate = .pred_class)
+
+```
+
+
+:::::
+:::
+
+
+
+::::
+  
+:::::
+
+:::
+:::
+
 ## Choosing *k*
 
 :::{.columns}
@@ -428,163 +730,95 @@ ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
 ::::: {.panel-tabset style="font-size:50%;"}
 ## k = 1
 
-```{r, fig.width=6, fig.height=5}
+```{r, fig.width=6}
 k = 1
 
-knn_spec <- nearest_neighbor(
-  mode = "classification",
-  engine = "kknn",
-  neighbors = k,
-  weight_func = "rectangular"
-)
+k_plot <- function(k, df){
 
-knn_wf <- workflow() %>% 
-  add_recipe(rec) %>% 
-  add_model(knn_spec)
+  knn_spec <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = k,
+    weight_func = "optimal"
+  )
+  
+  rec <- recipe(found_gold ~ lon + lat, df) %>% 
+    step_normalize(all_predictors())
+  
+  knn_wf <- workflow() %>% 
+    add_recipe(rec) %>% 
+    add_model(knn_spec)
+  
+  knn_fit <-
+    knn_wf %>% 
+    fit(data = df)
+  
+  tmp <- knn_fit %>% 
+    augment(new_data = pred.mat2)
+  
+  ggmap(map) +
+    annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                     xmax=bb$ur.lon, ymax=bb$ur.lat,
+             fill="black", alpha=0.4)+
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+    geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+    geom_point(data=df,aes(x = lon, y = lat, color = found_gold)) +
+    scale_color_manual(values=c("gold", "black"))+
+    guides(fill = FALSE)
+}
 
-knn_fit <-
-  knn_wf %>% 
-  fit(data = cat_df)
-
-
-tmp <- knn_fit %>% 
-  augment(new_data = pred.mat)
-
-ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
-                   fill = "yes"), alpha=.2) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
-                   fill = "no"), alpha=.2) +
-  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
-  geom_point(data = cat_df, aes(color = is_cat)) +
-  guides(fill = FALSE)+
-  ggtitle(paste("kNN Decision Boundary with k = ", k))
+k_plot(k, gold_df)
 ```
 
-## k = 7
-
-```{r, fig.width=6, fig.height=5}
-k = 7
-
-knn_spec <- nearest_neighbor(
-  mode = "classification",
-  engine = "kknn",
-  neighbors = k,
-  weight_func = "rectangular"
-)
-
-knn_wf <- workflow() %>% 
-  add_recipe(rec) %>% 
-  add_model(knn_spec)
-
-knn_fit <-
-  knn_wf %>% 
-  fit(data = cat_df)
-
-
-tmp <- knn_fit %>% 
-  augment(new_data = pred.mat)
-
-ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
-                   fill = "yes"), alpha=.2) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
-                   fill = "no"), alpha=.2) +
-  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
-  geom_point(data = cat_df, aes(color = is_cat)) +
-  guides(fill = FALSE)+
-  ggtitle(paste("kNN Decision Boundary with k = ", k))
-```
 
 ## k = 17
 
-```{r, fig.width=6, fig.height=5}
+```{r, fig.width=6}
 k = 17
 
-knn_spec <- nearest_neighbor(
-  mode = "classification",
-  engine = "kknn",
-  neighbors = k,
-  weight_func = "rectangular"
-)
-
-knn_wf <- workflow() %>% 
-  add_recipe(rec) %>% 
-  add_model(knn_spec)
-
-knn_fit <-
-  knn_wf %>% 
-  fit(data = cat_df)
-
-
-tmp <- knn_fit %>% 
-  augment(new_data = pred.mat)
-
-ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
-                   fill = "yes"), alpha=.2) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
-                   fill = "no"), alpha=.2) +
-  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
-  geom_point(data = cat_df, aes(color = is_cat)) +
-  guides(fill = FALSE)+
-  ggtitle(paste("kNN Decision Boundary with k = ", k))
+k_plot(k, gold_df)
 ```
 
 ## k = 67
 
-```{r, fig.width=6, fig.height=5}
+```{r, fig.width=6}
 k = 67
 
-knn_spec <- nearest_neighbor(
-  mode = "classification",
-  engine = "kknn",
-  neighbors = k,
-  weight_func = "rectangular"
-)
+k_plot(k, gold_df)
+```
 
-knn_wf <- workflow() %>% 
-  add_recipe(rec) %>% 
-  add_model(knn_spec)
+## k = 101
 
-knn_fit <-
-  knn_wf %>% 
-  fit(data = cat_df)
+```{r, fig.width=6}
+k = 101
 
-
-tmp <- knn_fit %>% 
-  augment(new_data = pred.mat)
-
-ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
-                   fill = "yes"), alpha=.2) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "no"), 
-                   fill = "no"), alpha=.2) +
-  geom_contour(aes(z = as.numeric(.pred_class == "yes")), colour="black") +
-  geom_point(data = cat_df, aes(color = is_cat)) +
-  guides(fill = FALSE)+
-  ggtitle(paste("kNN Decision Boundary with k = ", k))
+k_plot(k, gold_df)
 ```
 
 ## k = nrow(df)
 
-```{r, fig.width=6, fig.height=5}
+```{r, fig.width=6}
 library(kknn)
-k = nrow(cat_df)
+k = nrow(gold_df)
 
-#knn_fit <- train.kknn(is_cat ~ fuzziness + sleepiness, cat_df, kmax=nrow(cat_df), k = k, kernel = "rectangular")
+knn_fit <- kknn(found_gold ~ lon + lat, gold_df, pred.mat2, k = k, kernel = "rectangular")
 
-knn_fit <- kknn(is_cat ~ fuzziness + sleepiness, cat_df, pred.mat, k = k, kernel = "rectangular")
+tmp = pred.mat2 %>% mutate(.pred_class = knn_fit$fitted.values)
 
-tmp = pred.mat %>% mutate(.pred_class = knn_fit$fitted.values)
+ggmap(map) +
+    annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                     xmax=bb$ur.lon, ymax=bb$ur.lat,
+             fill="black", alpha=0.4)+
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+    geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+    geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+    scale_color_manual(values=c("gold", "black"))+
+    guides(fill = FALSE)
 
-ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
-  stat_contour_filled(aes(z = as.numeric(.pred_class == "yes"), 
-                   fill = "yes"), alpha=.2) +
-  geom_point(data = cat_df, aes(color = is_cat)) +
-  guides(fill = FALSE)+
-  ggtitle("kNN Decision Boundary with k = nrow(df)")
 ```
+
 
 :::::
 ::::
@@ -603,41 +837,25 @@ ggplot(tmp, aes(x=fuzziness, y=sleepiness)) +
 :::{.columns}
 :::: {.column width="55%"}
 
-```{r}
+```{r, eval= FALSE}
+gold_df <-make_gold(301, .15)
 
-set.seed(123)
-
-n_observations = 5000
-
-full_df = tibble(fuzziness = rnorm(n_observations, mean = 0, sd = 2),
-                sleepiness = rnorm(n_observations, mean = 0, sd = 2),
-                noise = rnorm(n_observations,mean=0,sd=1)) %>% 
-  mutate(z = .5 + fuzziness + sleepiness + noise) %>% 
-  mutate(pr = 1/(1+exp(-z))) %>% 
-  mutate(is_cat = rbinom(n=n_observations,size=1,prob=pr)) %>% 
-  mutate(is_cat = ifelse(is_cat == 1, "yes", "no")) 
-
-full_df$is_cat = factor(full_df$is_cat, levels = c("yes","no"))
-
-full_df <- full_df[,c(1,2,6)]
-
-cat_df <- rbind(full_df[which(full_df$is_cat == "yes")[1:500],], full_df[which(full_df$is_cat == "no")[1:500],])
-
-split <- initial_split(cat_df, strata = is_cat)
+split <- initial_split(gold_df)
 train <- training(split)
 test <- testing(split)
 
-for(i in 1:10){
+for(i in 1:100){
+  print(i)
   err_rates = tibble(k=numeric(), train_err=numeric(),test_err=numeric())
-  for(k in seq(1, 59, 2)){
+  for(k in seq(1, 150, 2)){
 
     #set.seed(123)
-    knn_fit <- train.kknn(is_cat ~ fuzziness + sleepiness, train, kmax=nrow(train), k = k, kernel = "rectangular")
+    knn_fit <- train.kknn(found_gold ~ lon + lat, train, kmax=nrow(train), k = k, kernel = "optimal")
     train_preds <- train %>% mutate(.pred_class = predict(knn_fit, train))
     test_preds <- test %>% mutate(.pred_class = predict(knn_fit, test))
   
-    train_err = mean(train_preds$is_cat != train_preds$.pred_class)
-    test_err = mean(test_preds$is_cat != test_preds$.pred_class)
+    train_err = mean(train_preds$found_gold != train_preds$.pred_class)
+    test_err = mean(test_preds$found_gold != test_preds$.pred_class)
     
     err_rates = err_rates %>% add_row(k = k, train_err = train_err, test_err = test_err)
   }
@@ -656,10 +874,12 @@ res <- res %>%
   mutate(`Train/Test` = ifelse(`Train/Test` == "train_err", "Train","Test"))
 ```
 
-```{r, fig.width=7, fig.height=4.5}
+```{r, fig.width=7, fig.height=4.5, eval=FALSE}
 ggplot(res, aes(x = k, y = Error, color=`Train/Test`)) + geom_line()
+ggsave('~/Documents/Github/BDSR2/imgs/err_rate_by_k_optimalkernel.png', width=7, height=4, units="in")
 ```
 
+![](../imgs/err_rate_by_k.png)
 ::::
 
 :::: {.column width="50%" .absolute top="120" left="560" style="font-size:60%;"}
@@ -723,59 +943,29 @@ ggplot(res, aes(x = k, y = Error, color=`Train/Test`)) + geom_line()
   
 ## kNN with `tidymodels`
 
-```{r}
-set.seed(123)
-
-n_observations = 5000
-
-full_df = tibble(fuzziness = rnorm(n_observations, mean = 0, sd = 2),
-                sleepiness = rnorm(n_observations, mean = 0, sd = 2),
-                noise = rnorm(n_observations,mean=0,sd=1)) %>% 
-  mutate(z = .5 + fuzziness + sleepiness + noise) %>% 
-  mutate(pr = 1/(1+exp(-z))) %>% 
-  mutate(is_cat = rbinom(n=n_observations,size=1,prob=pr)) %>% 
-  mutate(is_cat = ifelse(is_cat == 1, "yes", "no")) 
-
-full_df$is_cat = factor(full_df$is_cat, levels = c("yes","no"))
-
-full_df <- full_df[,c(1,2,6)]
-
-cat_df <- rbind(full_df[which(full_df$is_cat == "yes")[1:101],], full_df[which(full_df$is_cat == "no")[1:100],]) 
-
-set.seed(123)
-cat_df <- cat_df[sample(1:nrow(cat_df)), ]
-
-cat_df = cat_df %>% 
-  mutate(euc_dist = sqrt((fuzziness - 3.125)^2 + (sleepiness - -1.2)^2)) %>% 
-  arrange(euc_dist) %>% 
-  mutate(highlight_pt1 = ifelse(euc_dist <= euc_dist[7],1,0)) %>% 
-  mutate(fuzziness_dist = abs(fuzziness - 3.125)) %>% 
-  arrange(fuzziness_dist) %>% 
-  mutate(highlight_pt2 = ifelse(fuzziness_dist <= fuzziness_dist[7], 1, 0)) 
-```
-
-
 :::{style="font-size:65%;"}
 ```{r}
 #| echo: true
+#| eval: false
 library(kknn)
 
-split <- initial_split(cat_df)
+split <- initial_split(gold_df)
 train <- training(split)
 test <- testing(split)
 
 knn_spec <- nearest_neighbor(
   mode = "classification",
   engine = "kknn",
-  neighbors = 7,
+  neighbors = 5,
+  weight_func = NULL,
+  dist_power = NULL
 )
-# - Note: see the documentation for `nearest_neighbor`, because there are additional 
-#   hyperparameters you can set, including options for :
-#   - weighting influence of neighbors by distance
-#   - adjusting the distance metric
+
+rec <- recipe(found_gold ~ lon + lat, train) %>% 
+  step_normalize(all_predictors())
 
 knn_wf <- workflow() %>% 
-  add_formula(is_cat ~ fuzziness + sleepiness) %>% 
+  add_recipe(rec) %>% 
   add_model(knn_spec)
 
 knn_fit <-
@@ -784,8 +974,10 @@ knn_fit <-
 
 knn_fit %>% 
   augment(test) %>% 
-  accuracy(truth= is_cat, estimate=.pred_class, event_level="first")
+  accuracy(truth= found_gold, estimate=.pred_class, event_level="first")
 ```
+
+
 
 :::
 

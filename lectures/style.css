@@ -35,3 +35,10 @@
   overflow-y: auto;
 }
 
+.reveal .slides section.custom-width {
+    max-width: 100vw; /* Set to 100% of the viewport width */
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+

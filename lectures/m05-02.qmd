@@ -9,3 +9,872 @@ format:
   revealjs:
     css: style.css
 ---
+
+## Recap:
+
+### The effect of varying *k* from min-\>max
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(ggplot2)
+library(kknn)
+```
+
+::: {.panel-tabset style="font-size:75%;"}
+```{r}
+library(ggmap)
+register_stadiamaps(key = "44e7ed1d-754f-464a-a99b-c7958ea8fb66")
+ 
+map<-get_stadiamap(
+  bbox = c(left = 110, bottom = -40, right = 160, top = -10), 
+  zoom = 4, 
+  maptype = "stamen_terrain_background",
+  #color = "bw",
+  force=TRUE)
+
+bb = attr(map, "bb")
+
+
+
+make_gold <- function(n, noise_rate, seed=123){
+  set.seed(seed)
+
+  # Generate random data
+  x <- runif(n, -1, 1) # x-coordinates
+  y <- runif(n, -1, 1) # y-coordinates
+  radius <- 0.75 # radius of the circle
+  
+  # Classify points based on whether they are inside or outside the circle
+  labels <- ifelse(x^2 + y^2 <= radius^2, "yes", "no")
+  
+  # Create a data frame
+  gold_df <- data.frame(lon = x, lat = y, found_gold = labels)
+  
+  noisy_indices <- sample(1:n, size = floor(noise_rate * n))
+  
+  gold_df$found_gold[noisy_indices]<-ifelse(gold_df$found_gold[noisy_indices]=="yes","no","no")
+  
+  gold_df$found_gold<- factor(gold_df$found_gold, levels = c("yes","no"))
+  
+  ll.lat_sim <- min(gold_df$lat)
+  ll.lon_sim <- min(gold_df$lon)
+  ur.lat_sim <- max(gold_df$lat)
+  ur.lon_sim <- max(gold_df$lon)
+  
+  gold_df <- gold_df %>% 
+  mutate(lon = bb$ll.lon + (lon - ll.lon_sim) * (bb$ur.lon - bb$ll.lon) / (ur.lon_sim - ll.lon_sim),
+         lat = bb$ll.lat + (lat - ll.lat_sim) * (bb$ur.lat - bb$ll.lat) / (ur.lat_sim - ll.lat_sim))
+  
+  return(gold_df)
+}
+
+gold_df <- make_gold(201,0.35)
+
+n <- 200
+pred.mat2 <- expand.grid(
+  lon = with(gold_df, seq(min(lon), max(lon), length.out = n)),
+  lat = with(gold_df, seq(min(lat), max(lat), length.out = n))
+)
+
+plot_db <- function(knn_fit, df){
+  
+  tmp <- knn_fit %>% 
+    augment(new_data = pred.mat2)
+  
+  ggmap(map) +
+    annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                     xmax=bb$ur.lon, ymax=bb$ur.lat,
+             fill="black", alpha=0.4)+
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+    geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+    geom_point(data=df,aes(x = lon, y = lat, color = found_gold)) +
+    scale_color_manual(values=c("gold", "black"))+
+    guides(fill = FALSE)+
+    ggtitle(paste("kNN Decision Boundary with k = ", k))+
+    theme(text = element_text(size=15))
+}
+
+k_plot <- function(k, df){
+
+  knn_spec <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = k,
+    weight_func = "rectangular"
+  )
+  
+  rec <- recipe(found_gold ~ lon + lat, df) %>% 
+    step_normalize(all_predictors())
+  
+  knn_wf <- workflow() %>% 
+    add_recipe(rec) %>% 
+    add_model(knn_spec)
+  
+  knn_fit <-
+    knn_wf %>% 
+    fit(data = df)
+  
+  plot_db(knn_fit, df)
+}
+
+
+```
+
+## k = 1
+
+```{r, fig.width=8}
+k = 1
+
+k_plot(k, gold_df)
+```
+
+## k = 17
+
+```{r, fig.width=8}
+k = 17
+
+k_plot(k, gold_df)
+```
+
+## k = 67
+
+```{r, fig.width=8}
+k = 67
+
+k_plot(k, gold_df)
+```
+
+## k = 101
+
+```{r, fig.width=8}
+k = 101
+
+k_plot(k, gold_df)
+```
+
+## k = nrow(df)
+
+```{r, fig.width=8}
+library(kknn)
+k = nrow(gold_df)
+
+knn_fit <- kknn(found_gold ~ lon + lat, gold_df, pred.mat2, k = k, kernel = "rectangular")
+
+tmp = pred.mat2 %>% mutate(.pred_class = knn_fit$fitted.values)
+
+ggmap(map) +
+    annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                     xmax=bb$ur.lon, ymax=bb$ur.lat,
+             fill="black", alpha=0.4)+
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "yes")), fill="black", alpha=.2) +
+    stat_contour_filled(data=tmp,aes(z = as.numeric(.pred_class == "no")), fill="gold", alpha=.2) +
+    geom_contour(data=tmp,aes(z = as.numeric(.pred_class == "yes")), colour="black")+
+    geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+    scale_color_manual(values=c("gold", "black"))+
+    guides(fill = FALSE)
+
+```
+:::
+
+## [Fitting on two different subsets of the training set]{style="font-size:65%;"} {.custom-width}
+
+```{r}
+gold_df <- make_gold(300,.35,1)
+
+set.seed(123)
+```
+
+::: {style="font-size:65%;"}
+```{r}
+#| echo: true
+split<- initial_split(gold_df, strata=found_gold)
+test <- testing(split)
+train <- training(split)
+```
+
+::: fragment
+```{r}
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+train_subsample1 <- slice_sample(train,prop=.5)
+train_subsample2 <- slice_sample(train,prop=.5)
+```
+:::
+:::
+
+```{r}
+wfunc <- "optimal"
+#wfunc <- "rectangular"
+
+multi_metric <- metric_set(bal_accuracy, precision, recall)
+
+```
+
+::: {.columns .fragment}
+::: {.column width="50%"}
+::: {.panel-tabset style="font-size:50%;"}
+## sample 1
+
+```{r}
+set.seed(123)
+df=train_subsample1
+k=3
+
+knn_spec <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = k,
+    weight_func = wfunc
+  )
+
+rec <- recipe(found_gold ~ lon + lat, df) %>% 
+    step_normalize(all_predictors())
+  
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit.sml.1 <-
+  knn_wf %>% 
+  fit(data = df)
+```
+
+```{r, fig.width=7}
+plot_db(knn_fit.sml.1, df)
+```
+
+```{r}
+res<-knn_fit.sml.1 %>% 
+  augment(train_subsample1) %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>%
+  select(-.estimator)
+```
+
+::: {.absolute style="font-size:250%;" bottom="20"}
+```{r}
+print(res)
+```
+:::
+
+## sample 2
+
+```{r}
+set.seed(123)
+
+df=train_subsample2
+
+k=3
+
+knn_spec <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = k,
+    weight_func = wfunc
+  )
+
+rec <- recipe(found_gold ~ lon + lat, df) %>% 
+    step_normalize(all_predictors())
+  
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit.sml.2 <-
+  knn_wf %>% 
+  fit(data = df)
+```
+
+```{r, fig.width=7}
+plot_db(knn_fit.sml.2, df)
+```
+
+```{r}
+res<-knn_fit.sml.2 %>% 
+  augment(train_subsample2) %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>%
+  select(-.estimator)
+```
+
+::: {.absolute style="font-size:250%;" bottom="20"}
+```{r}
+print(res)
+```
+:::
+:::
+:::
+
+::: {.column width="50%"}
+::: {.panel-tabset style="font-size:50%;"}
+## sample 1
+
+```{r}
+set.seed(123)
+
+df=train_subsample1
+k=101
+
+knn_spec <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = k,
+    weight_func = wfunc
+  )
+
+rec <- recipe(found_gold ~ lon + lat, df) %>% 
+    step_normalize(all_predictors())
+  
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit.lrg.1 <-
+  knn_wf %>% 
+  fit(data = df)
+```
+
+```{r, fig.width=7}
+plot_db(knn_fit.lrg.1, df)
+```
+
+```{r}
+res<- knn_fit.lrg.1 %>% 
+  augment(train_subsample1) %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>%
+  select(-.estimator)
+```
+
+::: {.absolute style="font-size:250%;" bottom="20"}
+```{r}
+print(res)
+```
+:::
+
+## sample 2
+
+```{r}
+set.seed(123)
+
+df=train_subsample2
+k=101
+
+knn_spec <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = k,
+    weight_func = wfunc
+  )
+
+rec <- recipe(found_gold ~ lon + lat, df) %>% 
+    step_normalize(all_predictors())
+  
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit.lrg.2 <-
+  knn_wf %>% 
+  fit(data = df)
+```
+
+```{r, fig.width=7}
+plot_db(knn_fit.lrg.2, df)
+```
+
+```{r}
+res<-knn_fit.lrg.2 %>% 
+  augment(train_subsample2) %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>%
+  select(-.estimator)
+```
+
+::: {.absolute style="font-size:250%;" bottom="20"}
+```{r}
+print(res)
+```
+:::
+:::
+:::
+:::
+
+## [Comparing their predictions on the test set]{style="font-size:65%;"}
+
+::: columns
+::: {.column width="50%"}
+::: {.panel-tabset style="font-size:65%;"}
+## sample 1
+
+```{r, fig.width=7}
+plot_test_preds <- function(knn_fit, test, k){
+  
+  tmp <- knn_fit %>% 
+    augment(new_data = test) %>% 
+    mutate(correct = factor(ifelse(.pred_class == found_gold,1,0)))
+  
+  ggmap(map) +
+    annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                     xmax=bb$ur.lon, ymax=bb$ur.lat,
+             fill="black", alpha=0.4)+
+    geom_point(data=tmp,aes(x = lon, y = lat, color = .pred_class, shape=correct),size=3,stroke=1.5) +
+    scale_color_manual(values=c("gold", "black"))+
+    scale_shape_manual(values=c(1,4))+
+    guides(fill = FALSE)+
+    ggtitle(paste("Test set predictions with k = ", k))+
+    theme(text = element_text(size=15))
+}
+
+plot_test_preds(knn_fit.sml.1, test, 3)
+```
+
+## sample 2
+
+```{r, fig.width=7}
+plot_test_preds(knn_fit.sml.2, test,3)
+```
+:::
+:::
+
+::: {.column width="50%"}
+::: {.panel-tabset style="font-size:65%;"}
+## sample 1
+
+```{r, fig.width=7}
+plot_test_preds(knn_fit.lrg.1, test,101)
+```
+
+## sample 2
+
+```{r, fig.width=7}
+plot_test_preds(knn_fit.lrg.2, test,101)
+```
+:::
+:::
+:::
+
+::: {.columns style="font-size:75%;"}
+::: {.column width="50%"}
+```{r}
+preds1 <- knn_fit.sml.1 %>% 
+    augment(new_data = test) 
+preds2 <- knn_fit.sml.2 %>% 
+    augment(new_data = test)
+prop_match = round(mean(preds1$.pred_class == preds2$.pred_class),digits=2)
+```
+
+```{r}
+res1 <- preds1 %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>% 
+  select(-.estimator) %>% 
+  mutate(traindata = "sample1") %>% relocate(traindata)
+res2 <- preds2 %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>% 
+  select(-.estimator) %>% 
+  mutate(traindata = "sample2") %>% relocate(traindata)
+res <- rbind(res1,res2)
+```
+
+::: {.fragment fragment-index="1"}
+```{r}
+res
+```
+:::
+
+::: {.fragment fragment-index="2"}
+```{r}
+print(paste("Prediction match b/w fits = ", prop_match))
+```
+:::
+:::
+
+::: {.column width="50%"}
+```{r}
+preds1 <- knn_fit.lrg.1 %>% 
+    augment(new_data = test)
+preds2 <- knn_fit.lrg.2 %>% 
+    augment(new_data = test)
+prop_match = round(mean(preds1$.pred_class == preds2$.pred_class),digits=2)
+```
+
+```{r}
+res1 <- preds1 %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>% 
+  select(-.estimator) %>% 
+  mutate(traindata = "sample1") %>% relocate(traindata)
+res2 <- preds2 %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class) %>% 
+  pivot_wider(names_from=.metric, values_from=.estimate) %>% 
+  select(-.estimator) %>% 
+  mutate(traindata = "sample2") %>% relocate(traindata)
+res <- rbind(res1,res2)
+```
+
+::: {.fragment fragment-index="1"}
+```{r}
+res
+```
+:::
+
+::: {.fragment fragment-index="2"}
+```{r}
+print(paste("Prediction match b/w fits = ", prop_match))
+```
+:::
+:::
+:::
+
+## Bias and Variance
+
+::: {.columns style="font-size:70%;"}
+::: {.column width="50%"}
+-   **Bias**:
+    -   [How far off a model's predictions are from the true values]{style="font-size:80%;"}
+    -   [High bias reflects oversimplification]{style="font-size:80%;"}
+-   **Variance**:
+    -   [How much a model's predictions vary across training sets]{style="font-size:80%;"}
+    -   [High variance reflects overfitting]{style="font-size:80%;"}
+:::
+
+::: {.column width="50%"}
+![](../imgs/BV_targ.png){.fragment width="80%"}
+:::
+:::
+
+::: {.fragment style="font-size:45%;"}
+| Model                   | Assumptions | Flexibility | Bias     | Variance |
+|---------------------------|-------------|-------------|----------|----------|
+| **Linear Regression**   | Strong      | Low         | High     | Low      |
+| **Logistic Regression** | Moderate    | Moderate    | Moderate | Moderate |
+| **Naive Bayes**         | Very Strong | Low         | High     | Low      |
+| **k-Nearest Neighbors** | Weak        | High        | Low      | High     |
+:::
+
+## Bias/Variance Tradeoff
+
+::: {.columns}
+
+:::: {.column width="60%"}
+
+![](../imgs/BV_tradeoff.png)
+
+::::
+
+:::: {.column width="40%" .incremental}
+:::{style="font-size:75%;"}
+- Relevant factors:
+  - Model specification:
+    - Complexity (# of predictors)
+    - Hyperparameters
+    - Irrelevant or correlated features
+  - Training data:
+    - Size
+    - Noise
+    - Representativeness
+:::
+::::
+
+:::
+
+## Regression Example
+### <span style="font-size:60%;">Shows how <U>model complexity</U> relates to over-/under-fitting</span>
+
+```{r}
+# Set seed for reproducibility
+set.seed(123)
+
+# Generate data
+x <- seq(0, 10, length.out = 20)
+a <- -10  # You can adjust this value
+b <- 0.5 # Make sure this is between 0 and 1
+y <- a * b^x + rnorm(length(x), mean = 0, sd = 1) # Adding some noise
+
+traindata <- data.frame(x, y)
+
+x <- seq(0, 10, length.out = 20)
+a <- -10  # You can adjust this value
+b <- 0.5 # Make sure this is between 0 and 1
+y <- a * b^x + rnorm(length(x), mean = 0, sd = 1) # Adding some noise
+
+testdata <- data.frame(x, y)
+```
+
+::: r-stack
+::: {.fragment .fade-out fragment-index="1"}
+```{r, fig.width=6, fig.height=5}
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3)+
+  geom_point(data=testdata, aes(x = x, y = y),size=3)
+```
+
+[$empty$]{.absolute bottom="1" style="font-size:75%;opacity:0.0;"}
+:::
+
+::: {.fragment .fade-in-then-out fragment-index="1"}
+```{r, fig.width=6, fig.height=5}
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3)+
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3)
+```
+
+[$empty$]{.absolute bottom="1" style="font-size:75%;opacity:0.0;"}
+:::
+
+::: {.fragment .fade-in-then-out}
+```{r, fig.width=6, fig.height=5}
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3) +
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3) +
+  geom_smooth(method="lm", formula=y~x, se = FALSE, color="blue")
+```
+
+[$y = \alpha + \beta_1 x + \epsilon$]{.absolute bottom="1" style="font-size:75%;"}
+:::
+
+::: {.fragment .fade-in-then-out}
+```{r, fig.width=6, fig.height=5}
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3) +
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3) +
+  geom_smooth(method="lm", formula=y~x, se = FALSE, color="blue")+
+  geom_smooth(method="lm", formula=y~poly(x,2), se = FALSE, color="red")
+```
+
+[$y = \alpha + \beta_1 x + \beta_2 x^2 + \epsilon$]{.absolute bottom="1" style="font-size:75%;"}
+:::
+
+::: {.fragment .fade-in-then-out}
+```{r, fig.width=6, fig.height=5}
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3) +
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3) +
+  geom_smooth(method="lm", formula=y~x, se = FALSE, color="blue")+
+  geom_smooth(method="lm", formula=y~poly(x,3), se = FALSE, color="red")
+
+```
+
+[$y = \alpha + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + \epsilon$]{.absolute bottom="1" style="font-size:75%;"}
+:::
+
+::: {.fragment .fade-in}
+```{r, fig.width=6, fig.height=5}
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3) +
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3) +
+  geom_smooth(method="lm", formula=y~x, se = FALSE, color="blue")+
+  geom_smooth(method="lm", formula=y~poly(x,12), se = FALSE, color="red")
+
+```
+
+[$y = \alpha + \beta_1 x + \beta_2 x^2 + \beta_3 x^3 + ... \beta_{12} x^{12} + \epsilon$]{.absolute bottom="1" style="font-size:75%;"}
+:::
+:::
+
+## kNN Regression
+### <span style="font-size:60%;">Shows how <U>choice of hyperparameters</U> relates to over-/under-fitting</span>
+#### *k* = 1 overfits
+
+::: columns
+::: {.column width="50%"}
+```{r, fig.width=6, fig.height=5}
+k = 1
+
+knn_spec <- nearest_neighbor(
+    mode = "regression",
+    engine = "kknn",
+    neighbors = k
+  )
+
+knn_wf <- workflow() %>% 
+  add_formula(y ~ x) %>% 
+  add_model(knn_spec)
+
+knn_fit <- knn_wf %>% 
+  fit(data = traindata)
+
+pred.mat = data.frame(x=seq(0,10, by = .1))
+
+res<- knn_fit %>% 
+  augment(new_data=pred.mat)
+
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3) +
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3) +
+  geom_line(data = res, aes(x = x, y = .pred), color="red")
+```
+:::
+
+::: {.column width="50%" style="font-size:75%;"}
+```{r}
+#| echo: true
+#| code-line-numbers: "1,4"
+#| #| eval: false
+k = 1
+
+knn_spec <- nearest_neighbor(
+    mode = "regression",
+    engine = "kknn",
+    neighbors = k
+  )
+
+knn_wf <- workflow() %>% 
+  add_formula(y ~ x) %>% 
+  add_model(knn_spec)
+
+knn_fit <- knn_wf %>% 
+  fit(data = traindata)
+```
+
+```{r}
+knn_fit %>% 
+  augment(new_data=testdata) %>% 
+  rmse(truth=y, estimate=.pred)
+```
+:::
+:::
+
+## kNN Regression
+### <span style="font-size:60%;">Shows how <U>choice of hyperparameters</U> relates to over-/under-fitting</span>
+#### *k* = 11 underfits
+
+::: columns
+::: {.column width="50%"}
+```{r, fig.width=6, fig.height=5}
+k = 11
+
+knn_spec <- nearest_neighbor(
+    mode = "regression",
+    engine = "kknn",
+    neighbors = k
+  )
+
+knn_wf <- workflow() %>% 
+  add_formula(y ~ x) %>% 
+  add_model(knn_spec)
+
+knn_fit <- knn_wf %>% 
+  fit(data = traindata)
+
+pred.mat = data.frame(x=seq(0,10, by = .1))
+
+res<- knn_fit %>% 
+  augment(new_data=pred.mat)
+
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3) +
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3) +
+  geom_line(data = res, aes(x = x, y = .pred), color="red")
+```
+:::
+
+::: {.column width="50%" style="font-size:75%;"}
+```{r}
+#| echo: true
+#| code-line-numbers: "1,4"
+#| eval: false
+k = 11
+
+knn_spec <- nearest_neighbor(
+    mode = "regression",
+    engine = "kknn",
+    neighbors = k
+  )
+
+knn_wf <- workflow() %>% 
+  add_formula(y ~ x) %>% 
+  add_model(knn_spec)
+
+knn_fit <- knn_wf %>% 
+  fit(data = traindata)
+```
+
+```{r}
+knn_fit %>% 
+  augment(new_data=testdata) %>% 
+  rmse(truth=y, estimate=.pred)
+```
+:::
+:::
+
+## kNN Regression
+### <span style="font-size:60%;">Shows how <U>choice of hyperparameters</U> relates to over-/under-fitting</span>
+#### *k* = 3 works well
+
+::: columns
+::: {.column width="50%"}
+```{r, fig.width=6, fig.height=5}
+k = 3
+
+knn_spec <- nearest_neighbor(
+    mode = "regression",
+    engine = "kknn",
+    neighbors = k
+  )
+
+knn_wf <- workflow() %>% 
+  add_formula(y ~ x) %>% 
+  add_model(knn_spec)
+
+knn_fit <- knn_wf %>% 
+  fit(data = traindata)
+
+pred.mat = data.frame(x=seq(0,10, by = .1))
+
+res<- knn_fit %>% 
+  augment(new_data=pred.mat)
+
+ggplot(traindata, aes(x = x, y = y))+ 
+  geom_point(size=3) +
+  geom_point(data=testdata, aes(x = x, y = y),size=3,alpha=.3) +
+  geom_line(data = res, aes(x = x, y = .pred), color="red")
+```
+:::
+
+::: {.column width="50%" style="font-size:75%;"}
+```{r}
+#| echo: true
+#| code-line-numbers: "1,4"
+#| eval: false
+k = 3
+
+knn_spec <- nearest_neighbor(
+    mode = "regression",
+    engine = "kknn",
+    neighbors = k
+  )
+
+knn_wf <- workflow() %>% 
+  add_formula(y ~ x) %>% 
+  add_model(knn_spec)
+
+knn_fit <- knn_wf %>% 
+  fit(data = traindata)
+```
+
+```{r}
+knn_fit %>% 
+  augment(new_data=testdata) %>% 
+  rmse(truth=y, estimate=.pred)
+```
+:::
+:::
+
+## How do we navigate the bias/variance tradeoff?
+
+:::{.incremental}
+- **Model tuning through <U>cross-validation</U>**
+- Regularization
+- Feature selection
+- Dimensionality Reduction
+- Ensemble methods 
+:::
+ 

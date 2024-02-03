@@ -10,10 +10,12 @@ editor: source
 ::: {.callout-caution icon="false"}
 ## Learning Objectives
 
-Our learning objectives for this module are:
+Our learning objectives for this lab are:
 
--   Understand basic metrics of model fit, including accuracy, precision, recall, and AIC
--   Understand how model evaluation and comparison is used to select and tune models
+-   Understand the difference between regression and classification problems, and demonstrate an ability to select appropriate models for different problems
+-   Understand basic metrics of model fit for regression problems (including R^2, RMSE, and MAE) and for classification problems (including accuracy, precision, F-measure, and ROC-AUC), and demonstrate an ability to select appropriate metrics for different problems
+-   Use metrics to evaluate model performance on the test and train set, and to compare performance of models of different types and different levels of complexity
+
 :::
 
 ![Please don't eat me, Jane!](../imgs/babycow.jpeg){width=75%}
@@ -108,7 +110,9 @@ Make your train/test split of the data. Rather than using `initial_split()`, use
 ::: {.callout-note icon="false"}
 ## Exercise 4
 
-Build one or more model specifications and workflows, depending upon which model(s) you think could be applied to this type of data. Our goal will be to predict whether, on each trial, the participant chose the target or the non-target.
+Build _one or more_* model specifications and workflows. Our goal will be to predict whether, on each trial, the participant chose the target or the non-target.
+
+*Note: By "one or more," I mean that you should build _as many model types as make sense_ for the current data/question, which could be 1, 2, or 3 (of the options you've learned about so far)
 :::
 
 ```{r}

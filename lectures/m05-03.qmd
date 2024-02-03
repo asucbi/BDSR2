@@ -1,0 +1,259 @@
+---
+title: | 
+  | Intro to Cross-validation
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 5
+format: 
+  revealjs:
+    css: style.css
+---
+
+## Finding the optimal model: "Tuning"
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+```
+
+::: columns
+::: {.column width="50%"}
+![](../imgs/BV_tradeoff.png)
+:::
+
+::: {.column .incremental width="50%"}
+::: {style="font-size:65%;"}
+-   Two things we need to do:
+    -   Estimate model performance on test set (to avoid overfit models)
+    -   Select the best hyperparameters for our model
+-   Recall that overfit models will:
+    -   Perform well on the training set, but poorly on the test set
+    -   Be very sensitive to changes in the training data
+-   We can take advantage of these features to catch overfitting before we get to the test stage
+:::
+:::
+:::
+
+## Resampling
+
+![](../imgs/resampling.svg){width="80%"}
+
+::: columns
+::: {.column width="50%" style="font-size:55%"}
+-   With replacement: "bootstrapping"
+
+    -   Most often used for estimating population statistics
+:::
+
+::: {.column width="50%" style="font-size:55%"}
+-   Without replacement: "cross validation"
+
+    -   Most often used for estimating model performance on test set
+:::
+:::
+
+## k-fold cross-validation
+
+![](../imgs/kfoldcv.jpg)
+
+## Leave-one-out cross-validation (LOOCV)
+
+![](../imgs/loocv.jpg)
+
+## Monte Carlo cross-validation
+
+![](../imgs/mccv.png)
+
+## Cross-validation with `tidymodels`
+
+```{r}
+library(ggmap)
+register_stadiamaps(key = "44e7ed1d-754f-464a-a99b-c7958ea8fb66")
+ 
+map<-get_stadiamap(
+  bbox = c(left = 110, bottom = -40, right = 160, top = -10), 
+  zoom = 4, 
+  maptype = "stamen_terrain_background",
+  #color = "bw",
+  force=TRUE)
+
+bb = attr(map, "bb")
+
+make_gold <- function(n, noise_rate, seed=123){
+  set.seed(seed)
+
+  # Generate random data
+  x <- runif(n, -1, 1) # x-coordinates
+  y <- runif(n, -1, 1) # y-coordinates
+  radius <- 0.75 # radius of the circle
+  
+  # Classify points based on whether they are inside or outside the circle
+  labels <- ifelse(x^2 + y^2 <= radius^2, "yes", "no")
+  
+  # Create a data frame
+  gold_df <- data.frame(lon = x, lat = y, found_gold = labels)
+  
+  noisy_indices <- sample(1:n, size = floor(noise_rate * n))
+  
+  gold_df$found_gold[noisy_indices]<-ifelse(gold_df$found_gold[noisy_indices]=="yes","no","no")
+  
+  gold_df$found_gold<- factor(gold_df$found_gold, levels = c("yes","no"))
+  
+  ll.lat_sim <- min(gold_df$lat)
+  ll.lon_sim <- min(gold_df$lon)
+  ur.lat_sim <- max(gold_df$lat)
+  ur.lon_sim <- max(gold_df$lon)
+  
+  gold_df <- gold_df %>% 
+  mutate(lon = bb$ll.lon + (lon - ll.lon_sim) * (bb$ur.lon - bb$ll.lon) / (ur.lon_sim - ll.lon_sim),
+         lat = bb$ll.lat + (lat - ll.lat_sim) * (bb$ur.lat - bb$ll.lat) / (ur.lat_sim - ll.lat_sim))
+  
+  return(gold_df)
+}
+
+gold_df <- make_gold(201,0.35)
+```
+
+```{r}
+ggmap(map) +
+  annotate("rect", xmin=bb$ll.lon, ymin=bb$ll.lat,
+                   xmax=bb$ur.lon, ymax=bb$ur.lat,
+           fill="black", alpha=0.4)+
+  geom_point(data=gold_df,aes(x = lon, y = lat, color = found_gold)) +
+  scale_color_manual(values=c("gold", "black"))+
+  ggtitle("Locations where gold deposits were found")
+```
+
+## Cross-validation with `tidymodels`
+
+```{r}
+library(kknn)
+set.seed(123)
+```
+
+::: {style="font-size:65%;"}
+```{r}
+#| echo: true
+split<-initial_split(gold_df)
+test<-testing(split)
+train<-training(split)
+
+multi_metric <- metric_set(bal_accuracy, precision, recall)
+```
+
+::: columns
+::: {.column .fragment width="50%"}
+```{r}
+#| echo: true
+knn_spec <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = 3
+)
+
+rec <- recipe(found_gold ~ lon + lat, train) %>% 
+  step_normalize(all_predictors())
+
+knn_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec)
+
+knn_fit <-
+  knn_wf %>% 
+  fit(data = train)
+
+knn_fit %>% 
+  augment(train) %>% 
+  multi_metric(truth=found_gold, estimate=.pred_class)
+```
+:::
+
+::: {.column .fragment width="50%"}
+```{r}
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+#| code-line-numbers: "3,4,5,6,7,8,9,12,13,14,15,16"
+
+#tidymodels calls it "v-fold" cross-validation, 
+#rather than the typical "k-fold"
+folds <- vfold_cv(
+  data = train,
+  v = 5,
+  strata = found_gold,
+  repeats=1
+  )
+
+knn_fit_rs <-
+  knn_wf %>% 
+  fit_resamples(resamples = folds,
+                metrics = multi_metric)
+
+collect_metrics(knn_fit_rs)
+```
+:::
+:::
+:::
+
+## Hyperparameter tuning
+
+::: columns
+::: {.column width="50%" style="font-size:75%"}
+```{r, warn=FALSE}
+#| echo: true
+knn_spec_tune <- nearest_neighbor(
+    mode = "classification",
+    engine = "kknn",
+    neighbors = tune()
+)
+
+knn_wf_tune <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(knn_spec_tune)
+
+k_grid <- tibble(neighbors=seq(1,100,2))
+
+knn_fit_tune <- knn_wf_tune %>% 
+  tune_grid(
+    resamples = folds,
+    grid = k_grid,
+    metrics=metric_set(bal_accuracy)
+  )
+
+results<-collect_metrics(knn_fit_tune)
+```
+
+```{r}
+#| class-output: scrolling
+results
+```
+:::
+
+::: {.column width="50%" style="font-size:75%"}
+
+```{r,fig.width=5, fig.height=4}
+ggplot(results %>% filter(.metric == "bal_accuracy"), aes(x = neighbors, y = mean))+
+  geom_line()
+```
+:::
+:::
+
+## Hyperparameter tuning
+
+```{r}
+#| echo: true
+chosen_n <- knn_fit_tune %>% 
+  select_best(metric = "bal_accuracy", 
+              neighbors)
+
+final_knn <- finalize_workflow(knn_wf_tune, chosen_n)
+
+knn_fit <- fit(final_knn, train)
+
+knn_fit %>% 
+  augment(test) %>% 
+  metrics(found_gold, .pred_class)
+```

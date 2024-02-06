@@ -1,0 +1,265 @@
+---
+title: "Module 5 Lab: Human Activity Recognition w/ KNN & Cross-Validation"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this lab are:
+
+-   Understand the bias/variance tradeoff
+-   Understand how resampling methods are used for two distinct, but related goals:
+    -   Estimating model performance on the test set to catch overfitting
+    -   Tuning hyperparameters to find the model of optimal complexity
+-   Understand the k-nearest neighbors algorithm for classification and implement it with `tidymodels`
+    -   Use cross-validation to tune the value of k
+-   Understand the distinction between linear and non-linear classifiers, and be able to assess when each is appropriate for the data
+:::
+
+::: columns
+::: {.column width="55%"}
+![](../imgs/bikephone.jpg)
+:::
+
+::: {.column width="45%"}
+![](../imgs/runphone.jpg)
+:::
+:::
+
+Our cellphones and smartwatches record a lot of different kinds of data. There's our search history and web traffic, of course, but also GPS, audio data, and a variety of sensors, including a gyroscope, accelerometer, and gravity sensor. In this module, we'll see how that sensor data can be used to predict what a user is doing during some interval of time--whether they're sitting down, riding a bike, driving a car, etc. This type of analysis might be useful, for example, for a tech company to figure out your interests and serve up targeted ads, or to deliver content/functionality at just the right moment (e.g. maybe you want your maps interface to change automatically depending upon whether you are biking, driving, or walking).
+
+The dataset for this module contains summarized data (i.e. means, maxs, mins, etc) from the accelerometer, gyroscope, and gravity sensor of a smartwatch while participants performed various actions. In this lab, we'll train models to predict which activity is being performed from the cellphone sensor data, and use resampling techniques to optimize performance on the test set.
+
+## Library and data loading
+
+```{r}
+#| eval: FALSE
+library(tidyverse)
+library(tidymodels)
+
+load('HumanActivityRecognition.Rdata')
+```
+
+## Exploratory visualization
+
+::: {.callout-note icon="false"}
+## Exercise 1.A
+
+First, make a bar plot showing the number of observations of each type of `Activity`.
+:::
+
+```{r}
+
+```
+
+
+One thing to notice is that we have substantial "class imbalance," meaning there are many observations of some activities--such as cycling and football--and far fewer observations of other activities, such as jogging and pushups. Class imbalance can cause problems for our model, because the training data is driven much more strongly by only a subset of activities.
+
+To deal with this problem, we can use resampling techniques. We can either "upsample," to get more observations of the rarer classes, or "downsample," to have fewer observations of the more common classes.
+
+In this case, we will try upsampling, using the `step_upsample()` function. We can set `over_ratio` to .5, meaning we will oversample the classes with fewer observations until they have 50% as many observations as the class with the most observations. 
+
+::: {.callout-note icon="false"}
+## Exercise 1.B
+
+Make a recipe, starting with a formula predicting `Activity` from all other variables. Add an upsampling step as described above. Then prep and bake the recipe in order to recreate the first plot, but now showing how the distribution of classes will change after the upsampling step.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Next, we'll explore the data a bit to see what it looks like while doing different activities. Notice that there are a LOT of potential predictor variables in the dataset (112 to be precise). To start, we'll arbitrarily grab a few pairs of variables and make scatterplots, with points colored by `Activity`.
+
+Below, make three plots: 
+- 1. `ACCELEROMETER_X_mean` by `ACCELEROMETER_Y_mean` 
+- 2. `GRAVITY_X_mean` by `GRAVITY_Y_mean` 
+- 3. `GYROSCOPE_X_mean` by `GYROSCOPE_Y_mean`
+:::
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+In your own words, answer the following questions: 1. Which of these variables do you think would be useful for predicting `Activity`, and which would not? Why? 2. Do the data seem to have a linear or non-linear separability of classes?
+:::
+
+## Preparing our modeling workflow
+
+As you learned in this module's lectures, having too many predictors in our model can be problematic, if they aren't all useful. However, we haven't yet learned about techniques for dealing with that potential problem (that'll be in the next module), so for now we will just use all of the predictors.
+
+::: {.callout-note icon="false"}
+## Exercise 4
+
+Next, build a recipe, `rec`, consisting of a formula and an upsampling step. The formula should predict `Activity` from all of the other variables in the dataset. We should also include a recipe step to normalize all of our predictor variables.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 5
+
+Next, set up the test/train split. Use the `strata` argument appropriately, in light of the class imbalance.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 6
+
+Next, build model specifications for two different models: 1. a kNN model, with `k` = 3 2. a naive Bayes model 3. a multinomial regression model, using `multinomial_reg()` - This is the extension of logistic regression from binary classes to \>2 classes. It will fit a logistic separate logistic regression model for predicting each of our twelve activities separately, and then compare the likelihoods of each model to predict the most likely class - set the `mode` to "classification, `engine` to"glmnet", and set `penalty` and `mixture` to 0.
+:::
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Initial model fitting
+
+::: {.callout-note icon="false"}
+## Exercise 7
+
+Fit all three models to the training data. Get the predictions of each model on the training set, and return the default metrics (which are accuracy and Kappa). Summarize the results in words--how does each model perform on the training data? Do you think that these are good estimates of performance on the test set--why or why not?
+
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+
+Note that we can't straightforwardly use metrics like balanced accuracy, precision, recall, and F here, because we aren't dealing with binary classes. These metrics will only work if we choose one class as the "relevant" class, but for now we are just going to stick with accuracy.
+:::
+:::
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+## Crossfold validation to estimate performance on test set
+
+::: {.callout-note icon="false"}
+## Exercise 8
+
+Use the `vfold_cv()` function to make 5 folds of the training set. Then, use the `fit_resamples()` function to estimate the performance of each model on the test set, and collect the metrics.
+
+Explain any discrepancies with performance on the training set alone (Ex. 6) in terms of the models being over-/under-fit.
+:::
+
+```{r}
+
+```
+
+## Hyperparameter tuning
+
+::: {.callout-note icon="false"}
+## Exercise 9
+
+-   Create a new model specification, called `knn_spec_tune`, set up to tune the value of k.
+-   Then, make a tibble called `neighbor_grid`, containing a list of values for *k* (`neighbors`) to search through for your model tuning. Try values for *k* ranging from 3-20.
+-   Finally, use `tune_grid()` to tune *k* using the cross-validation folds you already set up.
+-   Collect the metrics, plot the estimated accuracy as a function of *k*, and summarize your findings in words. What do you think would be the optimal value for *k*, and why?
+
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+
+`autoplot()` can save you some time here, but you can also do it manually.
+:::
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 10
+
+Use the `select_best()` function, setting the `metric` to "accuracy", to choose the value of *k* neighbors that produced the best accuracy. Then, use `finalize_workflow` to plug in that best value, and then fit your finalized kNN model to the training data again.
+:::
+
+```{r}
+
+```
+
+## Evaluating performance on the test set
+
+::: {.callout-note icon="false"}
+## Exercise 11
+
+Evaluate the performance of your finalized kNN model and the other two models on the test set. Summarize the results in words.
+:::
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+We have obtained an accuracy metric for each model, but how do we know if this is "good" performance or not? We need to compare our final model with a **null model**.
+
+A **null model** represents the best guess one could make *before* seeing any of the predictor variables. For our dataset, if we were guessing completely randomly, we would be right 1/12th of the time (8.3% accuracy), because there are 12 classes. However, we could make a better guess by taking into account the *distribution* of the data, which is uneven--some activities account for *more* than 1/12th of the data, and others for less. As such, a **null** model could label every activity as whatever is the most frequent activity in our dataset, and it might still do better than 8.3% accuracy.
+
+::: {.callout-note icon="false"}
+## Exercise 12
+
+Manually calculate the performance that would be expected from a null model by getting the proportion of the dataset corresponding to each class. Fill in the blanks below:
+
+The most frequent `Activity` is \_**, which represents** % of the original dataset. As such, a null model would have an accuracy of \_\_%.
+
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+
+Below, I wanted to show you a `tidymodels` function, `null_model()`, that allows you to do what I described above, but using your standard model-fitting workflow. You don't really need it here, but it could be useful to know about in the future, in cases where things are more complex than just counting classes. If you want, you can use it to check your answer for this exercise.
+
+```{r}
+#| eval: false
+null_spec <- null_model() %>% 
+  set_engine("parsnip") %>%
+  set_mode("classification")
+```
+:::
+:::
+
+```{r}
+
+```
+

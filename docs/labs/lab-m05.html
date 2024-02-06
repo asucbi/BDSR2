@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ben Falandays">
+
+<title>Module 5 Lab: Human Activity Recognition w/ KNN &amp; Cross-Validation</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lab-m05_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab-m05_files/libs/quarto-html/quarto.js"></script>
+<script src="lab-m05_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab-m05_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab-m05_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab-m05_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab-m05_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab-m05_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab-m05_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab-m05_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#library-and-data-loading" id="toc-library-and-data-loading" class="nav-link active" data-scroll-target="#library-and-data-loading">Library and data loading</a></li>
+  <li><a href="#exploratory-visualization" id="toc-exploratory-visualization" class="nav-link" data-scroll-target="#exploratory-visualization">Exploratory visualization</a></li>
+  <li><a href="#preparing-our-modeling-workflow" id="toc-preparing-our-modeling-workflow" class="nav-link" data-scroll-target="#preparing-our-modeling-workflow">Preparing our modeling workflow</a></li>
+  <li><a href="#initial-model-fitting" id="toc-initial-model-fitting" class="nav-link" data-scroll-target="#initial-model-fitting">Initial model fitting</a></li>
+  <li><a href="#crossfold-validation-to-estimate-performance-on-test-set" id="toc-crossfold-validation-to-estimate-performance-on-test-set" class="nav-link" data-scroll-target="#crossfold-validation-to-estimate-performance-on-test-set">Crossfold validation to estimate performance on test set</a></li>
+  <li><a href="#hyperparameter-tuning" id="toc-hyperparameter-tuning" class="nav-link" data-scroll-target="#hyperparameter-tuning">Hyperparameter tuning</a></li>
+  <li><a href="#evaluating-performance-on-the-test-set" id="toc-evaluating-performance-on-the-test-set" class="nav-link" data-scroll-target="#evaluating-performance-on-the-test-set">Evaluating performance on the test set</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Module 5 Lab: Human Activity Recognition w/ KNN &amp; Cross-Validation</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ben Falandays </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="callout callout-style-default callout-caution no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Our learning objectives for this lab are:</p>
+<ul>
+<li>Understand the bias/variance tradeoff</li>
+<li>Understand how resampling methods are used for two distinct, but related goals:
+<ul>
+<li>Estimating model performance on the test set to catch overfitting</li>
+<li>Tuning hyperparameters to find the model of optimal complexity</li>
+</ul></li>
+<li>Understand the k-nearest neighbors algorithm for classification and implement it with <code>tidymodels</code>
+<ul>
+<li>Use cross-validation to tune the value of k</li>
+</ul></li>
+<li>Understand the distinction between linear and non-linear classifiers, and be able to assess when each is appropriate for the data</li>
+</ul>
+</div>
+</div>
+<div class="columns">
+<div class="column" style="width:55%;">
+<p><img src="../imgs/bikephone.jpg" class="img-fluid"></p>
+</div><div class="column" style="width:45%;">
+<p><img src="../imgs/runphone.jpg" class="img-fluid"></p>
+</div>
+</div>
+<p>Our cellphones and smartwatches record a lot of different kinds of data. There’s our search history and web traffic, of course, but also GPS, audio data, and a variety of sensors, including a gyroscope, accelerometer, and gravity sensor. In this module, we’ll see how that sensor data can be used to predict what a user is doing during some interval of time–whether they’re sitting down, riding a bike, driving a car, etc. This type of analysis might be useful, for example, for a tech company to figure out your interests and serve up targeted ads, or to deliver content/functionality at just the right moment (e.g.&nbsp;maybe you want your maps interface to change automatically depending upon whether you are biking, driving, or walking).</p>
+<p>The dataset for this module contains summarized data (i.e.&nbsp;means, maxs, mins, etc) from the accelerometer, gyroscope, and gravity sensor of a smartwatch while participants performed various actions. In this lab, we’ll train models to predict which activity is being performed from the cellphone sensor data, and use resampling techniques to optimize performance on the test set.</p>
+<section id="library-and-data-loading" class="level2">
+<h2 class="anchored" data-anchor-id="library-and-data-loading">Library and data loading</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">'HumanActivityRecognition.Rdata'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exploratory-visualization" class="level2">
+<h2 class="anchored" data-anchor-id="exploratory-visualization">Exploratory visualization</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 1.A
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>First, make a bar plot showing the number of observations of each type of <code>Activity</code>.</p>
+</div>
+</div>
+<p>One thing to notice is that we have substantial “class imbalance,” meaning there are many observations of some activities–such as cycling and football–and far fewer observations of other activities, such as jogging and pushups. Class imbalance can cause problems for our model, because the training data is driven much more strongly by only a subset of activities.</p>
+<p>To deal with this problem, we can use resampling techniques. We can either “upsample,” to get more observations of the rarer classes, or “downsample,” to have fewer observations of the more common classes.</p>
+<p>In this case, we will try upsampling, using the <code>step_upsample()</code> function. We can set <code>over_ratio</code> to .5, meaning we will oversample the classes with fewer observations until they have 50% as many observations as the class with the most observations.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 1.B
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Make a recipe, starting with a formula predicting <code>Activity</code> from all other variables. Add an upsampling step as described above. Then prep and bake the recipe in order to recreate the first plot, but now showing how the distribution of classes will change after the upsampling step.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 2
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Next, we’ll explore the data a bit to see what it looks like while doing different activities. Notice that there are a LOT of potential predictor variables in the dataset (112 to be precise). To start, we’ll arbitrarily grab a few pairs of variables and make scatterplots, with points colored by <code>Activity</code>.</p>
+<p>Below, make three plots: - 1. <code>ACCELEROMETER_X_mean</code> by <code>ACCELEROMETER_Y_mean</code> - 2. <code>GRAVITY_X_mean</code> by <code>GRAVITY_Y_mean</code> - 3. <code>GYROSCOPE_X_mean</code> by <code>GYROSCOPE_Y_mean</code></p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 3
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>In your own words, answer the following questions: 1. Which of these variables do you think would be useful for predicting <code>Activity</code>, and which would not? Why? 2. Do the data seem to have a linear or non-linear separability of classes?</p>
+</div>
+</div>
+</section>
+<section id="preparing-our-modeling-workflow" class="level2">
+<h2 class="anchored" data-anchor-id="preparing-our-modeling-workflow">Preparing our modeling workflow</h2>
+<p>As you learned in this module’s lectures, having too many predictors in our model can be problematic, if they aren’t all useful. However, we haven’t yet learned about techniques for dealing with that potential problem (that’ll be in the next module), so for now we will just use all of the predictors.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 4
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Next, build a recipe, <code>rec</code>, consisting of a formula and an upsampling step. The formula should predict <code>Activity</code> from all of the other variables in the dataset. We should also include a recipe step to normalize all of our predictor variables.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 5
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Next, set up the test/train split. Use the <code>strata</code> argument appropriately, in light of the class imbalance.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 6
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Next, build model specifications for two different models: 1. a kNN model, with <code>k</code> = 3 2. a naive Bayes model 3. a multinomial regression model, using <code>multinomial_reg()</code> - This is the extension of logistic regression from binary classes to &gt;2 classes. It will fit a logistic separate logistic regression model for predicting each of our twelve activities separately, and then compare the likelihoods of each model to predict the most likely class - set the <code>mode</code> to “classification, <code>engine</code> to”glmnet”, and set <code>penalty</code> and <code>mixture</code> to 0.</p>
+</div>
+</div>
+</section>
+<section id="initial-model-fitting" class="level2">
+<h2 class="anchored" data-anchor-id="initial-model-fitting">Initial model fitting</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 7
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Fit all three models to the training data. Get the predictions of each model on the training set, and return the default metrics (which are accuracy and Kappa). Summarize the results in words–how does each model perform on the training data? Do you think that these are good estimates of performance on the test set–why or why not?</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-9-contents" aria-controls="callout-9" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Hint
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-9" class="callout-9-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Note that we can’t straightforwardly use metrics like balanced accuracy, precision, recall, and F here, because we aren’t dealing with binary classes. These metrics will only work if we choose one class as the “relevant” class, but for now we are just going to stick with accuracy.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="crossfold-validation-to-estimate-performance-on-test-set" class="level2">
+<h2 class="anchored" data-anchor-id="crossfold-validation-to-estimate-performance-on-test-set">Crossfold validation to estimate performance on test set</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 8
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use the <code>vfold_cv()</code> function to make 5 folds of the training set. Then, use the <code>fit_resamples()</code> function to estimate the performance of each model on the test set, and collect the metrics.</p>
+<p>Explain any discrepancies with performance on the training set alone (Ex. 6) in terms of the models being over-/under-fit.</p>
+</div>
+</div>
+</section>
+<section id="hyperparameter-tuning" class="level2">
+<h2 class="anchored" data-anchor-id="hyperparameter-tuning">Hyperparameter tuning</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 9
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Create a new model specification, called <code>knn_spec_tune</code>, set up to tune the value of k.</li>
+<li>Then, make a tibble called <code>neighbor_grid</code>, containing a list of values for <em>k</em> (<code>neighbors</code>) to search through for your model tuning. Try values for <em>k</em> ranging from 3-20.</li>
+<li>Finally, use <code>tune_grid()</code> to tune <em>k</em> using the cross-validation folds you already set up.</li>
+<li>Collect the metrics, plot the estimated accuracy as a function of <em>k</em>, and summarize your findings in words. What do you think would be the optimal value for <em>k</em>, and why?</li>
+</ul>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-12-contents" aria-controls="callout-12" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Hint
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-12" class="callout-12-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><code>autoplot()</code> can save you some time here, but you can also do it manually.</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 10
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Use the <code>select_best()</code> function, setting the <code>metric</code> to “accuracy”, to choose the value of <em>k</em> neighbors that produced the best accuracy. Then, use <code>finalize_workflow</code> to plug in that best value, and then fit your finalized kNN model to the training data again.</p>
+</div>
+</div>
+</section>
+<section id="evaluating-performance-on-the-test-set" class="level2">
+<h2 class="anchored" data-anchor-id="evaluating-performance-on-the-test-set">Evaluating performance on the test set</h2>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 11
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Evaluate the performance of your finalized kNN model and the other two models on the test set. Summarize the results in words.</p>
+</div>
+</div>
+<p>We have obtained an accuracy metric for each model, but how do we know if this is “good” performance or not? We need to compare our final model with a <strong>null model</strong>.</p>
+<p>A <strong>null model</strong> represents the best guess one could make <em>before</em> seeing any of the predictor variables. For our dataset, if we were guessing completely randomly, we would be right 1/12th of the time (8.3% accuracy), because there are 12 classes. However, we could make a better guess by taking into account the <em>distribution</em> of the data, which is uneven–some activities account for <em>more</em> than 1/12th of the data, and others for less. As such, a <strong>null</strong> model could label every activity as whatever is the most frequent activity in our dataset, and it might still do better than 8.3% accuracy.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 12
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Manually calculate the performance that would be expected from a null model by getting the proportion of the dataset corresponding to each class. Fill in the blanks below:</p>
+<p>The most frequent <code>Activity</code> is _<strong>, which represents</strong> % of the original dataset. As such, a null model would have an accuracy of __%.</p>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-16-contents" aria-controls="callout-16" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Hint
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-16" class="callout-16-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>Below, I wanted to show you a <code>tidymodels</code> function, <code>null_model()</code>, that allows you to do what I described above, but using your standard model-fitting workflow. You don’t really need it here, but it could be useful to know about in the future, in cases where things are more complex than just counting classes. If you want, you can use it to check your answer for this exercise.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>null_spec <span class="ot">&lt;-</span> <span class="fu">null_model</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"parsnip"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

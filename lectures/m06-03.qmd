@@ -1,0 +1,158 @@
+---
+title: | 
+  | Intro to Natural Language Processing
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 6
+format: 
+  revealjs:
+    css: style.css
+---
+
+## `tidytext`
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(tidytext)
+library(textrecipes)
+```
+
+
+![](../imgs/tidytxt.png)
+
+## Text Data
+
+```{r}
+#| echo: true
+dickinson <- tibble(text=c("Because I could not stop for Death -",
+          "He kindly stopped for me -",
+          "The Carriage held but just Ourselves -",
+          "and Immortality"))
+```
+
+
+## Tokenizing
+
+```{r}
+#| echo: true
+#| code-line-numbers: "2"
+dickinson %>% 
+  unnest_tokens(word,text) 
+```
+
+## Removing stop words
+
+```{r}
+#| echo: true
+#| #| code-line-numbers: "3"
+dickinson %>% 
+  unnest_tokens(word,text) %>% 
+  anti_join(stop_words)
+```
+
+## Stemming
+
+```{r}
+library(SnowballC)
+
+dickinson %>% 
+  unnest_tokens(word,text) %>% 
+  anti_join(stop_words) %>% 
+  mutate(stem = wordStem(word)) 
+```
+
+
+
+
+## Nested Text Data
+
+```{r}
+library(janeaustenr)
+
+austen_books <- austen_books() %>%
+  group_by(book) %>%
+  mutate(
+    linenumber = row_number(),
+    chapter = cumsum(str_detect(text, 
+                                regex("^chapter [\\divxlc]", 
+                                      ignore_case = TRUE)))) %>%
+  ungroup() 
+
+```
+
+```{r}
+#| echo: true
+austen_books
+```
+
+
+## `textrecipes`
+
+![](../imgs/textrecipes.png)
+
+## Embeddings
+
+:::{.r-stack}
+
+::::{.fragment .fade-in-then-out}
+```{r}
+#| echo: true
+austen_books %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  mutate(stem = wordStem(word))
+```
+::::
+
+::::{.fragment .fade-in-then-out}
+```{r}
+#| echo: true
+austen_books %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  mutate(stem = wordStem(word)) %>% 
+  count(book, stem) 
+```
+::::
+
+::::{.fragment .fade-in-then-out}
+```{r}
+#| echo: true
+austen_books %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  mutate(stem = wordStem(word)) %>% 
+  count(book, stem) %>%
+  cast_dfm(book, stem, n)
+```
+
+::::
+
+::::
+
+## Embeddings
+### tf-idf
+
+Term frequency-Inverse document frequency
+
+![](../imgs/tfidf.webp)
+
+## Embeddings
+
+```{r}
+#| echo: true
+austen_books %>% 
+  unnest_tokens(word, text) %>%
+  anti_join(get_stopwords(), by = "word") %>%
+  mutate(stem = wordStem(word)) %>% 
+  count(book, stem) %>%
+  bind_tf_idf(stem, book, n) %>%
+  cast_dfm(book, stem, tf_idf)
+```
+
+
+
+
+
+

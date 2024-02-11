@@ -1,0 +1,488 @@
+---
+title: | 
+  | `Avoiding Overfitting, Pt. 1`
+  | Feature Engineering
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 6
+format: 
+  revealjs:
+    css: style.css
+---
+
+## Techniques for Avoiding Overfitting
+
+```{css, echo=FALSE}
+.title {
+  font-size: 70px !important;
+}
+
+.subtitle {
+  font-size: 50px !important;
+  color: blue
+}
+```
+
+::: incremental
+-   Cross validation
+-   **Feature engineering**
+    -   Feature selection
+    -   Feature extraction
+-   **Regularization**
+-   Ensemble methods
+:::
+
+## The data: cellphone sensors X activity
+
+```{r}
+library(knitr)
+library(kableExtra)
+library(tidyverse)
+library(tidymodels)
+library(themis)
+
+load('~/Documents/Github/BDSR2/data/HumanActivityRecognition.Rdata') 
+
+df <- df %>% relocate(Activity)
+
+rec <- recipe(Activity ~ ., df) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>% 
+  step_downsample(Activity,under_ratio=1)
+
+df <- rec %>% prep() %>% bake(new_data=NULL)
+
+```
+
+```{r}
+ggplot(df, aes(x = Activity, fill = Activity))+geom_bar()
+```
+
+## The data: cellphone sensors X activity {.nostretch}
+
+```{r, echo=TRUE}
+dim(df)
+```
+
+::: {style="font-size:50%;"}
+```{r}
+library(DT)
+datatable(df, 
+          options = list(
+            pageLength = 20, # Number of rows to display
+            scrollX = TRUE, # Enable horizontal scrollbar
+            scrollY = '400px' # Set vertical scroll and its height
+          ),
+          width = '100%', # Table width
+          height = 'auto' # Table height
+)
+```
+:::
+
+## Potential problems with high-dimensional data
+
+::: incremental
+-   Including irrelevant predictors -\> Overfitting
+-   Multicollinearity
+    -   Less-than-perfect collinearity is fine for prediction, but can be a problem for inference
+    -   Perfect collinearity and regression models can't be fit
+-   More features -\> more time & data to train
+:::
+
+## Example Data
+
+```{r}
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+n_obs = 1000
+sim_lin_df = 
+  tibble(
+    x1 = rnorm(n_obs,0,5),
+    x2 = rnorm(n_obs,0,10),
+    x3 = rnorm(n_obs,0,15),
+    y = 4.17 + 8.06*x1 + 8.06*x2 + 8.06*x3 + rnorm(n_obs,0,10)
+    ) %>% 
+  mutate(
+    noise1 = rnorm(n_obs,0,10), 
+    noise2 = rnorm(n_obs,0,10), 
+    perfectCorr_x2 = 2.55 + 3.94*x2, 
+    highCorr_x3 = 7.92 + 4.37*x3 + rnorm(n_obs,0,40), 
+    linComb_x2_x3 = 17 + 3.1*x2 + 4.7*x3, # x6 is a linear combination of x1 and x2
+    zeroVar = rep(1.24, n_obs), # x5 has zero variance
+  ) 
+```
+
+```{r}
+print("Corr(x3, highCorr_x3):")
+cor(sim_lin_df$x3, sim_lin_df$highCorr_x3)
+```
+
+## Feature selection:
+
+### Filtering methods
+
+::: r-stack
+::: {.fragment .absolute .fade-in-then-out left="0"}
+```{r}
+#| echo: true 
+rec <- recipe(y ~ ., sim_lin_df) %>% 
+  step_nzv(all_predictors()) 
+```
+
+::: columns
+::: {.column width="50%"}
+Kept
+
+```{r}
+kept = rec %>% 
+  prep() %>% 
+  juice() %>% colnames()
+kept
+```
+:::
+
+::: {.column width="50%"}
+Removed
+
+```{r}
+removed = !colnames(sim_lin_df) %in% kept
+colnames(sim_lin_df)[removed]
+```
+:::
+:::
+:::
+
+::: {.fragment .absolute .fade-in-then-out left="0"}
+```{r}
+#| echo: true 
+rec <- recipe(y ~ ., sim_lin_df) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_lincomb(all_predictors()) 
+```
+
+::: columns
+::: {.column width="50%"}
+Kept
+
+```{r}
+kept = rec %>% 
+  prep() %>% 
+  juice() %>% colnames()
+kept
+```
+:::
+
+::: {.column width="50%"}
+Removed
+
+```{r}
+removed = !colnames(sim_lin_df) %in% kept
+colnames(sim_lin_df)[removed]
+```
+:::
+:::
+:::
+
+::: {.fragment .absolute .fade-in-then-out left="0"}
+```{r}
+#| echo: true 
+rec <- recipe(y ~ ., sim_lin_df) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_lincomb(all_predictors()) %>% 
+  step_corr(all_predictors(), threshold = .9) 
+```
+
+::: columns
+::: {.column width="50%"}
+Kept
+
+```{r}
+kept = rec %>% 
+  prep() %>% 
+  juice() %>% colnames()
+kept
+```
+:::
+
+::: {.column width="50%"}
+Removed
+
+```{r}
+removed = !colnames(sim_lin_df) %in% kept
+colnames(sim_lin_df)[removed]
+```
+:::
+:::
+:::
+
+::: {.fragment .absolute left="0"}
+```{r}
+#| echo: true 
+rec <- recipe(y ~ ., sim_lin_df) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_lincomb(all_predictors()) %>% 
+  step_corr(all_predictors(), threshold = .7) 
+```
+
+::: columns
+::: {.column width="50%"}
+Kept
+
+```{r}
+kept = rec %>% 
+  prep() %>% 
+  juice() %>% colnames()
+kept
+```
+:::
+
+::: {.column width="50%"}
+Removed
+
+```{r}
+removed = !colnames(sim_lin_df) %in% kept
+colnames(sim_lin_df)[removed]
+```
+:::
+:::
+:::
+:::
+
+## Feature selection:
+
+### Feature importance
+
+::: columns
+::: {.column width="50%"}
+::: {style="font-size:85%;"}
+\
+
+```{r}
+#| echo: true
+rf_spec <- 
+  rand_forest(
+    mode="regression",
+    trees=500) %>% 
+  set_mode("regression") %>% 
+  set_engine(
+    "ranger", 
+    importance = "impurity")
+
+rf_fit <- 
+  workflow() %>% 
+  add_recipe(rec) %>%
+  add_model(rf_spec) %>%  
+  fit(sim_lin_df) 
+```
+:::
+:::
+
+::: {.column width="50%"}
+```{r, fig.width=5, fig.height=5}
+#| echo: true
+library(vip)
+vip(rf_fit)
+```
+:::
+:::
+
+## Feature selection:
+
+### Wrapper methods
+
+:::{.columns}
+::::{.column width="30%;"}
+-   Forwards addition
+-   Backwards elimination
+
+::::
+
+::::{.column width="70%;"}
+![](../imgs/wrappermethods.png)
+::::
+:::
+
+## Feature selection: {style="font-size:75%;"}
+
+### Backwards Elimination 
+
+::: r-stack
+::: {.fragment .absolute .fade-in-then-out left="0"}
+:::{.columns}
+::::{.column width="60%"}
+\
+```{r}
+#| echo: true
+rec <- recipe(y ~ ., sim_lin_df) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_lincomb(all_predictors()) %>% 
+  step_corr(all_predictors(), threshold = .7) 
+
+lr_fit <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(linear_reg()) %>% 
+  fit(sim_lin_df)
+
+tidy(lr_fit) %>% arrange(desc(statistic))
+```
+::::
+
+::::{.column width="40%"}
+```{r, fig.width=4, fig.height=5}
+#| echo: true
+vip(lr_fit)
+```
+::::
+:::
+:::
+
+::: {.fragment .absolute .fade-in-then-out left="0"}
+:::{.columns}
+::::{.column width="60%"}
+\
+```{r}
+#| echo: true
+rec2 <- rec %>% 
+  step_rm(all_of("noise1"))
+
+lr_fit <- workflow() %>% 
+  add_recipe(rec2) %>% 
+  add_model(linear_reg()) %>% 
+  fit(sim_lin_df)
+
+tidy(lr_fit) %>% arrange(desc(statistic))
+```
+::::
+
+::::{.column width="40%"}
+```{r, fig.width=4, fig.height=5}
+#| echo: true
+vip(lr_fit)
+```
+::::
+:::
+:::
+
+::: {.fragment .absolute left="0"}
+:::{.columns}
+::::{.column width="60%"}
+\
+```{r}
+#| echo: true
+rec2 <- rec %>% 
+  step_rm(all_of(c("noise1","noise2")))
+
+lr_fit <- workflow() %>% 
+  add_recipe(rec2) %>% 
+  add_model(linear_reg()) %>% 
+  fit(sim_lin_df)
+
+tidy(lr_fit) %>% arrange(desc(statistic))
+```
+::::
+
+::::{.column width="40%"}
+```{r, fig.width=4, fig.height=5}
+#| echo: true
+vip(lr_fit)
+```
+::::
+:::
+:::
+:::
+
+## Feature Extraction
+
+### Dimensionality Reduction
+
+::: {style="font-size:70%;"}
+::: columns
+::: {.column width="50%"}
+-   Principal Components Analysis (PCA)
+-   Independent Components Analysis (ICA)
+:::
+
+::: {.column width="50%"}
+-   Linear Discriminant Analysis (LDA)
+-   t-distributed Stochastic Neighbor Embedding (t-SNE)
+:::
+:::
+:::
+
+![](../imgs/dimensionality_reduction.jpeg)
+
+## PCA
+
+![](../imgs/pca.png)
+
+
+## PCA
+
+```{r}
+set.seed(123)
+```
+
+```{r}
+#| echo: true
+pca_rec <- recipe(y ~ ., sim_lin_df) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>% 
+  step_pca(all_predictors(), num_comp = 3)
+
+pca_estimates <- prep(pca_rec, sim_lin_df)
+pca_data <- bake(pca_estimates, sim_lin_df)
+
+tidy(pca_estimates, number=3)
+```
+
+## PCA
+
+```{r}
+#| echo: true
+tidy(pca_estimates, number=3, type = "variance") %>% 
+  filter(terms=="cumulative percent variance")
+```
+
+## PCA
+
+```{r}
+#| echo: true
+library(learntidymodels)
+plot_loadings(pca_estimates, component_number <= 3)
+```
+
+## PCA
+
+:::{style="font-size:60%;"}
+```{r}
+#| echo: true
+tidy(pca_estimates, number=3) %>% 
+  filter(component %in% c("PC1","PC2")) %>% 
+  pivot_wider(names_from="component",values_from="value") %>% 
+  ggplot(aes(x =PC1, y = PC2, color=factor(terms))) + 
+    geom_jitter(size=5,width=.1) + 
+    geom_hline(yintercept=0,linetype="dashed") + 
+    geom_vline(xintercept=0,linetype="dashed")
+```
+:::
+
+## When to use each technique:
+:::{style="font-size:75%;"}
+- **Filtering:**
+  - When multicollinearity and zero-variance features are a potential problem
+
+- **Feature selection:**
+  - When you're worried about overfitting
+  - When you want to identify the most important variables
+  - When you want a sparse model
+  
+- **Dimensionality reduction:**
+  - Pros of filtering and feature selection, plus useful for:
+    - Visualization
+    - Clustering
+    
+:::

@@ -1,0 +1,336 @@
+---
+title: | 
+  | `Avoiding Overfitting, Pt. 2`
+  | Penalized Regression
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 6
+format: 
+  revealjs:
+    css: style.css
+---
+
+## Regularization {style="font-size:75%;"}
+
+```{css, echo=FALSE}
+.title {
+  font-size: 70px !important;
+}
+
+.subtitle {
+  font-size: 50px !important;
+  color: blue
+}
+```
+
+```{r}
+library(tidymodels)
+library(tidyverse)
+```
+
+
+Techniques to avoid overfitting by increasing model bias in exchange for decreased variance.
+
+![](../imgs/BV_tradeoff.png)
+
+## Penalized Regression {style="font-size:75%;"}
+
+Mean Squared Error Loss Function:
+$$
+\frac{1}{n}\sum_{i}^{N}(y_i - f(x_i))^2
+$$
+
+L1 Regularization (Lasso):
+$$
+\frac{1}{n}\sum_{i}^{N}(y_i - f(x_i))^2 + \sum_{j} |\beta_j|
+$$
+
+L2 Regularization (Ridge):
+$$
+\frac{1}{n}\sum_{i}^{N}(y_i - f(x_i))^2 + \sum_{j} \beta_j^2
+$$
+
+## L1 (Lasso) vs L2 (Ridge) {style="font-size:75%;"}
+
+![](../imgs/l1_l2.png)
+
+
+## Elastic Net {style="font-size:75%;"}
+
+![](../imgs/elasticNet.png)
+
+## Human Activity Recognition Data 
+
+```{r}
+load('~/Documents/Github/BDSR2/data/HumanActivityRecognition.Rdata') 
+df <- df %>% relocate(Activity)
+```
+
+```{r, echo=TRUE}
+dim(df)
+```
+
+::: {style="font-size:50%;"}
+```{r}
+library(DT)
+datatable(df, 
+          options = list(
+            pageLength = 20, # Number of rows to display
+            scrollX = TRUE, # Enable horizontal scrollbar
+            scrollY = '400px' # Set vertical scroll and its height
+          ),
+          width = '100%', # Table width
+          height = 'auto' # Table height
+)
+```
+:::
+
+## Human Activity Recognition Data
+
+
+```{r}
+library(themis)
+recipe(Activity ~ ., df) %>% 
+  step_downsample(Activity, under_ratio = 1) %>% 
+  prep() %>%
+  bake(new_data = NULL) %>%
+  ggplot(aes(x = Activity, fill = Activity))+geom_bar() +
+  geom_bar()
+```
+
+## No penalty
+
+```{r}
+set.seed(123)
+
+split <- initial_split(df)
+train <- training(split)
+test <- testing(split)
+
+rec <- recipe(Activity ~ ., df) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>% 
+  step_downsample(Activity,under_ratio=1)
+
+#rec %>% prep() %>% bake(new_data = NULL) %>% dim()
+
+split <- initial_split(rec %>% prep() %>% bake(new_data = NULL))
+train <- training(split)
+test <- testing(split)
+
+rec <- recipe(Activity ~ ., train) %>% 
+  step_nzv(all_predictors()) %>% 
+  step_normalize(all_predictors()) %>% 
+  step_downsample(Activity,under_ratio=1)
+```
+
+:::{.columns}
+::::{.column width="50%"}
+```{r}
+#| echo: true
+mnr_spec <- multinom_reg(
+  mode="classification",
+  engine="glmnet",
+  penalty=0
+)
+
+mnr_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(mnr_spec) 
+
+mnr_fit <- mnr_wf %>% 
+  fit(train) 
+```
+::::
+
+::::{.column width="50%"}
+Train accuracy:
+```{r}
+tmp<-mnr_fit %>% augment(train) %>% accuracy(truth=Activity, estimate=.pred_class)
+tmp$.estimate
+```
+
+Test accuracy:
+```{r}
+tmp<-mnr_fit %>% augment(test) %>% accuracy(truth=Activity, estimate=.pred_class)
+tmp$.estimate
+```
+::::
+:::
+
+
+## Tuning the L1 Penalty 
+
+```{r}
+set.seed(123)
+```
+
+:::{.columns}
+::::{.column width="50%"}
+:::{style="font-size:50%;"}
+```{r, fig.width=3, fig.height=4}
+#| echo: true
+mnr_spec_tune <- multinom_reg(
+  mode="classification",
+  engine="glmnet",
+  penalty = tune(),
+  mixture = 1
+)
+
+folds = vfold_cv(train,v=5)
+
+param_grid = grid_regular(penalty(), levels=50) 
+
+tune_wf <- workflow() %>%
+  add_recipe(rec) %>% 
+  add_model(mnr_spec_tune)
+
+tune_rs <- tune_grid(
+  tune_wf,
+  folds,
+  grid = param_grid,
+  metrics = metric_set(accuracy)
+)
+```
+
+```{r, fig.width=5, fig.height=3}
+autoplot(tune_rs)
+```
+
+
+:::
+::::
+
+::::{.column width="50%"}
+
+```{r}
+chosen_penalty <- tune_rs %>% select_best(metric = "accuracy", penalty)
+
+final_mnr <- finalize_workflow(tune_wf, chosen_penalty)
+
+final_fit <- fit(final_mnr, train)
+```
+
+Train accuracy:
+```{r}
+tmp<-final_fit %>% augment(train) %>% accuracy(truth=Activity, estimate=.pred_class)
+tmp$.estimate
+```
+
+Test accuracy:
+```{r}
+tmp<-final_fit %>% augment(test) %>% accuracy(truth=Activity, estimate=.pred_class)
+tmp$.estimate
+```
+
+::::
+:::
+
+## Shrinkage of estimates 
+
+:::{.columns}
+::::{.column width="33%"}
+No Penalty
+```{r, fig.height=4, fig.width=3}
+mnr_spec <- multinom_reg(
+  mode="classification",
+  engine="glmnet",
+  penalty=0,
+  mixture=0
+)
+
+mnr_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(mnr_spec) 
+
+mnr_fit <- mnr_wf %>% 
+  fit(train) 
+
+tmp <- tidy(mnr_fit) %>% filter(term != "(Intercept)")
+
+tmp %>% ggplot(aes(x = estimate)) +geom_histogram() + scale_x_continuous(limits=c(-1,1))
+```
+::::
+
+::::{.column width="33%"}
+L1 (Lasso)
+```{r, fig.height=4, fig.width=3}
+mnr_spec <- multinom_reg(
+  mode="classification",
+  engine="glmnet",
+  penalty=chosen_penalty$penalty,
+  mixture=1
+)
+
+mnr_wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(mnr_spec) 
+
+mnr_fit <- mnr_wf %>% 
+  fit(train) 
+
+tmp <- tidy(mnr_fit) %>% filter(term != "(Intercept)")
+tmp %>% ggplot(aes(x = estimate)) +geom_histogram() + scale_x_continuous(limits=c(-1,1))
+```
+::::
+
+::::{.column width="33%"}
+L2 (Ridge)
+
+```{r, fig.width=3, fig.height=4}
+mnr_spec_tune <- multinom_reg(
+  mode="classification",
+  engine="glmnet",
+  penalty = tune(),
+  mixture = 0
+)
+
+folds = vfold_cv(train,v=5)
+
+param_grid = grid_regular(penalty(), levels=50) 
+
+tune_wf <- workflow() %>%
+  add_recipe(rec) %>% 
+  add_model(mnr_spec_tune)
+
+tune_rs <- tune_grid(
+  tune_wf,
+  folds,
+  grid = param_grid,
+  metrics = metric_set(accuracy)
+)
+
+chosen_penalty <- tune_rs %>% select_best(metric = "accuracy", penalty)
+
+final_mnr <- finalize_workflow(tune_wf, chosen_penalty)
+
+final_fit <- fit(final_mnr, train)
+
+tmp <- tidy(final_fit) %>% filter(term != "(Intercept)")
+tmp %>% ggplot(aes(x = estimate)) +geom_histogram() + scale_x_continuous(limits=c(-1,1))
+```
+
+::::
+:::
+
+## When to use each: 
+
+:::{.columns}
+::::{.column width="50%"}
+- **Ridge**:
+  - Multicollinearity is a concern
+  - Number of features is not a major concern
+  
+::::
+
+::::{.column width="50%"}
+- **Lasso**:
+  - You want to find a few key features and **eliminate** irrelevant ones
+
+::::
+:::
+
+- **Elastic**:
+  - Overfitting *and* multicollinearity are concerns
+

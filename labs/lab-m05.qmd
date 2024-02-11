@@ -55,12 +55,11 @@ First, make a bar plot showing the number of observations of each type of `Activ
 
 ```
 
-
 One thing to notice is that we have substantial "class imbalance," meaning there are many observations of some activities--such as cycling and football--and far fewer observations of other activities, such as jogging and pushups. Class imbalance can cause problems for our model, because the training data is driven much more strongly by only a subset of activities.
 
 To deal with this problem, we can use resampling techniques. We can either "upsample," to get more observations of the rarer classes, or "downsample," to have fewer observations of the more common classes.
 
-In this case, we will try upsampling, using the `step_upsample()` function. We can set `over_ratio` to .5, meaning we will oversample the classes with fewer observations until they have 50% as many observations as the class with the most observations. 
+In this case, we will try upsampling, using the `step_upsample()` function. We can set `over_ratio` to .5, meaning we will oversample the classes with fewer observations until they have 50% as many observations as the class with the most observations.
 
 ::: {.callout-note icon="false"}
 ## Exercise 1.B
@@ -77,10 +76,7 @@ Make a recipe, starting with a formula predicting `Activity` from all other vari
 
 Next, we'll explore the data a bit to see what it looks like while doing different activities. Notice that there are a LOT of potential predictor variables in the dataset (112 to be precise). To start, we'll arbitrarily grab a few pairs of variables and make scatterplots, with points colored by `Activity`.
 
-Below, make three plots: 
-- 1. `ACCELEROMETER_X_mean` by `ACCELEROMETER_Y_mean` 
-- 2. `GRAVITY_X_mean` by `GRAVITY_Y_mean` 
-- 3. `GYROSCOPE_X_mean` by `GYROSCOPE_Y_mean`
+Below, make three plots: - 1. `ACCELEROMETER_X_mean` by `ACCELEROMETER_Y_mean` - 2. `GRAVITY_X_mean` by `GRAVITY_Y_mean` - 3. `GYROSCOPE_X_mean` by `GYROSCOPE_Y_mean`
 :::
 
 ```{r}
@@ -128,7 +124,7 @@ Next, set up the test/train split. Use the `strata` argument appropriately, in l
 ::: {.callout-note icon="false"}
 ## Exercise 6
 
-Next, build model specifications for two different models: 1. a kNN model, with `k` = 3 2. a naive Bayes model 3. a multinomial regression model, using `multinomial_reg()` - This is the extension of logistic regression from binary classes to \>2 classes. It will fit a logistic separate logistic regression model for predicting each of our twelve activities separately, and then compare the likelihoods of each model to predict the most likely class - set the `mode` to "classification, `engine` to"glmnet", and set `penalty` and `mixture` to 0.
+Next, build model specifications for three different models: - 1. a kNN model, with `k` = 3 - 2. a naive Bayes model - 3. a multinomial regression model, using `multinomial_reg()` - This is the extension of logistic regression from binary classes to \>2 classes. It will fit a logistic separate logistic regression model for predicting each of our twelve activities separately, and then compare the likelihoods of each model to predict the most likely class - set the `mode` to "classification, `engine` to"glmnet", and set `penalty` and `mixture` to 0.
 :::
 
 ```{r}
@@ -262,4 +258,3 @@ null_spec <- null_model() %>%
 ```{r}
 
 ```
-

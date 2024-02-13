@@ -1,0 +1,243 @@
+---
+title: "Unit 2 Homework Project: Toxic Comment Classification"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this homework are:
+
+-   Utilize basic text pre-processing steps including:
+    - tokenizing
+    - removing stop words
+    - filtering out formatting strings
+    - stemming
+    - converting documents into text embeddings (specifically, bag-of-words and tf-idf embeddings)
+-   Deploy several classification models including penalized logistic regression, k-nearest neighbors, and naive Bayes to predict whether comments are toxic or healthy
+-   Use cross-fold validation to tune model hyperparameters
+-   Use classification metrics to compare and select models
+
+:::
+
+Moderating content is a major challenge on any public social media space, because there may be far too many posts or comments for any reasonably-sized team of humans to sift through. To make their job easier, content moderators can use machine-learning methods to automatically flag posts that are suspected to be toxic (such as containing hate-speech).
+
+Our dataset for this project is a large database of \>100k comments from Wikipedia's Talk Page, which have been annotated by humans for toxicity. Each comment was rated by multiple humans who each gave it a score indicating how toxic or healthy the comment was. Our goal is to train a model that can take a new (unlabeled) comment as input, and successfully predict whether that comment is toxic or healthy.
+
+Let's dive in!
+
+![](../../BDSR2/imgs/toxicComments.jpg)
+
+## WARNING:
+### I have tried to censor the most offensive words in this dataset, and we will not be doing any steps that require reading the actual comments. I would strongly **discourage** looking at the original comments, if you are concerned about reading offensive language. However, there is still some risk that you will be exposed to offensive language in the course of this exercise, and at the very least you will see some "bad words". If you are concerned about this, please speak to us before beginning.
+
+# Library and data loading
+
+```{r, message=FALSE}
+#| echo: true
+library(tidymodels)
+library(tidyverse)
+library(tidytext)
+library(ggplot2)
+library(textrecipes)
+library(SnowballC)
+library(discrim)
+```
+
+```{r, eval=FALSE}
+#| echo: true
+load('toxicComments.Rdata')
+```
+
+
+## Data Visualization & Pre-processing
+
+Our starting point is a dataframe with 159,686 unique comments, uniquely identified by the `rev_id` variable. Each comment was reviewed by \~10 different mTurk workers, each of which has a different `worker_id`, giving us 1,598,289 total rows. The workers gave each comment a `toxicity_score` between -2 (very toxic) to +2 (very healthy).
+
+::: {.callout-note icon="false"}
+## Exercise 1
+
+First, make a histogram of `toxicity_score`.
+:::
+
+```{r}
+```
+
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Next, let's compute a single, binary variable that tells us whether each comment was toxic or healthy. This requires two steps:
+
+1.  Group the data by each unique comment, and summarize it to get the mean toxicity score. Call the new variable `mean_toxicity`
+    -   Note: Be sure to keep the `comment` column in your dataframe, because we'll need this text data later!
+2.  Make a new column giving a binary classification of whether the comment is toxic. Call the new column `toxic`. Its value should be 1 if `mean_toxicity` \< 0 (indicating that the comment is toxic), or 0 otherwise (indicating that it is healthy). Make sure that this variable is treated as a `factor`.
+
+After you've completed those steps, make a barplot showing the frequency of toxic vs healthy comments in our dataset (the class distribution).
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+Next, let's take a look at the text data itself, which is contained in the `comment` column. We'll start by checking out the most frequent words in the dataset. Do the following:
+
+1. Use the `unnest_tokens()` function from the `tidytext` package to tokenize the comments into individual words. 
+2. Group by `word`
+3. Use `summarize()` to get the count for each word 
+4. Arrange the rows in decreasing order of count
+5. Filter to only keep the top 20 words
+    + You can use `top_n()` to filter the top 20 rows.
+6. Make a barplot of counts for the top 20 words, with `word` on the y-axis and the count variable determining the length of the bar
+    + You can use `reorder(column_being_plotted, column_to_order_by)` to make sure your bars are arranged in order of frequency.
+
+:::
+
+```{r}
+
+```
+
+Unsurprisingly, the most frequent words in our dataset include determiners ("the", "a", "an"), coordinating conjunctions ("for", "and", "but", etc.), and prepositions ("in", "under", "towards", etc.). In the world of natural-language processing, these words are often called "stop words," because these are words we want to remove before further processing. That way our model can better detect the less-frequent words that distinguish toxic vs healthy comments. We will also want to remove formatting strings, such as "newline_token", and any numbers.
+
+::: {.callout-note icon="false"}
+## Exercise 4
+
+Below, make a new dataframe called `clean_df`. Beginning with the original dataset, do the following:
+
+1. Tokenize the words
+2. Remove stop-words 
+3. Use `filter()` in combination with `str_detect()` on the `word` column to search for and remove the following patterns: 
+    + "\[0-9\]" 
+    + "newline_token" 
+    + "\\d"
+    + "\[\_\]"
+4. Plot the top 20 most-frequent words again
+
+Note: Make sure to retain the two key columns that we'll need for future processing: `rev_id`, and `toxic`
+
+:::
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 5
+
+Notice that our top most-frequent list contains some variations on the same word, such as "edit", "edits" and "editing." One more useful step is to convert all of the words into their basic word stem. Re-create the same plot above, but after tokenizing, include an additional line of code that will `mutate` the `word` column, adding a new column called `stem`. You can do this by using the `mutate` function, and applying the `wordStem()` function (from the SnowballC package) to the `word` column. Then, re-make the plot above, but this time show the top 20 most frequent word **stems**.
+
+Your final version of `clean_df` should have the following columns: `rev_id`, `toxic`,`word` and `stem`
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 6
+
+Compute the number of words in each comment, and make a **density plot** (`geom_density()`) for each level of `toxic`. Set the `fill` parameter to `toxic`. And lower the `alpha` parameter of the density curve so that you can see both distributions. Do you notice any differences between the distributions of wordcounts for healthy vs toxic comments? 
+
+Note: you may need to manually scale your x-axis in order to zoom in on the region of highest density.
+
+After visually inspecting the plots, also report the mean and median wordcount for each level of `toxic`. Are toxic or healthy comments usually longer?
+:::
+
+```{r}
+
+```
+
+
+
+::: {.callout-note icon="false"}
+## Exercise 7
+
+As a final visualization step, we'll make a word cloud. Do the following:
+
+1. Load the `wordcloud` library
+2. Group the data by `toxic` and `stem`
+3. Get the frequency counts for each stem
+4. Filter to keep only the top 100 most-frequent stems (within each level of `toxic`, so there should be 200 total rows left after the operation)
+5. Make a separate dataframe for just the toxic comments, and one for just the healthy comments
+6. Use the `wordcloud(word_column, frequency_column)` function to plot a word cloud for the **healthy** comments. If you are comfortable seeing the most-frequently use words in comments that were labelled toxic, you can optionally plot another wordcloud for that subset of the data.
+
+:::
+
+```{r}
+
+```
+
+For the rest of the exercises, we're going to use functions from the `textrecipes` package to process the text data as part of our modeling workflow. We'll want our models to take strings of text as inputs, and predict whether the string is a toxic or healthy comment. To get our data into the right format, we'll have to undo the tokenizing step, so that we once again have a column called `comment` containing text-strings. Below, I'll do this step for you by using the `str_c` command to concatenate all of words for each `rev_id`.
+
+```{r, eval = FALSE}
+clean_df <- clean_df %>% 
+  group_by(rev_id, toxic) %>% 
+  summarize(comment = str_c(word, collapse = " ")) %>%
+  ungroup()
+```
+
+
+# Set up the modeling pipeline
+
+::: {.callout-note icon="false"}
+## Exercise 8
+
+Next, make a test/train split from `clean_df`, and load the `textrecipes` library. Then, build a recipe starting with a formula with `toxic` as the outcome variable, and `comment` as the predictor. Add `step_tokenize`, `step_stem`, and `step_tokenfilter` with `max_tokens` = 1000, to use just the 1000 most-frequent words as features. Finally, use `step_tfidf` to convert the dataset into a tf-idf vector for each comment. `prep` and `bake` the recipe to see the outcome of your pre-processing steps.
+
+:::
+
+```{r}
+
+```
+
+
+# Building models
+
+::: {.callout-note icon="false"}
+## Exercise 9
+
+Build and fit a naive Bayes to the training data, and get the balanced accuracy for classification on the test set. We'll keep this step very simple and use it as a starting point to improve upon. 
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 10
+
+Build a logistic regression model, with `mixture` = 0 (we'll be using a Ridge or L2 model) and `penalty` = `tune()`. Make a grid of 30 penalty values using `grid_regular`. Then, use `tune_grid` to tune the penalty. Plot the balanced accuracy as a function of `penalty`. 
+
+:::
+
+```{r}
+
+```
+
+
+::: {.callout-note icon="false"}
+## Exercise 11
+
+Select the maximum penalty value that you can, without incurring any loss in balanced accuracy. Re-train a final model using the chosen penalty value. Finally, get the balanced accuracy on the test set. How do the results compare to naive Bayes?
+
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 12
+
+Load the `vip` library and use `vip(model)` on your final model to get a feature importance plot. Does it seem reasonable that these would be the most important words for distinguishing toxic and healthy comments?
+
+:::
+
+```{r}
+
+```
+

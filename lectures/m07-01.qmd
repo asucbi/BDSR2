@@ -1,0 +1,131 @@
+---
+title: "Tree-based methods"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## Overview
+
+**Types of Trees**
+
+- Regression trees
+- Classification trees
+
+**Ensemble methods**
+
+- Random Forests
+- Boosted trees
+- Bayesian Additive Regression Trees
+
+
+## Decision trees
+
+::: {style="font-size: 80%;"}
+- Decision trees segment or stratify the space of predictor into **regions**
+- Makes predictions based on the points from the training data that fall in each region
+:::
+
+![](../imgs/tree-ex2.png){fig-align="center"}
+
+## Regression tree visualized
+
+- A regression tree is a series of splitting rules
+- The model generates predictions using the mean of the observed points within each region
+
+:::: {.columns}
+::: {.column width="33%"}
+
+::: {style="font-size: 65%;"}
+
+1. `Years < 4.5` $\rightarrow$ left branch ($R_1$)
+2. `Years >= 4.5` $\rightarrow$ right branch
+    i) `Hits < 117.5` $\rightarrow$ left sub-branch ($R_2$)
+    ii) `Hits >= 117.5` $\rightarrow$ right sub-branch ($R_3$)
+:::
+
+:::
+::: {.column width="66%"}
+::: {layout-nrow=1}
+![](../imgs/tree-ex1.png){width=300}
+![](../imgs/tree-ex1b.png){width=300}
+:::
+:::
+::::
+
+
+## Linear v. Non-linear Models
+:::: {.columns}
+::: {.column width="50%"}
+- Linear models can have an advantage when dealing with **linear** problems
+- Tree-based methods can perform much better for **non-linear** problems
+:::
+::: {.column width="50%"}
+![](../imgs/trees-linear-nonlinear.png)
+:::
+::::
+
+
+## Building decision trees
+
+1. Divide predictor space ($X_1, X_2, X_3, ..., X_p$) into $J$ distinct and non-overlapping regions $R_1, R_2, R_3, ..., R_j$
+2. Predict the same value for every observation in $R_j$ based on the training values in $R_j$: 
+    - The mean (regression)
+    - The majority class (classification)
+
+::: {.fragment}
+
+**How do we do #1?**
+
+- Using a **greedy** process of **recursive binary splitting**
+
+:::
+
+## Regression tree: Loss function
+
+Want to find the regions of predictor space $R_1, R_2, ..., R_j$ that minimize the following loss function: 
+
+$$RSS = \sum^J_{j=1}\sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2 $$
+
+## The Algorithm
+
+- Work "top-down" beginning with $R_0$ including all of predictor space
+  - Find predictor $X_j$ and cutpoint $s$ so that splitting parameter space leads to greatest possible reduction in $RSS$
+  - Create regions $R_1$ and $R_{2}$: $R_1(j, s) = {X|X_j < s}$ and $R_2(j, s) = {X|X_j \geq s}$
+- Then repeat process within each of the new regions
+- Stop when no region contains more than $k$ observations
+
+## Sidebar: Greedy algorithms
+
+:::: {.columns}
+::: {.column width="60%"}
+
+- At each step, do the action that takes you closest to the goal (i.e. reduces the loss function the most)
+  - A heuristic for solving problems that are difficult or even impossible to solve other ways
+  - Do not guarantee an optimal solution!
+
+:::
+::: {.column width="40%"}
+
+![](../imgs/problem-solving.png){fig-align="center"}
+
+:::
+::::
+
+
+## Decision trees overfit
+
+- If we create enough distinct regions, our decision tree is bound to overfit our training data
+- Suppose we continue until all regions contain only 1 observation
+- Predictions will be very similar to k-Nearest Neighbors model with k = 1, which we saw tends to overfit
+
+## Dealing with overfitting
+
+- One solution is to fit large tree, and then to **prune** the resulting decision tree according to a *complexity penalty* (akin to regularization or penalized regression)
+- **Ensemble methods** are a more powerful approach
+  - Bagging
+  - Boosting
+  - Random Forests
+  - Bayesian Additive Regression Trees (BART)

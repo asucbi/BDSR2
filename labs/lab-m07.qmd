@@ -1,0 +1,88 @@
+---
+title: "BDSR2 lab template"
+author: "Derek Powell"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this module are:
+
+-   Learn to use a template to make lab documents for BDSR2
+-   Have something we can copy and paste to get started
+:::
+
+Here is where we would have an introduction to the lab.
+
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at neque vel auctor. Mauris in imperdiet tellus. Vestibulum tincidunt maximus pretium. Nullam molestie viverra purus, ut viverra mauris. Aliquam pulvinar nec ante eu elementum. Donec at faucibus urna. Cras semper egestas lectus, et vulputate sapien gravida pulvinar. Proin sit amet laoreet est. Sed auctor, mauris in ultricies tristique, justo ipsum pulvinar risus, non tincidunt sem massa id libero. Etiam eget volutpat nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean rhoncus urna efficitur nunc tincidunt tristique. Sed rhoncus erat nec suscipit lobortis. Duis efficitur pellentesque enim ac feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
+
+
+# The data
+
+We will be using the adult income data.
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+
+adult <- read.table('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', 
+                    sep = ',', fill = F, strip.white = T)
+colnames(adult) <- c('age', 'workclass', 'fnlwgt', 'educatoin', 
+                     'educatoin_num', 'marital_status', 'occupation', 'relationship', 'race', 'sex', 
+                     'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'income')
+
+adult <- as_tibble(adult) %>% 
+  mutate(income = factor(income))
+```
+
+
+# Exercises
+
+## Exercise 1
+::: {.callout-note icon="false"}
+## Exercise 1
+
+Set up the data in train and test splits (call the datasets `train` and `test`), with a 10-fold cross validation (call this `folds`).
+:::
+
+::: {.hidden}
+```{r}
+splits <- initial_split(adult, prop = .8)
+train <- training(splits)
+test <- testing(splits)
+
+folds <- vfold_cv(train, 10)
+```
+
+:::
+
+
+## Exercise 2
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Let's visualize the training data. plot something against the thing
+:::
+
+# a random forests vs logistic regression replication
+
+
+```{r}
+myrec <- recipe(income ~ ., train)
+
+rf_mod <- rand_forest(mode = "classification")
+lr_mod <- logistic_reg()
+
+wf <- workflow() %>% 
+  add_recipe(myrec) %>% 
+  add_model(rf_mod)
+
+wf_set <- workflow_set(list(all_var = myrec), models = list(lr = lr_mod, rf = rf_mod))
+
+fits <- workflow_map(wf_set, "fit_resamples", resamples = folds)
+
+collect_metrics(fits)
+```
+

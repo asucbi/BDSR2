@@ -47,8 +47,7 @@ train %>%
 ## A decision tree model
 
 ```{r}
-dt_mod <- decision_tree(mode = "regression")# %>% 
-  # set_args(cost_complexity = .001, tree_depth =  5, min_n = 50)
+dt_mod <- decision_tree(mode = "regression")
 
 rec <- recipe(cnt ~ 1, train) %>% 
   step_mutate(day_num = as.numeric(dteday))
@@ -76,7 +75,7 @@ test %>%
 ```
 
 
-## Decision trees can have too much variance
+## Decision trees have high variance
 
 Allowed to run deeply enough, decision trees will invariably overfit the data.
 
@@ -106,7 +105,6 @@ test %>%
 ```
 
 
-
 ## Ensemble methods
 
 - Bagging
@@ -122,6 +120,9 @@ Bagging is a nickname for **B**ootstrapped **AGG**regat**ING**
 - Use bootstrapping to resample data $B$ times (e.g. 100)
 - Fit a decision tree to each of the bootstrapped samples
 - Predict mean of regression trees or majority class for classification trees
+
+**Regression**
+$$\hat{y} = \frac{1}{B}\sum_i^B{\hat{f^b}(x)}$$
 
 <!-- :::: {.columns} -->
 <!-- ::: {.column width="50%"} -->
@@ -223,9 +224,9 @@ Random forests use bagging but also sample **predictors**.
 ::: {.callout-tip icon="false"}
 ## Algorithm
 ::: {style="font-size: 75%;"}
-For the $i$th of $N$ trees:
+For the $i$th of $B$ trees:
 
-- Create a resampeld and subsampled dataset $D_i$
+- Create a resampled and subsampled dataset $D_i$
   - Bootstrap resample observation dataset $D_i$
   - Sample $m$ predictors from the total set of $p$ predictors (default: $m \approx \sqrt{p}$)
 - Fit the decision tree on $D_i$
@@ -303,7 +304,9 @@ $$\sigma^2_{X+Y} = \sigma^2_{X} + \sigma^2_{Y} + 2\sigma_{XY}$$
 dt_mod <- decision_tree(mode = "regression", cost_complexity = .005, min_n = tune())
 
 bag_mod <- rand_forest(mode = "regression", mtry = ncol(train) - 1)
+
 rf_mod <- rand_forest(mode = "regression", mtry = tune())
+
 boost_mod <- boost_tree(mode = "regression", trees = tune(), learn_rate = tune())
 
 rec <- recipe(cnt ~ ., train) %>% 
@@ -324,7 +327,7 @@ wflows <- workflow_set(
   models = list(dec_tree = dt_mod, bagged = bag_mod, rf = rf_mod, boost = boost_mod, lin_reg = linear_reg())
 ) %>% 
   option_add(grid = tibble(min_n = c(5, 10, 20, 50)), id = "base_dec_tree") %>% 
-  option_add(grid = expand.grid(trees = c(100, 200, 500, 1000), learn_rate = c(.001, .01)), id = "base_boost") %>% 
+  option_add(grid = expand.grid(trees = c(200, 500, 1000), learn_rate = c(.01, .03, .05)), id = "base_boost") %>% 
   option_add(grid = tibble(mtry = c(2, 3, 4, 7)), id = "base_rf")
 
 res <- workflow_map(

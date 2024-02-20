@@ -1,20 +1,20 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="m07-01_files/libs/clipboard/clipboard.min.js"></script>
-<script src="m07-01_files/libs/quarto-html/tabby.min.js"></script>
-<script src="m07-01_files/libs/quarto-html/popper.min.js"></script>
-<script src="m07-01_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="m07-01_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="m07-01_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="m07-01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="m07-03_files/libs/clipboard/clipboard.min.js"></script>
+<script src="m07-03_files/libs/quarto-html/tabby.min.js"></script>
+<script src="m07-03_files/libs/quarto-html/popper.min.js"></script>
+<script src="m07-03_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="m07-03_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="m07-03_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="m07-03_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.0.36">
 
-  <title>Tree-based methods</title>
+  <title>Tree-based methods for classification</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="m07-01_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="m07-01_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="m07-03_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="m07-03_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -22,13 +22,77 @@
     div.column{display: inline-block; vertical-align: top; width: 50%;}
     div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
     ul.task-list{list-style: none;}
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="m07-01_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link rel="stylesheet" href="m07-03_files/libs/revealjs/dist/theme/quarto.css" id="theme">
   <link rel="stylesheet" href="style.css">
-  <link href="m07-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="m07-01_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="m07-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="m07-01_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link href="m07-03_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="m07-03_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="m07-03_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="m07-03_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
   .callout {
@@ -319,160 +383,179 @@
     <div class="slides">
 
 <section id="title-slide" class="center">
-  <h1 class="title">Tree-based methods</h1>
+  <h1 class="title">Tree-based methods for classification</h1>
   <p class="subtitle">Behavioral Data Science in R II</p>
 </section>
 
-<section id="overview" class="slide level2">
-<h2>Overview</h2>
-<p><strong>Types of Trees</strong></p>
-<ul>
-<li>Regression trees</li>
-<li>Classification trees</li>
-</ul>
-<p><strong>Ensemble methods</strong></p>
-<ul>
-<li>Random Forests</li>
-<li>Boosted trees</li>
-<li>Bayesian Additive Regression Trees</li>
-</ul>
-</section>
-<section id="decision-trees" class="slide level2">
-<h2>Decision trees</h2>
-<div style="font-size: 80%;">
-<ul>
-<li>Decision trees segment or stratify the space of predictor into <strong>regions</strong></li>
-<li>Makes predictions based on the points from the training data that fall in each region</li>
-</ul>
-</div>
+<section id="speech-recognition" class="slide level2">
+<h2>Speech recognition</h2>
 
-<img data-src="../imgs/tree-ex2.png" class="r-stretch quarto-figure-center"></section>
-<section id="regression-tree-visualized" class="slide level2">
-<h2>Regression tree visualized</h2>
+<img data-src="../imgs/siri-header.jpg" class="r-stretch quarto-figure-center"><ul>
+<li>A natural and useful method for human-computer interaction as well as for assistive technologies</li>
+<li>But speech is complex! Have to deal with …
 <ul>
-<li>A regression tree is a series of splitting rules</li>
-<li>The model generates predictions using the mean of the observed points within each region</li>
+<li>accents, dialects, different speakers, environmental noise</li>
+<li>phonemes are contextual</li>
+</ul></li>
 </ul>
-<div class="columns">
-<div class="column" style="width:33%;">
-<div style="font-size: 65%;">
-<ol type="1">
-<li><code>Years &lt; 4.5</code> <span class="math inline">\(\rightarrow\)</span> left branch (<span class="math inline">\(R_1\)</span>)</li>
-<li><code>Years &gt;= 4.5</code> <span class="math inline">\(\rightarrow\)</span> right branch
-<ol type="i">
-<li><code>Hits &lt; 117.5</code> <span class="math inline">\(\rightarrow\)</span> left sub-branch (<span class="math inline">\(R_2\)</span>)</li>
-<li><code>Hits &gt;= 117.5</code> <span class="math inline">\(\rightarrow\)</span> right sub-branch (<span class="math inline">\(R_3\)</span>)</li>
-</ol></li>
-</ol>
+</section>
+<section id="phoneme-dataset" class="slide level2">
+<h2>Phoneme dataset</h2>
+<p>We’ll use a dataset of 4509 examples of 5 phonemes as spoken by 50 male English speakers:</p>
+<ul>
+<li>“sh” as in “she”</li>
+<li>“dcl” as in “dark”</li>
+<li>“iy” as the vowel in “she”</li>
+<li>“aa” as the vowel in “dark”</li>
+<li>“ao” as the first vowel in “water”</li>
+</ul>
+<div class="cell">
+
 </div>
-</div><div class="column" style="width:66%;">
-<div class="quarto-layout-panel">
-<div class="quarto-layout-row quarto-layout-valign-top">
-<div class="quarto-layout-cell" style="flex-basis: 100.0%;justify-content: center;">
-<p><img data-src="../imgs/tree-ex1.png" width="300"> <img data-src="../imgs/tree-ex1b.png" width="300"></p>
+</section>
+<section id="plotting-the-speech-data" class="slide level2">
+<h2>Plotting the speech data</h2>
+
+<img data-src="m07-03_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
+<section id="setting-up" class="slide level2">
+<h2>Setting up</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>splits <span class="ot">&lt;-</span> <span class="fu">initial_split</span>(phoneme)</span>
+<span id="cb1-2"><a href="#cb1-2"></a>train <span class="ot">&lt;-</span> <span class="fu">training</span>(splits)</span>
+<span id="cb1-3"><a href="#cb1-3"></a>test <span class="ot">&lt;-</span> <span class="fu">testing</span>(splits)</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>folds <span class="ot">&lt;-</span> <span class="fu">vfold_cv</span>(train, <span class="dv">5</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a></span>
+<span id="cb1-7"><a href="#cb1-7"></a><span class="fu">nrow</span>(train); <span class="fu">nrow</span>(test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 3381</code></pre>
 </div>
-</div>
-</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 1128</code></pre>
 </div>
 </div>
 </section>
-<section id="linear-v.-non-linear-models" class="slide level2">
-<h2>Linear v. Non-linear Models</h2>
+<section id="pca-with-a-recipe" class="slide level2">
+<h2>PCA with a recipe</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(phoneme <span class="sc">~</span> ., train) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-2"><a href="#cb4-2"></a>  <span class="fu">step_rm</span>(row.names, speaker) <span class="sc">%&gt;%</span> </span>
+<span id="cb4-3"><a href="#cb4-3"></a>  <span class="fu">step_pca</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">num_comp =</span> <span class="dv">9</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="visualizing-principle-components" class="slide level2">
+<h2>Visualizing principle components</h2>
+
+<img data-src="m07-03_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+<section id="building-a-classifier" class="slide level2">
+<h2>Building a classifier</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>dt_mod <span class="ot">&lt;-</span><span class="fu">decision_tree</span>(<span class="at">mode =</span> <span class="st">"classification"</span>, <span class="at">cost_complexity =</span> .<span class="dv">001</span>)</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(phoneme <span class="sc">~</span> ., train) <span class="sc">%&gt;%</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a>  <span class="fu">step_rm</span>(row.names, speaker) <span class="sc">%&gt;%</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a>  <span class="fu">step_pca</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">num_comp =</span> <span class="dv">2</span>)</span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a>wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-8"><a href="#cb5-8"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-9"><a href="#cb5-9"></a>  <span class="fu">add_model</span>(dt_mod)</span>
+<span id="cb5-10"><a href="#cb5-10"></a></span>
+<span id="cb5-11"><a href="#cb5-11"></a>dec_tree_fit <span class="ot">&lt;-</span> wf <span class="sc">%&gt;%</span></span>
+<span id="cb5-12"><a href="#cb5-12"></a>  <span class="fu">fit</span>(train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="decision-tree-boundaries" class="slide level2">
+<h2>Decision tree boundaries</h2>
+
+<img data-src="m07-03_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"></section>
+<section id="classification-tree-loss-functions" class="slide level2">
+<h2>Classification tree: Loss functions</h2>
+<p>Two loss functions are commonly used for fitting classification trees:</p>
+<ul>
+<li>Gini index</li>
+<li>Entropy</li>
+</ul>
 <div class="columns">
 <div class="column" style="width:50%;">
-<ul>
-<li>Linear models can have an advantage when dealing with <strong>linear</strong> problems</li>
-<li>Tree-based methods can perform much better for <strong>non-linear</strong> problems</li>
-</ul>
-</div><div class="column" style="width:50%;">
-<p><img data-src="../imgs/trees-linear-nonlinear.png"></p>
-</div>
-</div>
-</section>
-<section id="growing-decision-trees" class="slide level2">
-<h2>Growing decision trees</h2>
-<ol type="1">
-<li>Divide predictor space (<span class="math inline">\(X_1, X_2, X_3, ..., X_p\)</span>) into <span class="math inline">\(J\)</span> distinct and non-overlapping regions <span class="math inline">\(R_1, R_2, R_3, ..., R_j\)</span></li>
-<li>Predict the same value for every observation in <span class="math inline">\(R_j\)</span> based on the training values in <span class="math inline">\(R_j\)</span>:
-<ul>
-<li>The mean (regression)</li>
-<li>The majority class (classification)</li>
-</ul></li>
-</ol>
-<div class="fragment">
-<p><strong>How do we do #1?</strong></p>
-<ul>
-<li>Using a <strong>greedy</strong> process of <strong>recursive binary splitting</strong></li>
-</ul>
-</div>
-</section>
-<section id="regression-tree-loss-function" class="slide level2">
-<h2>Regression tree: Loss function</h2>
-<p>Want to find the regions of predictor space <span class="math inline">\(R_1, R_2, ..., R_j\)</span> that minimize the following loss function:</p>
-<p><span class="math display">\[RSS = \sum^J_{j=1}\sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2 \]</span></p>
-</section>
-<section id="the-algorithm" class="slide level2">
-<h2>The Algorithm</h2>
-<div class="callout callout-tip no-icon callout-captioned callout-style-default">
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
 <div class="callout-body">
 <div class="callout-caption">
-<p><strong>Algorithm</strong></p>
+<p><strong>Definition</strong></p>
 </div>
 <div class="callout-content">
-<ul>
-<li>Work “top-down” beginning with <span class="math inline">\(R_0\)</span> including all of predictor space
-<ul>
-<li>Find predictor <span class="math inline">\(X_j\)</span> and cutpoint <span class="math inline">\(s\)</span> so that splitting parameter space leads to greatest possible reduction in <span class="math inline">\(RSS\)</span></li>
-<li>Create regions <span class="math inline">\(R_1\)</span> and <span class="math inline">\(R_{2}\)</span>: <span class="math inline">\(R_1(j, s) = {X|X_j &lt; s}\)</span> and <span class="math inline">\(R_2(j, s) = {X|X_j \geq s}\)</span></li>
-</ul></li>
-<li>Then repeat process within each of the new regions</li>
-<li>Stop when no region contains more than <span class="math inline">\(k\)</span> observations</li>
-</ul>
+<p><strong>Gini Index</strong></p>
+<p><span class="math display">\[ G = \sum^K_{k=1}{\hat{p}_{mk}( 1- \hat{p}_{mk})}\]</span></p>
 </div>
 </div>
 </div>
-</section>
-<section id="sidebar-greedy-algorithms" class="slide level2">
-<h2>Sidebar: Greedy algorithms</h2>
-<div class="columns">
-<div class="column" style="width:60%;">
-<ul>
-<li>At each step, do the action that takes you closest to the goal (i.e.&nbsp;reduces the loss function the most)
-<ul>
-<li>A heuristic for solving problems that are difficult or even impossible to solve other ways</li>
-<li>Do not guarantee an optimal solution!</li>
-</ul></li>
-</ul>
-</div><div class="column" style="width:40%;">
-<div class="quarto-figure quarto-figure-center">
-<figure>
-<p><img data-src="../imgs/problem-solving.png"></p>
-</figure>
+</div><div class="column" style="width:50%;">
+<div class="callout callout-caution no-icon callout-captioned callout-style-default">
+<div class="callout-body">
+<div class="callout-caption">
+<p><strong>Definition</strong></p>
+</div>
+<div class="callout-content">
+<p><strong>Entropy</strong></p>
+<p><span class="math display">\[ D = -\sum^K_{k=1}{\hat{p}_{mk}log \ \hat{p}_{mk}}\]</span></p>
+</div>
+</div>
 </div>
 </div>
 </div>
 </section>
-<section id="decision-trees-overfit" class="slide level2">
-<h2>Decision trees overfit</h2>
-<ul>
-<li>If we create enough distinct regions, our decision tree is bound to overfit our training data</li>
-<li>Suppose we continue until all regions contain only 1 observation</li>
-<li>Predictions will be very similar to k-Nearest Neighbors model with k = 1, which we saw tends to overfit</li>
-</ul>
+<section id="model-comparison-code" class="slide level2">
+<h2>Model comparison: Code</h2>
+<div style="font-size: 75%;">
+<div class="cell" data-hash="m07-03_cache/revealjs/unnamed-chunk-8_541919b5b7f064a2d3cadde221438a87">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>dt_mod <span class="ot">&lt;-</span><span class="fu">decision_tree</span>(<span class="at">mode =</span> <span class="st">"classification"</span>, <span class="at">cost_complexity =</span> .<span class="dv">001</span>, <span class="at">tree_depth  =</span> <span class="dv">12</span>, <span class="at">min_n =</span> <span class="dv">5</span>)</span>
+<span id="cb6-2"><a href="#cb6-2"></a>rf_mod <span class="ot">&lt;-</span> <span class="fu">rand_forest</span>(<span class="at">mode =</span> <span class="st">"classification"</span>)</span>
+<span id="cb6-3"><a href="#cb6-3"></a>mn_mod <span class="ot">&lt;-</span> <span class="fu">multinom_reg</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">set_engine</span>(<span class="st">"nnet"</span>, <span class="at">MaxNWts =</span> <span class="fl">1e4</span>)</span>
+<span id="cb6-5"><a href="#cb6-5"></a></span>
+<span id="cb6-6"><a href="#cb6-6"></a></span>
+<span id="cb6-7"><a href="#cb6-7"></a>rec_raw <span class="ot">&lt;-</span> <span class="fu">recipe</span>(phoneme <span class="sc">~</span> ., train) <span class="sc">%&gt;%</span> </span>
+<span id="cb6-8"><a href="#cb6-8"></a>  <span class="fu">step_rm</span>(row.names, speaker)</span>
+<span id="cb6-9"><a href="#cb6-9"></a>  </span>
+<span id="cb6-10"><a href="#cb6-10"></a>rec_pca <span class="ot">&lt;-</span> rec_raw <span class="sc">%&gt;%</span> </span>
+<span id="cb6-11"><a href="#cb6-11"></a>  <span class="fu">step_pca</span>(<span class="fu">all_numeric_predictors</span>(), <span class="at">num_comp =</span> <span class="dv">30</span>)</span>
+<span id="cb6-12"><a href="#cb6-12"></a></span>
+<span id="cb6-13"><a href="#cb6-13"></a>wflows <span class="ot">&lt;-</span> <span class="fu">workflow_set</span>(</span>
+<span id="cb6-14"><a href="#cb6-14"></a>  <span class="at">preproc =</span> <span class="fu">list</span>(<span class="at">raw =</span> rec_raw, <span class="at">pca =</span> rec_pca),</span>
+<span id="cb6-15"><a href="#cb6-15"></a>  <span class="at">models =</span> <span class="fu">list</span>(<span class="at">dec_tree =</span> dt_mod, <span class="at">rf =</span> rf_mod, <span class="at">multinom =</span> mn_mod)</span>
+<span id="cb6-16"><a href="#cb6-16"></a>) </span>
+<span id="cb6-17"><a href="#cb6-17"></a></span>
+<span id="cb6-18"><a href="#cb6-18"></a>res <span class="ot">&lt;-</span> <span class="fu">workflow_map</span>(</span>
+<span id="cb6-19"><a href="#cb6-19"></a>  wflows,</span>
+<span id="cb6-20"><a href="#cb6-20"></a>  <span class="at">fn =</span> <span class="st">"fit_resamples"</span>,</span>
+<span id="cb6-21"><a href="#cb6-21"></a>  <span class="at">resamples =</span> folds</span>
+<span id="cb6-22"><a href="#cb6-22"></a>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
 </section>
-<section id="dealing-with-overfitting" class="slide level2">
-<h2>Dealing with overfitting</h2>
-<ol type="1">
-<li>One solution is to fit large tree, and then to <strong>prune</strong> the resulting decision tree according to a <em>complexity penalty</em> (akin to regularization or penalized regression)</li>
-<li><strong>Ensemble methods</strong> are another, more powerful approach:
-<ul>
-<li>Bagging</li>
-<li>Random Forests</li>
-<li>Boosting</li>
-<li>Bayesian Additive Regression Trees (BART)</li>
-</ul></li>
-</ol>
-<div class="footer footer-default">
+<section id="model-comparison-results" class="slide level2">
+<h2>Model comparison: Results</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a><span class="fu">collect_metrics</span>(res) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">filter</span>(.metric <span class="sc">==</span> <span class="st">"accuracy"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-3"><a href="#cb7-3"></a>  <span class="fu">select</span>(wflow_id, .metric, mean, std_err) <span class="sc">%&gt;%</span> </span>
+<span id="cb7-4"><a href="#cb7-4"></a>  <span class="fu">arrange</span>(<span class="sc">-</span>mean)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 4
+  wflow_id     .metric   mean std_err
+  &lt;chr&gt;        &lt;chr&gt;    &lt;dbl&gt;   &lt;dbl&gt;
+1 pca_multinom accuracy 0.923 0.00409
+2 raw_rf       accuracy 0.922 0.00467
+3 pca_rf       accuracy 0.913 0.00622
+4 raw_multinom accuracy 0.881 0.00627
+5 pca_dec_tree accuracy 0.881 0.00793
+6 raw_dec_tree accuracy 0.877 0.00449</code></pre>
+</div>
+</div>
+</section>
+<section id="multinomial-regression-decision-boundaries" class="slide level2">
+<h2>Multinomial regression decision boundaries</h2>
+
+<img data-src="m07-03_files/figure-revealjs/unnamed-chunk-10-1.png" width="960" class="r-stretch"><div class="footer footer-default">
 
 </div>
 </section>
@@ -480,19 +563,19 @@
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="m07-01_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="m07-03_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="m07-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="m07-01_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="m07-01_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="m07-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="m07-01_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="m07-01_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="m07-01_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="m07-01_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="m07-01_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="m07-03_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>
@@ -687,6 +770,48 @@
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        function fireSlideChanged(previousSlide, currentSlide) {
+
+          // dispatch for htmlwidgets
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for reveal
+        if (window.Reveal) {
+          window.Reveal.addEventListener("slidechanged", function(event) {
+            fireSlideChanged(event.previousSlide, event.currentSlide);
+          });
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

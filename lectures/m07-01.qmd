@@ -68,7 +68,7 @@ bibliography: ../references.bib
 ::::
 
 
-## Building decision trees
+## Growing decision trees
 
 1. Divide predictor space ($X_1, X_2, X_3, ..., X_p$) into $J$ distinct and non-overlapping regions $R_1, R_2, R_3, ..., R_j$
 2. Predict the same value for every observation in $R_j$ based on the training values in $R_j$: 
@@ -91,11 +91,14 @@ $$RSS = \sum^J_{j=1}\sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2 $$
 
 ## The Algorithm
 
+::: {.callout-tip icon="false"}
+## Algorithm
 - Work "top-down" beginning with $R_0$ including all of predictor space
   - Find predictor $X_j$ and cutpoint $s$ so that splitting parameter space leads to greatest possible reduction in $RSS$
   - Create regions $R_1$ and $R_{2}$: $R_1(j, s) = {X|X_j < s}$ and $R_2(j, s) = {X|X_j \geq s}$
 - Then repeat process within each of the new regions
 - Stop when no region contains more than $k$ observations
+:::
 
 ## Sidebar: Greedy algorithms
 
@@ -123,9 +126,9 @@ $$RSS = \sum^J_{j=1}\sum_{i \in R_j} (y_i - \hat{y}_{R_j})^2 $$
 
 ## Dealing with overfitting
 
-- One solution is to fit large tree, and then to **prune** the resulting decision tree according to a *complexity penalty* (akin to regularization or penalized regression)
-- **Ensemble methods** are a more powerful approach
-  - Bagging
-  - Boosting
-  - Random Forests
-  - Bayesian Additive Regression Trees (BART)
+1. One solution is to fit large tree, and then to **prune** the resulting decision tree according to a *complexity penalty* (akin to regularization or penalized regression)
+2. **Ensemble methods** are another, more powerful approach:
+    - Bagging
+    - Random Forests
+    - Boosting
+    - Bayesian Additive Regression Trees (BART)

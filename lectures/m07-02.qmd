@@ -1,0 +1,348 @@
+---
+title: "Trees and forests"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+execute:
+  echo: true
+bibliography: ../references.bib
+---
+
+## The `dcbikeshare` data
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(dsbox)
+library(modelr)
+
+data(dcbikeshare)
+
+head(dcbikeshare)
+```
+
+## Setting up our splits
+
+```{r}
+d <- dcbikeshare %>% 
+  select(-registered, -casual, -instant, -temp, -atemp)
+
+splits <- initial_split(d)
+train <- training(splits)
+test <- testing(splits)
+
+nrow(train); nrow(test)
+```
+
+
+## Visualizing by date
+
+```{r}
+train %>% 
+  ggplot(aes(x=dteday, y = cnt)) +
+  geom_point()
+```
+
+## A decision tree model
+
+```{r}
+dt_mod <- decision_tree(mode = "regression")# %>% 
+  # set_args(cost_complexity = .001, tree_depth =  5, min_n = 50)
+
+rec <- recipe(cnt ~ 1, train) %>% 
+  step_mutate(day_num = as.numeric(dteday))
+
+wf <- workflow() %>% 
+  add_formula(cnt ~ dteday) %>% 
+  add_model(dt_mod)
+                   
+fit <- wf %>% fit(train)
+
+```
+
+
+## Visualizing our model
+
+```{r}
+#| echo: false
+preds <- fit %>% 
+  augment(tibble(dteday = seq(min(train$dteday), max(train$dteday), "days")))
+
+test %>% 
+  ggplot(aes(x=dteday, y = cnt)) +
+  geom_point() +
+  geom_line(data = preds, aes(y = .pred), color = "red")
+```
+
+
+## Decision trees can have too much variance
+
+Allowed to run deeply enough, decision trees will invariably overfit the data.
+
+```{r}
+#| echo: false
+dt_mod <- decision_tree(mode = "regression") %>% 
+  set_args(cost_complexity = .001, tree_depth =  8, min_n = 5)
+
+rec <- recipe(cnt ~ 1, train) %>% 
+  step_mutate(day_num = as.numeric(dteday))
+
+wf <- workflow() %>% 
+  add_formula(cnt ~ dteday) %>% 
+  add_model(dt_mod)
+
+
+fit <- wf %>% fit(train)
+
+preds <- fit %>% 
+  augment(tibble(dteday = seq(min(train$dteday), max(train$dteday), "days")))
+
+test %>% 
+  ggplot(aes(x=dteday, y = cnt)) +
+  geom_point() +
+  geom_line(data = preds, aes(y = .pred), color = "red")
+
+```
+
+
+
+## Ensemble methods
+
+- Bagging
+- Random Forests
+- Boosting
+
+## Bagging
+
+Bagging is a nickname for **B**ootstrapped **AGG**regat**ING**
+
+::::: {.callout-tip icon="false"}
+## Algorithm
+- Use bootstrapping to resample data $B$ times (e.g. 100)
+- Fit a decision tree to each of the bootstrapped samples
+- Predict mean of regression trees or majority class for classification trees
+
+<!-- :::: {.columns} -->
+<!-- ::: {.column width="50%"} -->
+<!-- **Regression** -->
+<!-- $$\hat{y} = \frac{1}{B}\sum_i^B{\hat{f^b}(x)}$$ -->
+<!-- ::: -->
+<!-- ::: {.column width="50%"} -->
+<!-- **Classification** -->
+<!-- $$\hat{y} = \frac{1}{B}\sum_i^B{\hat{f^b}(x)}$$ -->
+<!-- ::: -->
+<!-- :::: -->
+
+:::::
+
+## Bagging reduces variance
+
+```{r}
+#| echo: false
+bagged_tree_preds <- function(train){
+  dt_mod <- decision_tree(mode = "regression") %>% 
+  set_args(cost_complexity = .001, tree_depth = 8, min_n = 20)
+
+  rec <- recipe(cnt ~ 1, train) %>% 
+    step_mutate(day_num = as.numeric(dteday) - 14974)
+  
+  wf <- workflow() %>% 
+    add_formula(cnt ~ dteday) %>% 
+    add_model(dt_mod)
+  
+  fit <- wf %>% fit(train)
+  
+  preds <- fit %>% 
+    augment(tibble(dteday = seq(min(train$dteday), max(train$dteday), "days"))) 
+  
+  return(preds)
+}
+
+
+set.seed(123)
+
+b <- bootstrap(train, 100)
+
+preds <- b %>% 
+  mutate(preds = map(strap, ~bagged_tree_preds(as_tibble(.) ))) %>% 
+  select(-strap) %>% 
+  unnest(cols = c(preds))
+
+test %>%
+  ggplot(aes(x=dteday, y = cnt)) +
+  geom_point(alpha = .2) +
+  # geom_line(data =
+  #             , aes(y = .pred), color = "blue", size=1
+  #   ) +
+  geom_line(data = preds %>% filter(.id %in% c("001","002","003")), aes(y = .pred, color = .id)) +
+  geom_line(data = preds %>% 
+    group_by(dteday) %>% 
+    summarize(
+      .pred = mean(.pred),
+      ul = max(.pred),
+      ll = min(.pred)
+      ),
+  aes(y = .pred), color = "blue", size=1) +
+  geom_ribbon(
+    data = preds %>% 
+      group_by(dteday) %>% 
+      summarize(
+        # .pred = mean(.pred),
+        ul = max(.pred),
+        ll = min(.pred)
+        ),
+    inherit.aes = FALSE,
+    aes(x = dteday, ymin = ll, ymax = ul), alpha =.1, fill = "blue"
+  ) +
+  theme_bw() +
+  theme(
+    panel.grid = element_blank(),
+    legend.position = "none"
+    )
+  
+
+
+# 
+# preds <- preds %>% 
+#   group_by(dteday) %>% 
+#   summarize(.pred = mean(.pred))
+# 
+# train %>% 
+#   ggplot(aes(x=dteday, y = cnt)) +
+#   geom_point(alpha = .5) +
+#   geom_line(data = preds, aes(y = .pred), color = "blue", size=1)
+
+```
+
+
+## Random forests
+
+Random forests use bagging but also sample **predictors**. 
+  
+::: {.callout-tip icon="false"}
+## Algorithm
+::: {style="font-size: 75%;"}
+For the $i$th of $N$ trees:
+
+- Create a resampeld and subsampled dataset $D_i$
+  - Bootstrap resample observation dataset $D_i$
+  - Sample $m$ predictors from the total set of $p$ predictors (default: $m \approx \sqrt{p}$)
+- Fit the decision tree on $D_i$
+
+Generate predictions as with bagging, as average or majority class of all trees.
+:::
+
+:::  
+
+## Reducing variance
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- Sampling predictors when building a random forest helps reduce the correlation between the individual trees. 
+- Random forests are especially helpful when you have many correlated predictors
+
+:::
+::: {.column width="50%"}
+
+::: {.callout-caution icon="false"}
+## Math Box
+- For a set of independent variables $Z_1, Z_2, ..., Z_n$ with variance $\sigma^2$, the variance of the mean $\bar{Z}$ is $\frac{\sigma^2}{n}$
+- But only if the variables are **uncorrelated**
+
+**Variance sum law**
+
+$$\sigma^2_{X+Y} = \sigma^2_{X} + \sigma^2_{Y} + 2\sigma_{XY}$$
+:::
+
+:::
+::::
+
+
+
+
+## Boosting
+
+- Like bagging and random forests, boosting uses an ensemble of trees
+- Unlike bagging and random forests, boosted trees:
+  - Do not involve resampling
+  - Are grown sequentially
+
+## Growing boosted trees
+::: {style="font-size: 75%;"}
+- At each boosting step, a new tree is fit to the **residuals** of the previous tree
+- This way, each tree focuses on the error that the previous trees missed
+:::
+::: {.callout-tip icon="false"}
+## Algorithm
+::: {style="font-size: 75%;"}
+- Predictors $x$ are left alone but outcome data $y$ are transformed into residuals $r$
+- Start with a prediction of zero ($\hat{f} = 0$) and residuals $r_0 = y$
+- For each boosting step $b = 1, 2, ...,B$
+  - Fit a tree $\hat{f^b}$ to the residuals $r_b$
+  - Update $\hat{f}$ by adding the new tree weighted by the shrinkage parameter $\lambda$: $\hat{f}(x) \leftarrow \hat{f}(x) + \lambda \hat{f^b}(x)$
+  - Compute the new residuals $r_{b+1} \leftarrow r_b - \hat{f^b}(x)$
+:::
+
+:::
+
+
+## Overfitting
+
+- Boosted trees are a very powerful tool, with variants like XGBoost offering state-of-the-art performance on many problems
+- But:
+  - Boosted tree models typically require more careful hyperparameter tuning than random forests
+  - Boosted trees can overfit if too many trees are used
+
+# Comparing approaches for the `dcbikeshare` data
+
+## Making the models
+
+```{r}
+dt_mod <- decision_tree(mode = "regression", cost_complexity = .005, min_n = tune())
+
+bag_mod <- rand_forest(mode = "regression", mtry = ncol(train) - 1)
+rf_mod <- rand_forest(mode = "regression", mtry = tune())
+boost_mod <- boost_tree(mode = "regression", trees = tune(), learn_rate = tune())
+
+rec <- recipe(cnt ~ ., train) %>% 
+  step_mutate(day_num = as.numeric(dteday))%>%
+  step_rm(dteday)
+```
+
+## Comparing models
+
+```{r}
+#| cache: true
+
+set.seed(123)
+folds <- vfold_cv(train, 10)
+
+wflows <- workflow_set(
+  preproc = list(base = rec),
+  models = list(dec_tree = dt_mod, bagged = bag_mod, rf = rf_mod, boost = boost_mod, lin_reg = linear_reg())
+) %>% 
+  option_add(grid = tibble(min_n = c(5, 10, 20, 50)), id = "base_dec_tree") %>% 
+  option_add(grid = expand.grid(trees = c(100, 200, 500, 1000), learn_rate = c(.001, .01)), id = "base_boost") %>% 
+  option_add(grid = tibble(mtry = c(2, 3, 4, 7)), id = "base_rf")
+
+res <- workflow_map(
+  wflows,
+  fn = "tune_grid",
+  resamples = folds
+) 
+
+```
+
+## Model comparison results
+
+```{r}
+collect_metrics(res) %>% 
+  filter(.metric == "rsq") %>%
+  group_by(wflow_id) %>% 
+  filter(mean == max(mean)) %>%
+  select(wflow_id, .metric, mean, n, std_err) %>% 
+  arrange(-mean)
+```
+

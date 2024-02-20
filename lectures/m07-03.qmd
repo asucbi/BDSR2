@@ -1,0 +1,230 @@
+---
+title: "Tree-based methods for classification"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+execute:
+  echo: true
+bibliography: ../references.bib
+---
+
+
+## Speech recognition
+![](../imgs/siri-header.jpg){fig-align='center'}
+
+- A natural and useful method for human-computer interaction as well as for assistive technologies
+- But speech is complex! Have to deal with ...
+  - accents, dialects, different speakers, environmental noise
+  - phonemes are contextual
+
+## Phoneme dataset
+
+We'll use a dataset of 4509 examples of 5 phonemes as spoken by 50 male English speakers:
+
+- "sh" as in "she"
+- "dcl" as in "dark"
+- "iy" as the vowel in "she"
+- "aa" as the vowel in "dark"
+- "ao" as the first vowel in "water"
+
+```{r}
+#| echo: false
+library(tidyverse)
+library(tidymodels)
+phoneme <- read_csv("https://hastie.su.domains/ElemStatLearn/datasets/phoneme.data")
+
+phoneme <- phoneme %>% 
+  rename(phoneme = g ) %>% 
+  mutate(phoneme = factor(phoneme))
+
+
+theme_set(theme_bw())
+theme_update(panel.grid = element_blank())
+```
+
+## Plotting the speech data
+
+```{r}
+#| echo: false
+phoneme %>% 
+  group_by(phoneme) %>%
+  sample_n(3) %>%
+  gather(lp_dim, val, contains("x.")) %>% 
+  mutate(lp_dim = as.numeric(gsub("x.", "",lp_dim))) %>% 
+  rename(trial_id = row.names) %>% 
+  ggplot(aes(x=lp_dim, y = val, color = phoneme, group = trial_id)) +
+  geom_line(alpha = .5) +
+  labs(x = "Frequency", y = "log-periodogram", color = "Phoneme")
+
+```
+## Setting up
+
+```{r}
+splits <- initial_split(phoneme)
+train <- training(splits)
+test <- testing(splits)
+
+folds <- vfold_cv(train, 5)
+
+nrow(train); nrow(test)
+```
+
+
+## PCA with a recipe
+
+```{r}
+rec <- recipe(phoneme ~ ., train) %>% 
+  step_rm(row.names, speaker) %>% 
+  step_pca(all_numeric_predictors(), num_comp = 9)
+```
+
+## Visualizing principle components
+
+```{r}
+#| echo: false
+set.seed(123)
+
+juice(prep(rec)) %>% 
+  sample_n(1000) %>% 
+  ggplot(aes(x = PC1, y = PC2, color = phoneme)) +
+  geom_point(alpha = .5)
+```
+
+
+## Building a classifier
+
+```{r}
+dt_mod <-decision_tree(mode = "classification", cost_complexity = .001)
+
+rec <- recipe(phoneme ~ ., train) %>%
+  step_rm(row.names, speaker) %>%
+  step_pca(all_numeric_predictors(), num_comp = 2)
+
+wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(dt_mod)
+
+dec_tree_fit <- wf %>%
+  fit(train)
+      
+```
+
+
+## Decision tree boundaries
+
+```{r}
+#| echo: false
+library(modelr)
+
+juiced_df <- juice(prep(rec)) 
+
+pred_grid <- juiced_df %>% 
+  data_grid(
+    PC1 = seq_range(PC1, 100), 
+    PC2 = seq_range(PC2, 100)
+  )
+
+preds <- pred_grid %>% 
+  mutate(.pred_class = predict(extract_fit_engine(dec_tree_fit), newdata = ., type = "class"))
+
+juiced_df %>% 
+  ggplot(aes(x = PC1, y = PC2, color = phoneme)) +
+  geom_point(alpha = .5) +
+  geom_point(data = preds, aes(x = PC1, y = PC2, color = .pred_class), shape = 15, alpha=.2, inherit.aes = FALSE, stat = "identity")
+```
+
+
+## Classification tree: Loss functions
+
+Two loss functions are commonly used for fitting classification trees:
+
+- Gini index
+- Entropy
+
+:::: {.columns}
+::: {.column width="50%"}
+
+::: {.callout-caution icon="false"}
+## Definition
+**Gini Index**
+$$ G = \sum^K_{k=1}{\hat{p}_{mk}( 1- \hat{p}_{mk})}$$
+:::
+
+:::
+::: {.column width="50%"}
+
+
+::: {.callout-caution icon="false"}
+## Definition
+**Entropy**
+$$ D = -\sum^K_{k=1}{\hat{p}_{mk}log \ \hat{p}_{mk}}$$
+:::
+
+:::
+::::
+
+
+
+## Model comparison: Code
+
+::: {style="font-size: 75%;"}
+
+```{r}
+#| cache: true
+
+dt_mod <-decision_tree(mode = "classification", cost_complexity = .001, tree_depth  = 12, min_n = 5)
+rf_mod <- rand_forest(mode = "classification")
+mn_mod <- multinom_reg() %>% 
+  set_engine("nnet", MaxNWts = 1e4)
+
+
+rec_raw <- recipe(phoneme ~ ., train) %>% 
+  step_rm(row.names, speaker)
+  
+rec_pca <- rec_raw %>% 
+  step_pca(all_numeric_predictors(), num_comp = 30)
+
+wflows <- workflow_set(
+  preproc = list(raw = rec_raw, pca = rec_pca),
+  models = list(dec_tree = dt_mod, rf = rf_mod, multinom = mn_mod)
+) 
+
+res <- workflow_map(
+  wflows,
+  fn = "fit_resamples",
+  resamples = folds
+) 
+```
+:::
+
+## Model comparison: Results
+
+```{r}
+collect_metrics(res) %>% 
+  filter(.metric == "accuracy") %>% 
+  select(wflow_id, .metric, mean, std_err) %>% 
+  arrange(-mean)
+```
+
+
+## Multinomial regression decision boundaries
+
+```{r}
+#| echo: false
+wf <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(mn_mod)
+
+fitz <- wf %>%
+  fit(train)
+
+preds <- pred_grid %>% 
+  mutate(.pred_class = predict(extract_fit_engine(fitz), newdata = ., type = "class"))
+
+juiced_df %>% 
+  ggplot(aes(x = PC1, y = PC2, color = phoneme)) +
+  geom_point(alpha = .5) +
+  geom_point(data = preds, aes(x = PC1, y = PC2, color = .pred_class), shape = 15, alpha=.2, inherit.aes = FALSE, stat = "identity")
+```
+

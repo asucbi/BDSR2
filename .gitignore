@@ -65,3 +65,6 @@ proc/**/data
 ## answer keys
 
 *-key.*
+
+# cached files
+*/*_files/*

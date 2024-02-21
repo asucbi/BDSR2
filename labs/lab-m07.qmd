@@ -1,5 +1,5 @@
 ---
-title: "BDSR2 lab template"
+title: "Module 7 Lab: NYC taxi trips"
 author: "Derek Powell"
 bibliography: ../references.bib
 editor: source
@@ -7,63 +7,70 @@ editor: source
 
 
 ```{r}
-#| echo: false
+#| include: false
 library(tidyverse)
 library(tidymodels)
+library(hutils)
 
-set.seed(123)
-taxi <- read_csv("data/nyc_taxi_trip_duration.csv") %>% 
-  sample_frac(.1) %>% 
-  select(-id, -dropoff_datetime) %>% 
-  filter(trip_duration > 59, trip_duration <= 8*60*60) %>% 
-  # mutate(trip_duration = log(trip_duration)) %>% 
-  filter(40.850 > pickup_latitude, pickup_latitude > 40.625, 40.850 > dropoff_latitude, dropoff_latitude >= 40.624) %>% 
-  filter(pickup_longitude > -74.05, pickup_longitude < -73.75,  dropoff_longitude > -74.05,  dropoff_longitude < -73.75) %>% 
-  mutate(
-    dist = hutils::haversine_distance(pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude),
-    # euc_dist = sqrt((pickup_longitude - dropoff_longitude)^2 + (pickup_latitude - dropoff_latitude)^2),
-    speed = dist/(trip_duration/3600)
-    ) %>% 
-  filter(!(trip_duration < 120 & speed > 100)) %>% 
-  select(-dist, -speed) %>% 
-  mutate(trip_duration = log(trip_duration))
+taxi <- read_csv("data/nyc-taxi.csv")
+
 ```
+
+![](../imgs/nyc-taxi.jpg)
 
 ::: {.callout-caution icon="false"}
 ## Learning Objectives
 
 Our learning objectives for this module are:
 
--   Apply non-linear modeling techniques with decision trees, random forests, and boosted trees and contrast them with a linear model
+-   Apply non-linear modeling techniques with decision trees, random forests, and boosted trees
 -   Gain experience using recipes to conduct feature engineering and visualization
 -   Become acquainted with using `workflow_set()` and `workflow_map()` functions of `tidymodels` to efficiently compare models
 -   Conduct an efficient hyperparameter tuning search and compare against untuned models.
 :::
 
-Here is where we would have an introduction to the lab.
+In this lab assignment we will be building a predictive model to predict NYC taxi travel times. 
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at neque vel auctor. Mauris in imperdiet tellus. Vestibulum tincidunt maximus pretium. Nullam molestie viverra purus, ut viverra mauris. Aliquam pulvinar nec ante eu elementum. Donec at faucibus urna. Cras semper egestas lectus, et vulputate sapien gravida pulvinar. Proin sit amet laoreet est. Sed auctor, mauris in ultricies tristique, justo ipsum pulvinar risus, non tincidunt sem massa id libero. Etiam eget volutpat nunc. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Aenean rhoncus urna efficitur nunc tincidunt tristique. Sed rhoncus erat nec suscipit lobortis. Duis efficitur pellentesque enim ac feugiat. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae.
+Taxi cabs are a quintessential part of the everyday rhythm of New York City life. They offer a reliable and convenient means of transportation for residents and visitors alike: From commuters navigating the city's diverse neighborhoods to tourists exploring its iconic landmarks, taxis serve as dependable allies in navigating the urban landscape. Whether hailed on the street or summoned via a mobile app, these yellow cabs are an integral part of NYC's charm, providing a familiar sight amid the hustle and bustle of city life.
 
+At the same time, predicting travel times, delivery schedules, and other logistical factors is crucial for individuals, businesses, and governments alike. For individuals, accurate predictions enable efficient planning of daily activities, reducing stress and enhancing productivity. Businesses rely on such forecasts to optimize supply chain management, minimize costs, and maintain customer satisfaction through timely deliveries. Additionally, governments utilize predictive models to improve traffic management, urban planning, and public transportation systems, ultimately enhancing overall city functionality and citizen well-being. In essence, accurate predictions of travel and delivery times are fundamental for enhancing efficiency, reducing costs, and improving the quality of life for everyone involved.
 
-# The data
+# Preliminaries
 
-We will be using data describing `r nrow(taxi)` NYC taxi rides in 2016. This is a small subset of a larger dataset of 1.5 million taxi rides that was the subject of a Kaggle competition: link.
+## The data
 
+We will be using data describing `r nrow(taxi)` NYC taxi rides in 2016. This is a small subset of a larger dataset of 1.5 million taxi rides that was the subject of a [Kaggle competition](https://www.kaggle.com/c/nyc-taxi-trip-duration).
 
-
-# Setting up parallel processing
-
-We will be performing some computationally intensive training and tuning steps that benefit from parallelization: spreading the training of individual models across multiple processor cores.
-
-We can configure this with the `doMC` package, setting cores to 8 to match how I've set up your posit cloud instances.
+Use the code below to set up your environment and load the data.
 
 ```{r}
+#| message: false
+library(tidyverse)
+library(tidymodels)
+library(hutils)
+
+taxi <- read_csv("data/nyc-taxi.csv")
+```
+
+
+## Setting up parallel processing
+
+We will be performing some computationally intensive training and tuning steps that benefit from parallelization: spreading the training of individual models across multiple CPU cores.
+
+We can configure this with the `doMC` package, setting cores to 8 to match how I've set up your posit cloud instances. Relevant `tidymodels` functions will then automatically use parallelization as defined here by default. 
+
+Copy and paste the code below and run it to set up parallelization in your environment.
+
+```{r}
+#| message: false
 library(doMC)
 registerDoMC(cores = 8)
 ```
 
 
-# Exercises
+# Exploratory Data Analysis
+
+We'll begin as we generally should with a quick exploratory data analysis and some visualizations of our data.
 
 ## Exercise 1
 ::: {.callout-note icon="false"}
@@ -72,31 +79,12 @@ registerDoMC(cores = 8)
 Set up the data in train and test splits (call the datasets `train` and `test`), with a 10-fold cross validation (call this `folds`).
 :::
 
-::: {.hidden}
-```{r}
-splits <- initial_split(taxi, prop = .8)
-train <- training(splits)
-test <- testing(splits)
-
-folds <- vfold_cv(train, 5)
-```
-:::
-
 
 ## Exercise 2
 ::: {.callout-note icon="false"}
 ## Exercise 2
 
 Let's visualize the training data by plotting the pickup latitude and longitude points. Because there are so many points, we'll want to set `size` to be `.1` and `alpha` to `.2`.
-:::
-
-::: {.hidden}
-```{r}
-train %>% 
-  ggplot(aes(x=pickup_longitude, y = pickup_latitude)) +
-  geom_point(alpha = .2, size = .1, color = "blue") +
-  theme_bw() 
-```
 :::
 
 ## Exercise 3
@@ -108,39 +96,20 @@ Let's also plot the distribution of our outcome variable, `trip_duration`. These
 
 # Fitting models
 
+Now we're ready to begin fitting some models. Let's quickly compare a few types of models using a workflow set.
 
 ## Exercise 4
 ::: {.callout-note icon="false"}
 ## Exercise 4
 Let's fit some models!
 
-- Create a recipe called `base_rec` that predicts `trip_duration` from all variables
+- Create a recipe called `base_rec` that predicts `trip_duration` from all variables. Your recipe should convert all variables into numeric variables (dummy coding nominal variables) so that the data can be used for the boosted tree model (`xgboost` requires all predictors be numeric).
 - Create a workflow set that:
   - Includes the recipe as the preprocessor with `preprocessor = list(base = base_rec)`
-  - And includes as models a decision tree, random forest, and linear regression model (remember, they have to be put together in a list)
+  - And includes as models a decision tree, random forest, boosted tree, and linear regression model (remember, they have to be put together in a list)
 - Using `workflow_map`, fit these models to the cross-validation folds. 
 - Examine their performance using `collect_metrics`
 :::
-
-
-
-```{r}
-myrec <- recipe(trip_duration ~ ., train)
-
-# boost_mod <- boost_tree(mode = "regression")
-rf_mod <- rand_forest(mode = "regression")
-lr_mod <- linear_reg()
-
-wf <- workflow() %>% 
-  add_recipe(myrec) %>% 
-  add_model(rf_mod)
-# 
-wf_set <- workflow_set(list(np = myrec), models = list(lr = lr_mod, rf = rf_mod))
-
-fits <- workflow_map(wf_set, "fit_resamples", resamples = folds)
-
-collect_metrics(fits)
-```
 
 
 ## Exercise 5
@@ -149,15 +118,13 @@ collect_metrics(fits)
 
 Let's add an additional metric, mean absolute error. Create a metric set called `custom_metrics` that calculates $R^2$, $RMSE$ and $MAE$. Re-run the model training and evaluation with this passed into your `workflow_map()` with the `metrics` argument.
 
-By how many seconds will our estimates miss on average? Exponentiate the $MAE$ values to find this answer.
+By how many seconds will our estimates typically be off by? Exponentiate the $MAE$ values to find this answer.
 :::
 
 
 # Feature engineering
 
-We need some more features. One is distance. Others are related to time.
-
-Use the `hutils::haversine_distance()` function
+We might be able to improve our predictions by engineering some new features to help our models uncover important relationships. For instance, **distance** might be an important variable for predicting the duration of a trip. Distance information is already in the data we have, in the latitude and longitude values for pickup and dropoff. However, we might make that information easier for our model to use by directly computing a variable to represent it.
 
 ## Exercise number 6
 ::: {.callout-note icon="false"}
@@ -165,8 +132,9 @@ Use the `hutils::haversine_distance()` function
 
 Create a new recipe called `fe_rec` that will include some additional feature engineering steps.
 
-- Create a new variable called `dist_km` using the `hutils::haversine_distance()` function. Look at the help if you need help.
-- Use the `step_date()` and `step_time()` recipe functions to create features for the day of the week, day of year, and decimal representation for the time of day.
+- Create a new variable called `dist_km` using the `haversine_distance()` function from the `hutils` package. Look at the help if you need help.
+- Create a new variable called `bearing` using the `bearing()` function from the `hutils` package. This will indicate the overall direction of travel for the trip.
+- Use the `step_date()` and `step_time()` recipe functions to create features for the day of the week, day of year, and decimal representation for the time of day. You can remove the original datetime variable with the `keep_original_cols` argument or in its owns step.
 
 Then, prep and juice your recipe and store it as `train_juiced`.
 :::
@@ -178,39 +146,11 @@ Then, prep and juice your recipe and store it as `train_juiced`.
 
 Visualize some of your new features. 
 
-1. Examine the relationship between `trip_duration` and distance
-2. Examine how the time of day affects the average speed of travel across the city. Outside of your recipe, round your decimal time of day variable to the 1 decimal place and compute a new variable `speed_kmph`. Plot the average speed across each of the new time of day values. For bonus points, add a `geom_ribbon()` with a 95% confidence interval (i.e. $1.96 \times$ the standard error).
+1. Examine the relationship between `trip_duration` and distance. Use a small point size and low alpha so you can see individual points better.
+2. Examine how the time of day affects the average speed of travel across the city. Outside of your recipe, mutate the `train_juiced` data to round your decimal time of day variable to the 1 decimal place and compute a new variable `speed_kmph`. Plot the average speed across each of the new time of day values. For bonus points, add a `geom_ribbon()` with a 95% confidence interval (i.e. $1.96 \times$ the standard error).
 
 :::
 
-
-```{r}
-fe_rec <- recipe(trip_duration ~ ., train) %>%
-  step_mutate(
-    dist = hutils::haversine_distance(pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude)
-    ) %>%
-  step_date(pickup_datetime, features = c("dow", "doy")) %>%
-  step_time(pickup_datetime, features = c("decimal_day"), keep_original_cols = FALSE)
-
-train_juiced <- juice(prep(fe_rec))
-```
-
-```{r}
-train_juiced %>% 
-  ggplot(aes(x=dist, y = trip_duration)) +
-  geom_point()
-```
-
-```{r}
-train_juiced %>% 
-  mutate(speed_kmph = dist / exp(trip_duration) * 3600) %>% 
-  mutate(pickup_datetime_decimal_day = round(pickup_datetime_decimal_day, 1)) %>% 
-  group_by(pickup_datetime_decimal_day) %>% 
-  summarize(M = mean(speed_kmph), se = sd(speed_kmph)/sqrt(n()))  %>% 
-  ggplot(aes(x = pickup_datetime_decimal_day, y = M)) +
-  geom_line() +
-  geom_ribbon(aes(ymin = M - 2 * se, ymax = M + 2*se), alpha = .2)
-```
 
 
 ## Exercise 8
@@ -229,37 +169,47 @@ Briefly answer two questions:
 Using `workflow_map()` fit the same models with the new feature engineering recipe. Then, collect and display the results. What do you find?
 :::
 
-
-
 ## Hyperparameter tuning
 
-Let's make our models even better
+Let's make our models even better! Unlike a basic linear regression model, models like boosted trees need some tuning of their hyperparameters to perform their best.
 
-- 12, 13, read tidymodels 15
+::: callout-tip
+For further details and examples that might help with this set of exercises, I'll refer you to Sections 12.2, 12.5-12.6, 13.1, 13.5.5, and Chapter 15 of [Tidy Modeling with R](https://www.tmwr.org/tuning#tuning-parameter-examples).
+:::
 
 ## Exercise 10
 ::: {.callout-note icon="false"}
 ## Exercise 10
 
 - Make new random forest and boosted tree models and pass in the `tune()` function for their important parameters: `mtry` for the random forest model, and `trees`, `learn_rate` for the boosted tree model.
-- Create a new `workflow_map()` with the argument `fn = "tune_race_anova"` and `grid = 20`. This will create a grid with (up to) 20 different parameter combinations and conduct a racing parameter search to find the best hyperparameters for each model.
+- Set a seed as there is some randomization involved in the next step
+- Run a new `workflow_map()` to compare your linear regression, random forest, and boosted tree models using the feature engineering preprocessor. Note that running this step may take 20+ minutes. You will need to set a few special arguments:
+    - First, set the arguments `fn = "tune_race_anova"` and `grid = 10`. This will create a grid with (up to) 10 different parameter combinations and conduct a racing parameter search to find the best hyperparameters for each model.
+    - Also, set the argument `control = control_race(save_workflow = TRUE)` to save the workflows so they can be extracted later.
 - Rather than just collecting the metrics, plot them as a pointrange plot (with the errorbars representing standard errors). Make sure to sort from best to worst, and color things by the model type.
 
 What do you make of the performance and the effect of our extra tuning effort?
 :::
 
+## Exercise 11
 
-```{r}
-rf_mod_tune <- rand_forest("regression", mtry = tune())
-wf_set2 <- workflow_set(list(np = myrec, fe = fe_rec), models = list(lr = lr_mod, rf = rf_mod_tune))
+It's time to re-train our best model on our full training data set and evaluate its performance on the test data. 
 
-fits <- workflow_map(
-  wf_set2, 
-  "tune_race_anova", 
-  resamples = folds,
-  grid = 20
-  )
+::: {.callout-note icon="false"}
+## Exercise 11
 
-collect_metrics(fits)
-```
+Extract the best-performing workflow from your workflow set and re-train it on the full training data. You can use the function `select_best(..., metric = "rmse")` on your fitted results to get the workflow with the best model and hyperparameter settings. 
 
+Then, calculate its predictive performance on the test data. 
+
+:::
+
+# Wrapping up
+
+When you are finished, knit your Quarto document to a PDF file.
+
+::: {.callout-important icon="false"}
+**MAKE SURE YOU LOOK OVER THIS FILE CAREFULLY BEFORE SUBMITTING**
+:::
+
+When you are sure it looks good, submit it on Canvas in the appropriate assignment page.

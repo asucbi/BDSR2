@@ -5,13 +5,39 @@ bibliography: ../references.bib
 editor: source
 ---
 
+
+```{r}
+#| echo: false
+library(tidyverse)
+library(tidymodels)
+
+set.seed(123)
+taxi <- read_csv("data/nyc_taxi_trip_duration.csv") %>% 
+  sample_frac(.1) %>% 
+  select(-id, -dropoff_datetime) %>% 
+  filter(trip_duration > 59, trip_duration <= 8*60*60) %>% 
+  # mutate(trip_duration = log(trip_duration)) %>% 
+  filter(40.850 > pickup_latitude, pickup_latitude > 40.625, 40.850 > dropoff_latitude, dropoff_latitude >= 40.624) %>% 
+  filter(pickup_longitude > -74.05, pickup_longitude < -73.75,  dropoff_longitude > -74.05,  dropoff_longitude < -73.75) %>% 
+  mutate(
+    dist = hutils::haversine_distance(pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude),
+    # euc_dist = sqrt((pickup_longitude - dropoff_longitude)^2 + (pickup_latitude - dropoff_latitude)^2),
+    speed = dist/(trip_duration/3600)
+    ) %>% 
+  filter(!(trip_duration < 120 & speed > 100)) %>% 
+  select(-dist, -speed) %>% 
+  mutate(trip_duration = log(trip_duration))
+```
+
 ::: {.callout-caution icon="false"}
 ## Learning Objectives
 
 Our learning objectives for this module are:
 
--   Learn to use a template to make lab documents for BDSR2
--   Have something we can copy and paste to get started
+-   Apply non-linear modeling techniques with decision trees, random forests, and boosted trees and contrast them with a linear model
+-   Gain experience using recipes to conduct feature engineering and visualization
+-   Become acquainted with using `workflow_set()` and `workflow_map()` functions of `tidymodels` to efficiently compare models
+-   Conduct an efficient hyperparameter tuning search and compare against untuned models.
 :::
 
 Here is where we would have an introduction to the lab.
@@ -21,20 +47,19 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer imperdiet at ne
 
 # The data
 
-We will be using the adult income data.
+We will be using data describing `r nrow(taxi)` NYC taxi rides in 2016. This is a small subset of a larger dataset of 1.5 million taxi rides that was the subject of a Kaggle competition: link.
+
+
+
+# Setting up parallel processing
+
+We will be performing some computationally intensive training and tuning steps that benefit from parallelization: spreading the training of individual models across multiple processor cores.
+
+We can configure this with the `doMC` package, setting cores to 8 to match how I've set up your posit cloud instances.
 
 ```{r}
-library(tidyverse)
-library(tidymodels)
-
-adult <- read.table('https://archive.ics.uci.edu/ml/machine-learning-databases/adult/adult.data', 
-                    sep = ',', fill = F, strip.white = T)
-colnames(adult) <- c('age', 'workclass', 'fnlwgt', 'educatoin', 
-                     'educatoin_num', 'marital_status', 'occupation', 'relationship', 'race', 'sex', 
-                     'capital_gain', 'capital_loss', 'hours_per_week', 'native_country', 'income')
-
-adult <- as_tibble(adult) %>% 
-  mutate(income = factor(income))
+library(doMC)
+registerDoMC(cores = 8)
 ```
 
 
@@ -49,13 +74,12 @@ Set up the data in train and test splits (call the datasets `train` and `test`),
 
 ::: {.hidden}
 ```{r}
-splits <- initial_split(adult, prop = .8)
+splits <- initial_split(taxi, prop = .8)
 train <- training(splits)
 test <- testing(splits)
 
-folds <- vfold_cv(train, 10)
+folds <- vfold_cv(train, 5)
 ```
-
 :::
 
 
@@ -63,25 +87,178 @@ folds <- vfold_cv(train, 10)
 ::: {.callout-note icon="false"}
 ## Exercise 2
 
-Let's visualize the training data. plot something against the thing
+Let's visualize the training data by plotting the pickup latitude and longitude points. Because there are so many points, we'll want to set `size` to be `.1` and `alpha` to `.2`.
 :::
 
-# a random forests vs logistic regression replication
+::: {.hidden}
+```{r}
+train %>% 
+  ggplot(aes(x=pickup_longitude, y = pickup_latitude)) +
+  geom_point(alpha = .2, size = .1, color = "blue") +
+  theme_bw() 
+```
+:::
+
+## Exercise 3
+::: {.callout-note icon="false"}
+## Exercise 3
+Let's also plot the distribution of our outcome variable, `trip_duration`. These values are log-transformed. Plot them as they are in the dataset, and also after exponentiating them back onto their original scale. What do you think the original values represent? (seconds? minutes ? hours?)
+:::
+
+
+# Fitting models
+
+
+## Exercise 4
+::: {.callout-note icon="false"}
+## Exercise 4
+Let's fit some models!
+
+- Create a recipe called `base_rec` that predicts `trip_duration` from all variables
+- Create a workflow set that:
+  - Includes the recipe as the preprocessor with `preprocessor = list(base = base_rec)`
+  - And includes as models a decision tree, random forest, and linear regression model (remember, they have to be put together in a list)
+- Using `workflow_map`, fit these models to the cross-validation folds. 
+- Examine their performance using `collect_metrics`
+:::
+
 
 
 ```{r}
-myrec <- recipe(income ~ ., train)
+myrec <- recipe(trip_duration ~ ., train)
 
-rf_mod <- rand_forest(mode = "classification")
-lr_mod <- logistic_reg()
+# boost_mod <- boost_tree(mode = "regression")
+rf_mod <- rand_forest(mode = "regression")
+lr_mod <- linear_reg()
 
 wf <- workflow() %>% 
   add_recipe(myrec) %>% 
   add_model(rf_mod)
-
-wf_set <- workflow_set(list(all_var = myrec), models = list(lr = lr_mod, rf = rf_mod))
+# 
+wf_set <- workflow_set(list(np = myrec), models = list(lr = lr_mod, rf = rf_mod))
 
 fits <- workflow_map(wf_set, "fit_resamples", resamples = folds)
+
+collect_metrics(fits)
+```
+
+
+## Exercise 5
+::: {.callout-note icon="false"}
+## Exercise 5
+
+Let's add an additional metric, mean absolute error. Create a metric set called `custom_metrics` that calculates $R^2$, $RMSE$ and $MAE$. Re-run the model training and evaluation with this passed into your `workflow_map()` with the `metrics` argument.
+
+By how many seconds will our estimates miss on average? Exponentiate the $MAE$ values to find this answer.
+:::
+
+
+# Feature engineering
+
+We need some more features. One is distance. Others are related to time.
+
+Use the `hutils::haversine_distance()` function
+
+## Exercise number 6
+::: {.callout-note icon="false"}
+## Exercise number 6
+
+Create a new recipe called `fe_rec` that will include some additional feature engineering steps.
+
+- Create a new variable called `dist_km` using the `hutils::haversine_distance()` function. Look at the help if you need help.
+- Use the `step_date()` and `step_time()` recipe functions to create features for the day of the week, day of year, and decimal representation for the time of day.
+
+Then, prep and juice your recipe and store it as `train_juiced`.
+:::
+
+
+## Exercise 7
+::: {.callout-note icon="false"}
+## Exercise 7
+
+Visualize some of your new features. 
+
+1. Examine the relationship between `trip_duration` and distance
+2. Examine how the time of day affects the average speed of travel across the city. Outside of your recipe, round your decimal time of day variable to the 1 decimal place and compute a new variable `speed_kmph`. Plot the average speed across each of the new time of day values. For bonus points, add a `geom_ribbon()` with a 95% confidence interval (i.e. $1.96 \times$ the standard error).
+
+:::
+
+
+```{r}
+fe_rec <- recipe(trip_duration ~ ., train) %>%
+  step_mutate(
+    dist = hutils::haversine_distance(pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude)
+    ) %>%
+  step_date(pickup_datetime, features = c("dow", "doy")) %>%
+  step_time(pickup_datetime, features = c("decimal_day"), keep_original_cols = FALSE)
+
+train_juiced <- juice(prep(fe_rec))
+```
+
+```{r}
+train_juiced %>% 
+  ggplot(aes(x=dist, y = trip_duration)) +
+  geom_point()
+```
+
+```{r}
+train_juiced %>% 
+  mutate(speed_kmph = dist / exp(trip_duration) * 3600) %>% 
+  mutate(pickup_datetime_decimal_day = round(pickup_datetime_decimal_day, 1)) %>% 
+  group_by(pickup_datetime_decimal_day) %>% 
+  summarize(M = mean(speed_kmph), se = sd(speed_kmph)/sqrt(n()))  %>% 
+  ggplot(aes(x = pickup_datetime_decimal_day, y = M)) +
+  geom_line() +
+  geom_ribbon(aes(ymin = M - 2 * se, ymax = M + 2*se), alpha = .2)
+```
+
+
+## Exercise 8
+::: {.callout-note icon="false"}
+## Exercise 8
+Briefly answer two questions:
+
+1. What do you make of the second plot? Can you explain what is going on?
+2. Do you think these new features might help your models? If so, which will each help?
+:::
+
+## Exercise 9
+::: {.callout-note icon="false"}
+## Exercise 9
+
+Using `workflow_map()` fit the same models with the new feature engineering recipe. Then, collect and display the results. What do you find?
+:::
+
+
+
+## Hyperparameter tuning
+
+Let's make our models even better
+
+- 12, 13, read tidymodels 15
+
+## Exercise 10
+::: {.callout-note icon="false"}
+## Exercise 10
+
+- Make new random forest and boosted tree models and pass in the `tune()` function for their important parameters: `mtry` for the random forest model, and `trees`, `learn_rate` for the boosted tree model.
+- Create a new `workflow_map()` with the argument `fn = "tune_race_anova"` and `grid = 20`. This will create a grid with (up to) 20 different parameter combinations and conduct a racing parameter search to find the best hyperparameters for each model.
+- Rather than just collecting the metrics, plot them as a pointrange plot (with the errorbars representing standard errors). Make sure to sort from best to worst, and color things by the model type.
+
+What do you make of the performance and the effect of our extra tuning effort?
+:::
+
+
+```{r}
+rf_mod_tune <- rand_forest("regression", mtry = tune())
+wf_set2 <- workflow_set(list(np = myrec, fe = fe_rec), models = list(lr = lr_mod, rf = rf_mod_tune))
+
+fits <- workflow_map(
+  wf_set2, 
+  "tune_race_anova", 
+  resamples = folds,
+  grid = 20
+  )
 
 collect_metrics(fits)
 ```

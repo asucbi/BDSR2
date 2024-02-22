@@ -112,23 +112,23 @@ Let's fit some models!
 :::
 
 
-## Exercise 5
-::: {.callout-note icon="false"}
-## Exercise 5
+<!-- ## Exercise 5 -->
+<!-- ::: {.callout-note icon="false"} -->
+<!-- ## Exercise 5 -->
 
-Let's add an additional metric, mean absolute error. Create a metric set called `custom_metrics` that calculates $R^2$, $RMSE$ and $MAE$. Re-run the model training and evaluation with this passed into your `workflow_map()` with the `metrics` argument.
+<!-- Let's add an additional metric, mean absolute error. Create a metric set called `custom_metrics` that calculates $R^2$, $RMSE$ and $MAE$. Re-run the model training and evaluation with this passed into your `workflow_map()` with the `metrics` argument. -->
 
-By how many seconds will our estimates typically be off by? Exponentiate the $MAE$ values to find this answer.
-:::
+<!-- By how many seconds will our estimates typically be off by? Exponentiate the $MAE$ values to find this answer. -->
+<!-- ::: -->
 
 
 # Feature engineering
 
 We might be able to improve our predictions by engineering some new features to help our models uncover important relationships. For instance, **distance** might be an important variable for predicting the duration of a trip. Distance information is already in the data we have, in the latitude and longitude values for pickup and dropoff. However, we might make that information easier for our model to use by directly computing a variable to represent it.
 
-## Exercise number 6
+## Exercise number 5
 ::: {.callout-note icon="false"}
-## Exercise number 6
+## Exercise number 5
 
 Create a new recipe called `fe_rec` that will include some additional feature engineering steps.
 
@@ -140,9 +140,9 @@ Then, prep and juice your recipe and store it as `train_juiced`.
 :::
 
 
-## Exercise 7
+## Exercise 6
 ::: {.callout-note icon="false"}
-## Exercise 7
+## Exercise 6
 
 Visualize some of your new features. 
 
@@ -153,18 +153,18 @@ Visualize some of your new features.
 
 
 
-## Exercise 8
+## Exercise 7
 ::: {.callout-note icon="false"}
-## Exercise 8
+## Exercise 7
 Briefly answer two questions:
 
 1. What do you make of the second plot? Can you explain what is going on?
 2. Do you think these new features might help your models? If so, which will each help?
 :::
 
-## Exercise 9
+## Exercise 8
 ::: {.callout-note icon="false"}
-## Exercise 9
+## Exercise 8
 
 Using `workflow_map()` fit the same models with the new feature engineering recipe. Then, collect and display the results. What do you find?
 :::
@@ -177,9 +177,9 @@ Let's make our models even better! Unlike a basic linear regression model, model
 For further details and examples that might help with this set of exercises, I'll refer you to Sections 12.2, 12.5-12.6, 13.1, 13.5.5, and Chapter 15 of [Tidy Modeling with R](https://www.tmwr.org/tuning#tuning-parameter-examples).
 :::
 
-## Exercise 10
+## Exercise 9
 ::: {.callout-note icon="false"}
-## Exercise 10
+## Exercise 9
 
 - Make new random forest and boosted tree models and pass in the `tune()` function for their important parameters: `mtry` for the random forest model, and `trees`, `learn_rate` for the boosted tree model.
 - Set a seed as there is some randomization involved in the next step
@@ -191,12 +191,12 @@ For further details and examples that might help with this set of exercises, I'l
 What do you make of the performance and the effect of our extra tuning effort?
 :::
 
-## Exercise 11
+## Exercise 10
 
 It's time to re-train our best model on our full training data set and evaluate its performance on the test data. 
 
 ::: {.callout-note icon="false"}
-## Exercise 11
+## Exercise 10
 
 Extract the best-performing workflow from your workflow set and re-train it on the full training data. You can use the function `select_best(..., metric = "rmse")` on your fitted results to get the workflow with the best model and hyperparameter settings. 
 

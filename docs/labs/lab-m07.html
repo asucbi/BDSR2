@@ -177,11 +177,11 @@ Learning Objectives
 <section id="setting-up-parallel-processing" class="level2">
 <h2 class="anchored" data-anchor-id="setting-up-parallel-processing">Setting up parallel processing</h2>
 <p>We will be performing some computationally intensive training and tuning steps that benefit from parallelization: spreading the training of individual models across multiple CPU cores.</p>
-<p>We can configure this with the <code>doMC</code> package, setting cores to 8 to match how I’ve set up your posit cloud instances. Relevant <code>tidymodels</code> functions will then automatically use parallelization as defined here by default.</p>
+<p>We can configure this with the <code>doMC</code> package, setting cores to 4 to match how I’ve set up your posit cloud instances. Relevant <code>tidymodels</code> functions will then automatically use parallelization as defined here by default.</p>
 <p>Copy and paste the code below and run it to set up parallelization in your environment.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(doMC)</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoMC</span>(<span class="at">cores =</span> <span class="dv">8</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">registerDoMC</span>(<span class="at">cores =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 </section>

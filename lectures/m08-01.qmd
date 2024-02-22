@@ -1,5 +1,5 @@
 ---
-title: "Presentation Template"
+title: "Interpretability and Feature Importance"
 subtitle: Behavioral Data Science in R II
 format: 
   revealjs:
@@ -7,11 +7,74 @@ format:
 bibliography: ../references.bib
 ---
 
-## Quarto
+## Interpretability
+
+- As scientists, we don't want to only know **what** prediction to make but also **why** a prediction would be made
+- We want to use machine learning models to gain insight and understanding into a domain
+- We want our models to be **interpretable**
+
+## Interpretability in applications
+
+:::: {.columns}
+::: {.column width="50%"}
+- Sometimes non-scientists just wants a prediction for some application:
+  - A bank wants to process credit card applications
+  - A social media co. wants to predict which users will churn
+  - A doctor wants to predict which drug will have the best effect for a patient
+:::
+::: {.column width="50%"}
+- But even in these cases, we often need interpretability
+  - Customers and want to know why a loan was denied
+  - Companies want to be able to act to improve retention
+  - We want to ensure **fairness** across e.g. race or gender
+:::
+::::
+
+## Black boxes
+
+Models like Random Forests and Boosted trees are sometimes likened to black boxes:
+
+data --> black box --> predictions (make a mermaid diagram)
+
+## Interpretability tools
+
+We need ways to look inside the black box
+
+- Feature importance
+- Diagnostic plots
+
+## Feature importance
+
+How important is feature $x_i$ for the predictions of the model?
+
+**Permutation Feature Importance**
+
+- How much does scrambling (permuting) the values of feature $x_i$ hurt the model's predictions?
+
+## Permutation Feature Importance
+
+::: {.callout-tip icon="false"}
+## Algorithm
+
+For any given loss function do the following:
+
+1. Compute loss function for original model
+2. For variable $i$ in ${1,...,p}$ do
+     - randomize values
+     - apply given ML model
+     - estimate loss function
+     - compute feature importance (some difference/ratio measure 
+       between permuted loss & original loss)
+3. Sort variables by descending feature importance 
+:::
+
+## Feature Importance for NYC taxi model
+
 
 
 ```{r}
 #| message: false
+#| include: false
 library(tidyverse)
 library(tidymodels)
 library(hutils)
@@ -22,6 +85,7 @@ taxi <- read_csv("data/nyc-taxi.csv") %>%
 ```
 
 ```{r}
+#| include: false
 splits <- initial_split(taxi, prop = .8)
 train <- training(splits)
 test <- testing(splits)
@@ -30,6 +94,7 @@ folds <- vfold_cv(train, 10)
 ```
 
 ```{r}
+#| include: false
 train %>% 
   ggplot(aes(x=pickup_longitude, y = pickup_latitude)) +
   geom_point(alpha = .2, size = .2, shape = 16, color = "goldenrod1") +
@@ -39,6 +104,7 @@ train %>%
 
 
 ```{r}
+#| include: false
 fe_rec <- recipe(trip_duration ~ ., train) %>%
   step_mutate(
     dist = haversine_distance(pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude),
@@ -52,6 +118,7 @@ train_juiced <- juice(prep(fe_rec))
 ```
 
 ```{r}
+#| include: false
 rf_mod <- rand_forest(mode = "regression")
 
 wf <- workflow() %>% 
@@ -71,7 +138,7 @@ we'll use DALEX for this and PDP plots -- it seems nice!
 `model_parts(explainer_lm, loss_function = loss_root_mean_square)`
 
 ```{r}
-
+#| include: false
 make_explainer_obj <- function(fitted_workflow){
   fitted_model <-
     fitted_workflow %>% 
@@ -98,12 +165,16 @@ make_explainer_obj <- function(fitted_workflow){
   return(vip_features)
 }
 
-
-explainer_rf <- make_explainer_obj(fitted_model)
 ```
 
 ```{r}
+#| message: false
+library(DALEX)
+library(DALEXtra)
+
+explainer_rf <- make_explainer_obj(fitted_model)
 vip_res <- model_parts(explainer_rf, N = 1000)
+
 plot(vip_res)
 ```
 
@@ -111,6 +182,7 @@ plot(vip_res)
 ## PDP plots
 
 ```{r}
+#| echo: false
 train_juiced %>% 
   mutate(speed_kmph = dist / exp(trip_duration) * 3600) %>% 
   mutate(pickup_datetime_decimal_day = round(pickup_datetime_decimal_day, 1)) %>% 
@@ -123,8 +195,6 @@ train_juiced %>%
 
 
 ```{r}
-
-
 
 pdp_time <- model_profile(explainer_rf, N = 100, variables = "pickup_datetime_decimal_day")
 plot(pdp_time)

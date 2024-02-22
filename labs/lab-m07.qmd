@@ -50,7 +50,8 @@ library(tidyverse)
 library(tidymodels)
 library(hutils)
 
-taxi <- read_csv("data/nyc-taxi.csv")
+taxi <- read_csv("data/nyc-taxi.csv") %>% 
+  mutate(pickup_datetime = lubridate::as_datetime(pickup_datetime))
 ```
 
 

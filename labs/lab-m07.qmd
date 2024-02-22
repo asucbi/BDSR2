@@ -169,7 +169,7 @@ Briefly answer two questions:
 Using `workflow_map()` fit the same models with the new feature engineering recipe. Then, collect and display the results. What do you find?
 :::
 
-## Hyperparameter tuning
+# Hyperparameter tuning
 
 Let's make our models even better! Unlike a basic linear regression model, models like boosted trees need some tuning of their hyperparameters to perform their best.
 

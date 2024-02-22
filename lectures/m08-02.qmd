@@ -1,10 +1,11 @@
 ---
-title: "Interpretability and Feature Importance"
+title: "Interpretability through plotting"
 subtitle: Behavioral Data Science in R II
 format: 
   revealjs:
     css: style.css
 bibliography: ../references.bib
+fig-dpi: 300
 ---
 
 ## Interpretability tools
@@ -12,10 +13,9 @@ bibliography: ../references.bib
 We need ways to look inside the black box
 
 - Feature importance
-- Diagnostic plots
+- **Diagnostic plots**
   - Partial Dependency Plots
   - Individual Conditional Expectation Plots
-
 
 
 ```{r}
@@ -65,6 +65,7 @@ train_juiced <- juice(prep(fe_rec))
 
 ```{r}
 #| include: false
+#| cache: true
 rf_mod <- rand_forest(mode = "regression")
 
 wf <- workflow() %>% 
@@ -110,7 +111,9 @@ make_explainer_obj <- function(fitted_workflow){
 ## Setting up an explainer
 
 ```{r}
+#| echo: true
 #| message: false
+#| output: false
 library(DALEX)
 library(DALEXtra)
 
@@ -124,16 +127,15 @@ Partial dependence plots visualize the **marginal** influence of a predictor, av
 
 ::: {.callout-tip icon="false"}
 ## Algorithm
-For a selected predictor (x)
+For a selected predictor (x):
+
 1. Construct a grid of j evenly spaced values across the distribution
    of $x$: ${x1, x2, ..., xj}$
-2. For $i$ in ${1,...,j}$ do
-     | Copy the training data and replace the original values of x 
-       with the constant xi
-     | Apply given ML model (i.e., obtain vector of predictions)
-     | Average predictions together
-   End
-3. Plot the averaged predictions against x1, x2, ..., xj
+2. For $j$ in ${1,...,j}$ do
+     - Copy the training data $j$ times and replace the all original values of $x$ with the constant $x_j$
+     - Apply given ML model (i.e., obtain vector of predictions)
+     - Average predictions together
+3. Plot the averaged predictions against $x_1$, $x_2$, ..., $x_j$
 :::
 
 ## Visualizing time-of-day effects
@@ -141,32 +143,25 @@ For a selected predictor (x)
 ```{r}
 #| echo: false
 
-# train_juiced %>% 
-#   ggplot(aes(x = pickup_datetime_dow, y = trip_duration)) +
-#     geom_boxplot(size = .1)
+ggplot_pdp <- function(obj, x) {
 
-# train_juiced %>% 
-#   mutate(speed_kmph = dist / exp(trip_duration) * 3600) %>% 
-#   mutate(pickup_datetime_decimal_day = round(pickup_datetime_decimal_day, 1)) %>% 
-#   group_by(pickup_datetime_dow) %>% 
-#   summarize(M = mean(trip_duration), se = sd(trip_duration)/sqrt(n()))  %>% 
-#   ggplot(aes(x = pickup_datetime_dow, y = M)) +
-#   geom_pointrange(aes(ymin = M - 2 * se, ymax = M + 2*se))
+  p <- 
+    as_tibble(obj$agr_profiles) %>%
+    mutate(`_label_` = stringr::str_remove(`_label_`, "^[^_]*_")) %>% 
+    ggplot(aes(`_x_`, `_yhat_`)) +
+    geom_line(color = "midnightblue", linewidth = 1.2, alpha = 0.8)
+  
+  p
+}
 
-# train_juiced %>% 
-#   mutate(speed_kmph = dist / exp(trip_duration) * 3600) %>% 
-#   mutate(pickup_datetime_decimal_day = round(pickup_datetime_decimal_day, 1)) %>% 
-#   group_by(pickup_datetime_decimal_day) %>% 
-#   summarize(M = mean(trip_duration), se = sd(trip_duration)/sqrt(n()))  %>% 
-#   ggplot(aes(x = pickup_datetime_decimal_day, y = M)) +
-#   geom_line() +
-#   geom_ribbon(aes(ymin = M - 2 * se, ymax = M + 2*se), alpha = .2)
+
 ```
 
 
 ```{r}
+#| echo: true
 pdp_time <- model_profile(explainer_rf, N = 100, variables = "pickup_datetime_decimal_day")
-plot(pdp_time)
+ggplot_pdp(pdp_time, pickup_datetime_decimal_day)
 
 ```
 
@@ -207,6 +202,10 @@ ggplot_ice <- function(obj, x) {
   p
 }
 
+```
+
+```{r}
+#| echo: true
 ggplot_ice(pdp_time, pickup_datetime_decimal_day)
 ```
 
@@ -214,66 +213,102 @@ ggplot_ice(pdp_time, pickup_datetime_decimal_day)
 ## Visualizing distance and `trip_duration`
 
 ```{r}
+#| echo: true
 pdp_dist <- model_profile(explainer_rf, N = 100, variables = "dist")
-plot(pdp_dist)
-```
-
-```{r}
 ggplot_ice(pdp_dist, dist)
 ```
 
+## 2-way Partial Dependency Plots
+
+Partial dependency plots can also be made in two dimensions, to plot the relationship between two variables and the outcome.
+
+![](../imgs/2-way-pdp.png)
+
+## A 2-way PDP of our NYC taxi model
+
+- Examining trip_duration as a function of `pickup_latitude` and `pickup_longitude`
+
 ```{r}
-pdp_dist <- model_profile(explainer_rf, N = 100, variables = "bearing")
-ggplot_ice(pdp_dist, bearing)
+#| echo: false
+pdp_2way <- function(fitted_workflow, x1, x2, grid_steps = 64, N = 100, custom_range = NULL){
+  var1 <- enquo(x1)
+  x1_var_name <- quo_name(var1)
+  
+  var2 <- enquo(x2)
+  x2_var_name <- quo_name(var2)
+  
+  d <- fitted_model %>% 
+      extract_mold() %>% 
+      pluck("predictors")
+  
+  if (is.null(custom_range)){
+    grid <- crossing(
+    !! x1_var_name := seq(min(pull(d, !!var1)), max(pull(d, !!var1)), length.out = grid_steps),
+    !! x2_var_name := seq(min(pull(d, !!var2)), max(pull(d, !!var2)), length.out = grid_steps)
+    )
+  } else {
+    grid <- crossing(
+      !! x1_var_name := seq(custom_range[1,1], custom_range[2,1],  length.out = grid_steps),
+      !! x2_var_name := seq(custom_range[1,2], custom_range[2,2], length.out = grid_steps)
+    )
+  }
+  
+
+  pred_df <-  d %>%
+    sample_n(N) %>%
+    mutate(.id = 1:n()) %>%
+    select(-c(!!var1, !!var2)) %>%
+    cross_join(grid)
+
+  p <- extract_fit_parsnip(fitted_model) %>%
+    augment(pred_df) %>%
+    group_by(!!var1, !!var2) %>%
+    summarize(m = mean(.pred)) %>%
+    ggplot(aes(x = !!var1, y = !!var2, fill = m)) +
+    geom_raster(interpolate = TRUE) +
+    # geom_tile(linewidth=0.0) +
+    scale_fill_viridis_c() +
+    theme_minimal() +
+    theme(panel.grid = element_blank())
+  
+  return(p)
+  
+}
+
+
 ```
 
 ```{r}
-pdp_2d <- model_profile(explainer_rf, N = 100, variables = c("bearing", "pickup_datetime_decimal_day"), type = "conditional")
+#| echo: true
+p <- pdp_2way(fitted_model, pickup_longitude, pickup_latitude, grid_steps = 128, N = 250)
+p
 ```
 
+## Overlaying data
+
 ```{r}
-Nsteps <- 100
-
-grid <- crossing(
-  bearing = seq(0, 360, length.out = Nsteps),
-  pickup_datetime_decimal_day = seq(min(juiced_df$pickup_datetime_decimal_day), max(juiced_df$pickup_datetime_decimal_day), length.out = Nsteps),
-)
-
-pred_df <-  fitted_model %>% 
-    extract_mold() %>% 
-    pluck("predictors")  %>% 
-  sample_n(11) %>% 
-  mutate(.id = 1:n()) %>% 
-  select(-bearing, -pickup_datetime_decimal_day) %>% 
-  cross_join(grid)
-
-extract_fit_parsnip(fitted_model) %>% 
-  augment(pred_df) %>% 
-  group_by(bearing, pickup_datetime_decimal_day) %>% 
-  summarize(m = mean(.pred)) %>% 
-  ggplot(aes(x=bearing, y = pickup_datetime_decimal_day, fill = m)) +
-  geom_tile(color = NA) +
-  scale_fill_viridis_c() +
-  theme_minimal() +
-  theme(panel.grid = element_blank())
-
+#| echo: true
+p +
+  geom_point(
+    data = train, mapping = aes(x = pickup_longitude, y = pickup_latitude), inherit.aes = FALSE, color = "red", size = .1, alpha = .1
+  )
 ```
 
-```{r}
-# library(plotly)
-# pred_2d <- extract_fit_parsnip(fitted_model) %>%
-#   augment(pred_df) %>%
-#   group_by(dist, pickup_datetime_decimal_day) %>%
-#   summarize(m = mean(.pred)) %>%
-#   ungroup() %>%
-#   as.matrix()
-# 
-# fig <- plot_ly(z = ~pred_2d)
-# 
-# fig <- fig %>% add_surface()
-# 
-# 
-# fig
+## Insights in two dimensions
 
+Trips are slower in lower Manhattan than upper Manhattan or Harlem
+
+```{r}
+#| echo: false
+#| fig.dpi: 300
+p <- pdp_2way(fitted_model, pickup_longitude, pickup_latitude, grid_steps = 128, N = 250, custom_range = matrix(c(c(-74.02, -73.925), c(40.66, 40.85)), ncol = 2))
+
+p +
+  geom_point(
+    data = train, mapping = aes(x = pickup_longitude, y = pickup_latitude), inherit.aes = FALSE, color = "red", size = .05, alpha = .1
+  ) +
+  xlim(-74.02, -73.925) +
+  ylim(40.66, 40.85) +
+  theme(aspect.ratio = 1)
 ```
 

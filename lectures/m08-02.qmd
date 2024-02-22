@@ -1,0 +1,279 @@
+---
+title: "Interpretability and Feature Importance"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## Interpretability tools
+
+We need ways to look inside the black box
+
+- Feature importance
+- Diagnostic plots
+  - Partial Dependency Plots
+  - Individual Conditional Expectation Plots
+
+
+
+```{r}
+#| message: false
+#| include: false
+library(tidyverse)
+library(tidymodels)
+library(hutils)
+library(DALEX)
+library(DALEXtra)
+taxi <- read_csv("data/nyc-taxi.csv") %>% 
+  mutate(pickup_datetime = lubridate::as_datetime(pickup_datetime))
+```
+
+```{r}
+#| include: false
+splits <- initial_split(taxi, prop = .8)
+train <- training(splits)
+test <- testing(splits)
+
+folds <- vfold_cv(train, 10)
+```
+
+```{r}
+#| include: false
+train %>% 
+  ggplot(aes(x=pickup_longitude, y = pickup_latitude)) +
+  geom_point(alpha = .2, size = .2, shape = 16, color = "goldenrod1") +
+  theme_void() +
+  theme(panel.background = element_rect(fill = "black"))
+```
+
+
+```{r}
+#| include: false
+fe_rec <- recipe(trip_duration ~ ., train) %>%
+  step_mutate(
+    dist = haversine_distance(pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude),
+    bearing = bearing(pickup_latitude, pickup_longitude, dropoff_latitude, dropoff_longitude)
+    ) %>%
+  step_date(pickup_datetime, features = c("dow", "doy")) %>%
+  step_time(pickup_datetime, features = c("decimal_day")) %>% 
+  update_role(pickup_datetime, new_role = "id")
+
+train_juiced <- juice(prep(fe_rec))
+```
+
+```{r}
+#| include: false
+rf_mod <- rand_forest(mode = "regression")
+
+wf <- workflow() %>% 
+  add_recipe(fe_rec) %>% 
+  add_model(rf_mod)
+
+fitted_model <- wf %>% 
+  fit(train)
+
+```
+
+
+```{r}
+#| include: false
+make_explainer_obj <- function(fitted_workflow){
+  fitted_model <-
+    fitted_workflow %>% 
+    extract_fit_parsnip() # <- parsnip model_fit object
+
+  feature_data <- 
+    fitted_workflow %>% 
+    extract_mold() %>% 
+    pluck("predictors") 
+  
+  outcome_data <- 
+    fitted_workflow %>% 
+    extract_mold() %>% 
+    pluck("outcomes") %>% 
+    pluck(1)    # <- is is a 1D df, make it a vector
+  
+  vip_features <- 
+    explain_tidymodels(
+      fitted_model, 
+      data = feature_data, 
+      y = outcome_data
+    )
+  
+  return(vip_features)
+}
+
+```
+
+## Setting up an explainer
+
+```{r}
+#| message: false
+library(DALEX)
+library(DALEXtra)
+
+explainer_rf <- make_explainer_obj(fitted_model)
+```
+
+
+## PDP plots
+
+Partial dependence plots visualize the **marginal** influence of a predictor, averaging over the other predictors.
+
+::: {.callout-tip icon="false"}
+## Algorithm
+For a selected predictor (x)
+1. Construct a grid of j evenly spaced values across the distribution
+   of $x$: ${x1, x2, ..., xj}$
+2. For $i$ in ${1,...,j}$ do
+     | Copy the training data and replace the original values of x 
+       with the constant xi
+     | Apply given ML model (i.e., obtain vector of predictions)
+     | Average predictions together
+   End
+3. Plot the averaged predictions against x1, x2, ..., xj
+:::
+
+## Visualizing time-of-day effects
+
+```{r}
+#| echo: false
+
+# train_juiced %>% 
+#   ggplot(aes(x = pickup_datetime_dow, y = trip_duration)) +
+#     geom_boxplot(size = .1)
+
+# train_juiced %>% 
+#   mutate(speed_kmph = dist / exp(trip_duration) * 3600) %>% 
+#   mutate(pickup_datetime_decimal_day = round(pickup_datetime_decimal_day, 1)) %>% 
+#   group_by(pickup_datetime_dow) %>% 
+#   summarize(M = mean(trip_duration), se = sd(trip_duration)/sqrt(n()))  %>% 
+#   ggplot(aes(x = pickup_datetime_dow, y = M)) +
+#   geom_pointrange(aes(ymin = M - 2 * se, ymax = M + 2*se))
+
+# train_juiced %>% 
+#   mutate(speed_kmph = dist / exp(trip_duration) * 3600) %>% 
+#   mutate(pickup_datetime_decimal_day = round(pickup_datetime_decimal_day, 1)) %>% 
+#   group_by(pickup_datetime_decimal_day) %>% 
+#   summarize(M = mean(trip_duration), se = sd(trip_duration)/sqrt(n()))  %>% 
+#   ggplot(aes(x = pickup_datetime_decimal_day, y = M)) +
+#   geom_line() +
+#   geom_ribbon(aes(ymin = M - 2 * se, ymax = M + 2*se), alpha = .2)
+```
+
+
+```{r}
+pdp_time <- model_profile(explainer_rf, N = 100, variables = "pickup_datetime_decimal_day")
+plot(pdp_time)
+
+```
+
+## Individual Conditionalized Expectation
+
+- ICE plots visualize the effect of a predictor for a sample of individual cases.
+- Help to visualize heterogeneity in predictor effects (i.e., does predictor effect vary depending on levels of other variables)
+
+## ICE plots
+
+```{r}
+
+ggplot_ice <- function(obj, x) {
+  agg_d <- as_tibble(obj$agr_profiles) %>%
+      mutate(`_label_` = stringr::str_remove(`_label_`, "^[^_]*_")) 
+  
+  first_y <- agg_d %>% summarize(first_y = first(`_yhat_`)) %>% pull(first_y)
+  
+  p <- 
+    agg_d %>% 
+    mutate(`_yhat_` = `_yhat_` - first_y) %>% 
+    ggplot(aes(`_x_`, `_yhat_`)) +
+    geom_line(data = as_tibble(obj$cp_profiles) %>% 
+                group_by(`_ids_`) %>% 
+                mutate(firsts = first(`_yhat_`)) %>% 
+                mutate(`_yhat_` = `_yhat_` - firsts),
+              aes(x = {{ x }}, group = `_ids_`),
+              linewidth = 0.5, alpha = 0.1, color = "gray50")
+  
+  num_colors <- n_distinct(obj$agr_profiles$`_label_`)
+  
+  if (num_colors > 1) {
+    p <- p + geom_line(aes(color = `_label_`), linewidth = 1.2, alpha = 0.8)
+  } else {
+    p <- p + geom_line(color = "midnightblue", linewidth = 1.2, alpha = 0.8)
+  }
+  
+  p
+}
+
+ggplot_ice(pdp_time, pickup_datetime_decimal_day)
+```
+
+
+## Visualizing distance and `trip_duration`
+
+```{r}
+pdp_dist <- model_profile(explainer_rf, N = 100, variables = "dist")
+plot(pdp_dist)
+```
+
+```{r}
+ggplot_ice(pdp_dist, dist)
+```
+
+```{r}
+pdp_dist <- model_profile(explainer_rf, N = 100, variables = "bearing")
+ggplot_ice(pdp_dist, bearing)
+```
+
+```{r}
+pdp_2d <- model_profile(explainer_rf, N = 100, variables = c("bearing", "pickup_datetime_decimal_day"), type = "conditional")
+```
+
+```{r}
+Nsteps <- 100
+
+grid <- crossing(
+  bearing = seq(0, 360, length.out = Nsteps),
+  pickup_datetime_decimal_day = seq(min(juiced_df$pickup_datetime_decimal_day), max(juiced_df$pickup_datetime_decimal_day), length.out = Nsteps),
+)
+
+pred_df <-  fitted_model %>% 
+    extract_mold() %>% 
+    pluck("predictors")  %>% 
+  sample_n(11) %>% 
+  mutate(.id = 1:n()) %>% 
+  select(-bearing, -pickup_datetime_decimal_day) %>% 
+  cross_join(grid)
+
+extract_fit_parsnip(fitted_model) %>% 
+  augment(pred_df) %>% 
+  group_by(bearing, pickup_datetime_decimal_day) %>% 
+  summarize(m = mean(.pred)) %>% 
+  ggplot(aes(x=bearing, y = pickup_datetime_decimal_day, fill = m)) +
+  geom_tile(color = NA) +
+  scale_fill_viridis_c() +
+  theme_minimal() +
+  theme(panel.grid = element_blank())
+
+```
+
+```{r}
+# library(plotly)
+# pred_2d <- extract_fit_parsnip(fitted_model) %>%
+#   augment(pred_df) %>%
+#   group_by(dist, pickup_datetime_decimal_day) %>%
+#   summarize(m = mean(.pred)) %>%
+#   ungroup() %>%
+#   as.matrix()
+# 
+# fig <- plot_ly(z = ~pred_2d)
+# 
+# fig <- fig %>% add_surface()
+# 
+# 
+# fig
+
+```
+

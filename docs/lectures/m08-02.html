@@ -446,7 +446,7 @@
 <h2>Visualizing time-of-day effects</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>pdp_time <span class="ot">&lt;-</span> <span class="fu">model_profile</span>(explainer_rf, <span class="at">N =</span> <span class="dv">100</span>, <span class="at">variables =</span> <span class="st">"pickup_datetime_decimal_day"</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">plot</span>(pdp_time)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2"></a><span class="fu">ggplot_pdp</span>(pdp_time, pickup_datetime_decimal_day)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 
 </div>
 <img data-src="m08-02_files/figure-revealjs/unnamed-chunk-9-1.png" width="3000" class="r-stretch"></section>

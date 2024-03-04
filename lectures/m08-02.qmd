@@ -121,9 +121,9 @@ explainer_rf <- make_explainer_obj(fitted_model)
 ```
 
 
-## PDP plots
+## Partial Dependence Plots
 
-Partial dependence plots visualize the **marginal** influence of a predictor, averaging over the other predictors.
+PDPs visualize the **marginal** influence of a predictor, averaging over the other predictors.
 
 ::: {.callout-tip icon="false"}
 ## Algorithm
@@ -218,9 +218,9 @@ pdp_dist <- model_profile(explainer_rf, N = 100, variables = "dist")
 ggplot_ice(pdp_dist, dist)
 ```
 
-## 2-way Partial Dependency Plots
+## 2-way Partial Dependence Plots
 
-Partial dependency plots can also be made in two dimensions, to plot the relationship between two variables and the outcome.
+Partial dependence plots can also be made in two dimensions, to plot the relationship between two variables and the outcome.
 
 ![](../imgs/2-way-pdp.png)
 

@@ -420,6 +420,19 @@ Exercise 9
 <p>What do you make of the performance and the effect of our extra tuning effort?</p>
 </div>
 </div>
+<div class="callout-caution callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Warning
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>If this is just taking too long to run on Posit cloud, you can run this exercise using just a sample of rows of your training dataset (e.g.&nbsp;5k or 10k rows).</p>
+</div>
+</div>
 </section>
 <section id="exercise-10" class="level2">
 <h2 class="anchored" data-anchor-id="exercise-10">Exercise 10</h2>
@@ -434,8 +447,37 @@ Exercise 10
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>Extract the best-performing workflow from your workflow set and re-train it on the full training data. You can use the function <code>select_best(..., metric = "rmse")</code> on your fitted results to get the workflow with the best model and hyperparameter settings.</p>
+<p>Extract the best-performing workflow from your workflow set and re-train it on the full training data.</p>
 <p>Then, calculate its predictive performance on the test data.</p>
+</div>
+</div>
+<div class="callout-tip callout callout-style-default callout-captioned">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-caption-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To extract the best-fitting workflow, you’ll need to take a few steps:</p>
+<ol type="1">
+<li>First, you’ll need to identify which type of model performed best. You can do this by plotting the results, which you already did above. (A shortcut to do this is <code>autoplot()</code>).</li>
+<li>Then, you can use <code>extract_workflow_set_result()</code> to extract the results corresponding to the correct workflow id from the output of your <code>workflow_map()</code> step.</li>
+<li>You can use <code>select_best()</code> on those workflow set results to get your best-performing parameters.</li>
+<li>And you can then either manually set the parameters to match those of your best-fitting workflow, or use <code>finalize_workflow()</code> to set them from the result.</li>
+</ol>
+<p>Roughly, this could look something like:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>best_mod <span class="ot">&lt;-</span> wf_map_result <span class="sc">%&gt;%</span> </span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">extract_workflow_set_result</span>(<span class="st">"best_wf_name"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select_best</span>(<span class="st">"rmse"</span>) <span class="co"># or other metric name</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>final_wf <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(my_recipe) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(my_tunable_model) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">finalize_workflow</span>(best_mod)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div>
 </section>

@@ -25,10 +25,14 @@ bibliography: ../references.bib
   - A doctor wants to predict which drug will have the best effect for a patient
 :::
 ::: {.column width="50%"}
+
+::: {.fragment}
 - Still, applications often need interpretability:
   - Customers and want to know why a loan was denied
   - Companies want to be able to act to improve retention
   - We want to ensure **fairness** across e.g. race or gender
+:::
+
 :::
 ::::
 :::
@@ -53,9 +57,13 @@ We need ways to look inside the black box
 
 How important is feature $x_i$ for the predictions of the model?
 
+::: {.fragment}
 **Permutation Feature Importance**
 
 - How much does scrambling (permuting) the values of feature $x_i$ hurt the model's predictions?
+
+:::
+
 
 ## Permutation Feature Importance
 
@@ -65,12 +73,12 @@ How important is feature $x_i$ for the predictions of the model?
 For any given loss function do the following:
 
 1. Compute loss function for original model
-2. For variable $i$ in $\{1,...,p\}$ do
-     - randomize values
+2. For variable $i$ in $\{1,...,p\}$ do:
+     - randomize values of the predictor
      - apply given ML model
      - estimate loss function
-     - compute feature importance (some difference/ratio measure 
-       between permuted loss & original loss)
+     - compute feature importance as some difference/ratio measure 
+       between permuted loss vs. original loss
 3. Sort variables by descending feature importance 
 :::
 
@@ -122,7 +130,7 @@ train_juiced <- juice(prep(fe_rec))
 ```
 
 ```{r}
-#| include: false
+#| include: true
 #| cache: true
 rf_mod <- rand_forest(mode = "regression")
 
@@ -137,7 +145,7 @@ fitted_model <- wf %>%
 
 ## `DALEX`
 
-- Prep fitted workflow into a `explainer` object
+- Prep fitted workflow into an `explainer` object
   - I have provided a helper function for this: `make_explainer_obj()`
 - `DALEX` functions:
   - `model_part()`: permutation feature importance

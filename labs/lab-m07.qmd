@@ -193,6 +193,13 @@ For further details and examples that might help with this set of exercises, I'l
 What do you make of the performance and the effect of our extra tuning effort?
 :::
 
+::: {.callout-caution}
+## Warning
+
+If this is just taking too long to run on Posit cloud, you can run this exercise using just a sample of rows of your training dataset (e.g. 5k or 10k rows).
+:::
+
+
 ## Exercise 10
 
 It's time to re-train our best model on our full training data set and evaluate its performance on the test data. 
@@ -200,11 +207,36 @@ It's time to re-train our best model on our full training data set and evaluate 
 ::: {.callout-note icon="false"}
 ## Exercise 10
 
-Extract the best-performing workflow from your workflow set and re-train it on the full training data. You can use the function `select_best(..., metric = "rmse")` on your fitted results to get the workflow with the best model and hyperparameter settings. 
+Extract the best-performing workflow from your workflow set and re-train it on the full training data. 
 
 Then, calculate its predictive performance on the test data. 
 
 :::
+
+::: callout-tip
+To extract the best-fitting workflow, you'll need to take a few steps:
+
+1. First, you'll need to identify which type of model performed best. You can do this by plotting the results, which you already did above. (A shortcut to do this is `autoplot()`).
+2. Then, you can use `extract_workflow_set_result()` to extract the results corresponding to the correct workflow id from the output of your `workflow_map()` step.
+3. You can use `select_best()` on those workflow set results to get your best-performing parameters.
+4. And you can then either manually set the parameters to match those of your best-fitting workflow, or use `finalize_workflow()` to set them from the result.
+
+Roughly, this could look something like:
+
+```r
+best_mod <- wf_map_result %>% 
+  extract_workflow_set_result("best_wf_name") %>% 
+  select_best("rmse") # or other metric name
+
+final_wf <- workflow() %>% 
+  add_recipe(my_recipe) %>% 
+  add_model(my_tunable_model) %>% 
+  finalize_workflow(best_mod)
+  
+```
+:::
+
+
 
 # Wrapping up
 

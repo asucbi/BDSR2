@@ -1,0 +1,16 @@
+---
+title: |
+  | Prediction & Classification
+  | with the `k-means` Algorithm
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 2
+  | Module 9
+format: 
+  revealjs:
+    css: style.css
+---
+
+## 
+
+

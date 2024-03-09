@@ -1,0 +1,123 @@
+---
+title: "Recommender systems via Collaborative Filtering"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+::: {.hidden}
+```{r}
+library(tidyverse)
+```
+
+:::
+
+## Recommender Systems: Applications
+
+- Recommendations for movies, music, shows, clothing, etc.
+
+## Collaborative filtering
+
+Use similarities between items and users to predict what items a user will like.
+
+![](../imgs/recsys-collab-filter.png)
+
+## Machine Learning \& Recommender Systems
+
+## `recommenderlab` package
+
+```{r}
+#| message: false
+library(recommenderlab)
+```
+
+## MovieLense Data
+
+```{r}
+data("MovieLense")
+
+MovieLense100 <- MovieLense[rowCounts(MovieLense) > 100, ]
+train <- MovieLense100[1:300]
+
+as(train[1:8, 1:8], "matrix") %>% as_tibble()
+```
+
+## User-based recommender system
+
+![](../imgs/user-based-rec.png)
+- Find similar users
+- Compute average rating for item among similar users
+
+```{r}
+ubcf <- Recommender(train, method = "UBCF")
+```
+
+
+## Item-based recommender system
+
+- Find similar items
+- Compute weighted average of users' ratings on similar items
+- Typically more efficient than user-based recommendation (usually have fewer items than users)
+
+```{r}
+ibcf <- Recommender(train, method = "IBCF")
+```
+
+## Matrix Factorization approaches
+
+![](../imgs/matrix-factorization-rec-intro1.png)
+
+## Matrix multiplication basics
+
+vectors (and matrices)
+transposed vectors (and matrices)
+output sizes
+
+## SVD
+
+## Matrix factorization for recommendation
+
+:::: {.columns}
+::: {.column width="50%"}
+![](../imgs/recsys-1d-matrix.png)
+:::
+::: {.column width="50%"}
+![](../imgs/recsys-1d-space.png)
+:::
+::::
+
+
+## Matrix factorization for recommendation 2
+
+:::: {.columns}
+::: {.column width="50%"}
+![](../imgs/recsys-2d-matrix.png)
+:::
+::: {.column width="50%"}
+![](../imgs/recsys-2d-space.png)
+:::
+::::
+
+
+## Funk-SVD for Recommendation
+
+Diagram for this
+
+## Fund-SVD in `recommenderlab`
+
+```{r}
+svfd <- Recommender(train, method = "SVDF")
+```
+
+## Generating User and Item Embeddings
+
+```{r}
+
+```
+
+## Examining item embeddings
+
+with k-means?
+---

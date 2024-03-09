@@ -1,0 +1,173 @@
+---
+title: "Distance and similarity measures"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+
+## Similarity as distance
+
+- It is common in Machine Learning applications to model the similarity of two data points using some **distance measure**
+- The notion of distance in a **psychological space** is a crucial one in psychology and cognitive science
+
+## Different ways to measure distance
+
+Straight line (as the crow flies): 18.6 mi
+
+:::: {.columns}
+::: {.column width="50%"}
+Driving: 26.4 mi
+![](../imgs/tempe-west-dist-driving.png)
+:::
+::: {.column width="50%"}
+Walking: 22.3 mi
+![](../imgs/tempe-west-dist-walking.png)
+:::
+::::
+
+## Different distance measures
+
+![](../imgs/distance-metric-examples.png){fig-align="center"}
+
+## Properties of distance measures
+
+- Minimality: Distance from a point to itself is zero
+- Positivity: distances cannot be negative
+- Symmetry: distance from a to b is the same as from b to a
+- Triangle inequality: $d(x,z) \leq d(x,y) + d(y, z)$
+  - i.e. the shortest path between two points is a straight line
+
+## Euclidean \& Manhattan distance
+
+:::: {.columns}
+
+::: {.column width="30%"}
+![](../imgs/Manhattan_distance.svg)
+
+:::
+
+::: {.column width="70%"}
+
+::: {.callout-caution icon="false"}
+## Euclidean Distance in $\mathbb{R}^2$
+$$ d_2((x_1, y_1), (x_2, y_2)) = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} $$
+:::
+
+::: {.callout-caution icon="false"}
+## Manhattan Distance in $\mathbb{R}^2$
+$$ d_1((x_1, y_1), (x_2, y_2)) = |x_2 - x_1| + |y_2 - y_1| $$
+:::
+
+:::
+::::
+
+- [Green: Euclidean distance]{style="color: green;"}
+- Others: Manhattan distance (all equal)
+
+
+## Pitfalls of $d_2$ and $d_1$
+
+Euclidean and Manhattan distances are scale-dependent: need to be careful about scale of dimensions and may need to normalize dimensions
+
+```{r}
+#| echo: false
+#| message: false
+#| fig-align: center
+library(tidyverse)
+library(patchwork)
+
+set.seed(123)
+d <- tibble(
+  x = rnorm(100, sd = 3),
+  y = rnorm(100)
+)
+
+line_d <- bind_rows(d[1,], d[3,]) %>% 
+  mutate(id = c("start", "end")) %>% 
+  pivot_wider(names_from = id, values_from = c(x, y))
+
+d_standardized <- d %>% 
+  mutate_all(~(.x - mean(.x))/sd(.x))
+
+line_d_standardized <- bind_rows(d_standardized[1,], d_standardized[3,]) %>% 
+  mutate(id = c("start", "end")) %>% 
+  pivot_wider(names_from = id, values_from = c(x, y))
+
+d %>% 
+  ggplot(aes(x=x, y=y)) +
+  geom_point() +
+  geom_segment(data = line_d, aes(x=x_start, y = y_start, xend = x_end, yend = y_end), color = "red", size=1) +
+  xlim(-7, 7) +
+  ylim(-7, 7) +
+  theme_bw() +
+  theme(aspect.ratio = 1) +
+  labs(title = "Unstandardized") +
+
+d_standardized %>% 
+  ggplot(aes(x=x, y=y)) +
+  geom_point() +
+  geom_segment(data = line_d_standardized, aes(x=x_start, y = y_start, xend = x_end, yend = y_end), color = "red", size =1) +
+  xlim(-7, 7) +
+  ylim(-7, 7) +
+  theme_bw() +
+  theme(aspect.ratio = 1) +
+  labs(title = "Standardized")
+
+```
+
+## Hamming distance
+
+::: {.callout-caution icon="false"}
+## Definition
+
+The Hamming distance between two equal-length strings of symbols is the number of positions at which the corresponding symbols are different.
+
+:::
+
+**Examples**
+
+Hamming distance between:
+
+- "ka[rol]{style="color: red;"}in" and "ka[thr]{style="color: red;"}in" is 3
+- [0000]{style="color: red;"} and [1111]{style="color: red;"} is 4
+- [["tall"]{style="color: red;"}, "smart", ["18-35"]{style="color: red;"}] and [["short"]{style="color: red;"}, "smart", ["45-55"]{style="color: red;"}] is 2
+
+
+## Cosine similarity
+
+
+::: {.callout-caution icon="false"}
+
+## Definition
+
+$$S_c(A,B) = cos(\theta) = \frac{A \cdot B}{||A|| \ ||B||} = \frac{\sum_i^n{A_iB_i}}{ \sqrt{\sum_i^n{A_i}^2} \cdot \sqrt{\sum_i^n{B_i}^2}} $$
+:::
+
+:::: {.columns}
+::: {.column width="70%"}
+
+- Based on the angle between vectors in a space
+- Scale-invariant comparison of similarity of vectors
+- Ranges from -1 to 1
+- Technically not a distance measure, but instead a similarity measure
+
+:::
+::: {.column width="30%"}
+![](../imgs/dist-cosine.png)
+:::
+::::
+
+
+
+## Document similarity with cosine similarity
+
+Document term-frequency matrix
+
+
+
+## Deeper undertanding of vectors
+
+Refer to threeblueonebrown

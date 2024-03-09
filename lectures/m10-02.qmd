@@ -1,0 +1,33 @@
+---
+title: "Embeddings"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## Embeddings: Vector Representations
+
+An **embedding** is a representation of something as a vector of numbers
+
+## Word Embeddings
+
+## Cosine Similarity 
+
+## Calculating cosine similarity
+
+## Solving Analogies with word embeddings
+
+## Creating word embeddings
+
+- Based on co-occurrences
+- Captures the meaning of words
+
+## References
+
+You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
+
+I've started off the references with our main text [@gareth.etal2014]. 
+
+---

@@ -21,42 +21,73 @@ library(tidyverse)
 
 Finding hidden structures in data without using labels
 
-- Clustering
+- **Clustering**
 - Dimensionality reduction
+  - Often useful in conjunction with clustering, when data is high-dimensional
 
 <!-- ask, if it isnt based on labels, what is it based on? -->
 
-## Types of clustering algorithms
+## Clustering can be used to...
+
+:::{.incremental}
+- Segment and/or group data
+- Detect outliers
+- Construct features to support supervised learning
+:::
+
+## Common applications for clustering
+
+:::{.incremental}
+- Market segmentation
+- Recommendation systems
+- Genetic analysis
+- Computer vision (e.g. ROI detection)
+- Social network analysis (community detection)
+- NLP (document clustering and topic modeling)
+- Anomaly detection
+:::
+
+## Common clustering methods
+
+:::{.incremental}
 
 - Hierarchical
 - Centroid-based
 - Density-based
 - Distribution-based
+:::
+
+:::{.fragment}
+Note:
+All of these clustering methods are primarily suited for 
+**continuous** data only (because they depend on distance metrics)
+:::
 
 ## Hierarchical Clustering
 
-![](../imgs/HierarchicalClustering.svg)
+- Agglomerative (bottom-up) or Divisive (top-down)
+
+![](../imgs/HierarchicalClustering.png){fig-pos='b'}
 
 ## Centroid-based Clustering
 
 - e.g. k-means
 
-![](../imgs/CentroidBasedClustering.svg)
+![](../imgs/CentroidBasedClustering.png){fig-pos='b'}
 
 ## Density-based Clustering
 
 - e.g. DBSCAN
 
-![](../imgs/DensityClustering.svg)
+![](../imgs/DensityClustering.png){fig-pos='b'}
 
 ## Distribution-based Clustering
 
 - e.g. Gaussian mixture clustering
 
-![](../imgs/DistributionClustering.svg)
+![](../imgs/DistributionClustering.png){fig-pos='b'}
 
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
+## Agglomerative clustering algorithm (Hierarchical)
 
 1. Start with every observation in its own cluster
 
@@ -65,8 +96,8 @@ df = tibble(x = c(2, 3.5, 4, 7,9), y = c(3, 5, 4, 1, 1.5), labels=c("a","b","c",
 ggplot(df, aes(x = x, y = y, label = labels)) + geom_text() + geom_point(size=5, shape = 1)+
   coord_cartesian(xlim=c(-1,11), ylim=c(-1,6))
 ```
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
+
+## Agglomerative clustering algorithm (Hierarchical)
 
 2. Merge ("agglomerate") the two closest clusters
 
@@ -80,29 +111,10 @@ ggplot() + geom_text(data=df, aes(x = x, y = y, label = labels)) +
   geom_point(data=circles, aes(x = x, y = y), shape=1, size=5)+
   coord_cartesian(xlim=c(-1,11), ylim=c(-1,6))
 ```
-  
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
 
-3. Repeat until there is one group (or specified number of groups)
-  - Produces a dendrogram (tree structure)
-  
-```{r, fig.width=3, fig.height=3}
-df = tibble(x = c(2, 3.5, 4, 7,9), y = c(3, 5, 4, 1, 1.5), labels=c("a","b","c","d","e"))
-clust1 = tibble(x = mean(c(3.5, 4)), y = mean(c(5,4)))
-circles = tibble(x = c(2, 7,9), y = c(3, 1, 1.5))
-ggplot() + geom_text(data=df, aes(x = x, y = y, label = labels)) +
-  geom_point(data=clust1, aes(x = x, y = y), shape=1, size=20) +
-  geom_point(data=clust1, aes(x = x, y = y), shape="X", size=3, color="red") +
-  geom_point(data=circles, aes(x = x, y = y), shape=1, size=5)+
-  coord_cartesian(xlim=c(-1,11), ylim=c(-1,6))
-```
+## Agglomerative clustering algorithm (Hierarchical)
 
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
-
-3. Repeat until there is one group (or specified number of groups)
-  - Produces a dendrogram (tree structure)
+3. Continue until there is only one cluster
   
 ```{r, fig.width=3, fig.height=3}
 df = tibble(x = c(2, 3.5, 4, 7,9), y = c(3, 5, 4, 1, 1.5), labels=c("a","b","c","d","e"))
@@ -118,10 +130,9 @@ ggplot() + geom_text(data=df, aes(x = x, y = y, label = labels)) +
   coord_cartesian(xlim=c(-1,11), ylim=c(-1,6))
 ```
 
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
+## Agglomerative clustering algorithm (Hierarchical)
 
-3. Repeat until there is one group (or specified number of groups)
+3. Continue until there is only one cluster
 
 ```{r, fig.width=3, fig.height=3}
 df = tibble(x = c(2, 3.5, 4, 7,9), y = c(3, 5, 4, 1, 1.5), labels=c("a","b","c","d","e"))
@@ -135,30 +146,40 @@ ggplot() + geom_text(data=df, aes(x = x, y = y, label = labels)) +
   coord_cartesian(xlim=c(-1,11), ylim=c(-1,6))
 ```
 
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
+## Agglomerative clustering algorithm (Hierarchical)
 
-3. Repeat until there is one group (or specified number of groups)
-  - Produces a dendrogram (tree structure)
+3. Continue until there is only one cluster
+
+```{r, fig.width=3, fig.height=3}
+df = tibble(x = c(2, 3.5, 4, 7,9), y = c(3, 5, 4, 1, 1.5), labels=c("a","b","c","d","e"))
+clusts = tibble(x = c(mean(c(2,mean(c(3.5, 4)))), mean(c(7,9))), y = c(mean(c(3,mean(c(5,4)))),mean(c(1, 1.5))))
+
+clust1 = tibble(x = mean(clusts$x), y = mean(clusts$y))
+
+ggplot() + geom_text(data=df, aes(x = x, y = y, label = labels)) +
+  geom_point(data=clust1, aes(x = x, y = y), shape=1, size=75) +
+  geom_point(data=clust1, aes(x = x, y = y), shape="X", size=3, color="red") +
+  coord_cartesian(xlim=c(-1,11), ylim=c(-1,6))
+```
+
+## Agglomerative clustering algorithm (Hierarchical)
+
+4. Visualize order of steps as dendrogram, where length of vertical segments represents distance between clusters
   
-![](../imgs/clustdendrogram.png)
+![](../imgs/clustdendrogram.png){fig-pos='b'}
 
   
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
+## Agglomerative clustering algorithm (Hierarchical)
 
+5. Cut the tree at some "depth" \
+[Optimal clusters often chosen by finding max vertical height that doesn't cross any horizontal segments]{style="font-size:60%;"}
 
-4. Cut the tree at some "depth" 
-  - Observations that are grouped together below the cut point are treated as in one cluster
-  
-<!-- note: optimal clusters often chosen by finding max vertical height that doesn't cross any horizontal segments-->
+![](../imgs/clustdendrogram2.png){fig-pos='b'}
 
-![](../imgs/clustdendrogram2.png)
+## Agglomerative clustering algorithm (Hierarchical)
 
-## Hierarchical Clustering
-### a.k.a. "agglomerative clustering"
-
-- At each step, we merge two closest clusters
+::: {.r-fit-text}
+- At each step, we merge two <U>closest</U> clusters
 - There are multiple ways to define cluster distances:
   - single linkage: 
     - The distance between two clusters is the distance between the two closest observations.
@@ -169,11 +190,12 @@ ggplot() + geom_text(data=df, aes(x = x, y = y, label = labels)) +
   - centroid method: 
     - The distance between two clusters is the distance between their centroids (geometric mean or median).
 
-## Hierarchical Clustering 
-### using `tidyclust`
+:::
+
+## Agglomerative clustering with `tidyclust`
 
 :::{.columns}
-::::{.column width="50%"}
+::::{.column width="50%" .r-fit-text}
 ```{r}
 #| echo: true
 library(tidyclust)
@@ -200,24 +222,27 @@ preds = hc_fit %>% augment(iris)
 ::::
 
 ::::{.column width="50%"}
-```{r, fig.width=5, fig.height=4}
+```{r, fig.height=5}
 hc_fit$fit %>% plot()
 ```
 
-```{r, fig.width=5, fig.height=3}
+```{r, fig.height=4}
 ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color = .pred_cluster)) +
   geom_point(data=centroids, aes(x = Sepal.Length, y = Sepal.Width, color = .cluster),shape='X', size=5)
 ```
 ::::
 :::
 
-## The k-means algorithm (centroid-based)
+## The k-means algorithm (centroid-based) {style="font-size:75%;"}
 
+:::{style="font-size:80%;"}
 - Tries to partition the _n_ observations into _k_ clusters so as to minimize the within-cluster sum of squares (WCSS). 
   - WCSS is the sum of squared distances between each point and the centroid of its cluster
-  
+
+:::
+
 :::{.columns}
-::::{.column width="50%"}
+::::{.column width="50%" .r-fit-text .incremental}
 1. Initialization: 
   - Simplest option is to randomly assign each point to one of _k_ clusters
 2. Update step: 
@@ -235,7 +260,7 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
 ## k-means with `tidyclust`
 
 :::{.columns}
-::::{.column width="50%"}
+::::{.column width="50%" .r-fit-text}
 ```{r}
 #| echo: true
 kmeans_spec <- k_means(num_clusters = 3)
@@ -259,10 +284,11 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
 :::
 
 ## DBSCAN (density-based)
-### Density-based spectral clustering of applications with noise
+#### Density-based spectral clustering of applications with noise
 
+:::{style="font-size:50%;"}
 :::{.columns}
-::::{.column width="50%"}
+::::{.column width="40%"}
 - Defines density at point _p_ as num. points within radius _epsilon_ of _p_
 - Classifies each datapoint as
   - Core point: 
@@ -272,10 +298,10 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
   - Noise point: 
     - any point that isn't a core or noise point
 
-![](../imgs/dbscan.png)
+
 ::::
 
-::::{.column width="50%"}
+::::{.column width="60%"}
 - Algorithm:
   - Classify all points
   - Remove noise points
@@ -285,14 +311,10 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
   - For each border point:
     - Assign to nearest core-point cluster
   
+![](../imgs/dbscan.png){width=400}
 ::::
 :::
-
-## DBSCAN vs k-means
-
-![](../imgs/dbscanVSkmeans.png)
-
-## DBSCAN implementation
+:::
 
 ```{r}
 #| echo: true
@@ -309,16 +331,21 @@ ggplot() +
 
 ## Gaussian mixture (distribution-based)
 
+:::{.columns}
+::::{.column width="40%"}
+:::{style="font-size:75%;"}
 - Algorithm:
   - Fit the mean & variance of _k_ N-dimensional Gaussians to the data
   - Assign each point to the maximum-likelihood Gaussian
   
-![](../imgs/gaussians1.webp)
-![](../imgs/gaussians-3d.webp)
+:::
+::::
 
-## GMM vs k-means
-
-![](../imgs/gmm_vs_kmeans_1.png)
+::::{.column width="60%"}
+![](../imgs/gaussians1.webp){width=400}
+![](../imgs/gaussians-3d.webp){width=400}
+::::
+:::
 
 ## GMM implementation
 
@@ -339,16 +366,16 @@ library(mixtools)
 gmm_fit = GMM(iris, gaussian_comps = 3, dist_mode = "eucl_dist", full_covariance_matrices = TRUE)
   
 mu1 = c(centroids[1,1],centroids[1,2])
-e1=data.frame(ellipse(mu1, gmm_fit$covariance_matrices[,,1], alpha = .05, npoints = 250, newplot = TRUE,
-        draw = TRUE))
+e1=data.frame(ellipse(mu1, gmm_fit$covariance_matrices[,,1], alpha = .05, npoints = 250, newplot = FALSE,
+        draw = FALSE))
 
 mu2 = c(centroids[2,1],centroids[2,2])
-e2=data.frame(ellipse(mu2, gmm_fit$covariance_matrices[,,2], alpha = .05, npoints = 250, newplot = TRUE,
-        draw = TRUE))
+e2=data.frame(ellipse(mu2, gmm_fit$covariance_matrices[,,2], alpha = .05, npoints = 250, newplot = FALSE,
+        draw = FALSE))
 
 mu3 = c(centroids[3,1],centroids[3,2])
-e3=data.frame(ellipse(mu3, gmm_fit$covariance_matrices[,,3], alpha = .05, npoints = 250, newplot = TRUE,
-        draw = TRUE))
+e3=data.frame(ellipse(mu3, gmm_fit$covariance_matrices[,,3], alpha = .05, npoints = 250, newplot = FALSE,
+        draw = FALSE))
 
 ggplot() + 
   geom_point(data=tmp, aes(x = x, y = y, 
@@ -361,6 +388,30 @@ ggplot() +
 ```
 
 
-## Comparison of Clustering Techniques
+## Comparison of Clustering Methods
 
 ![](../imgs/ClusteringComparison.png)
+
+## Comparison of Clustering Methods
+
+![](../imgs/ClusteringMethodComparison.png)
+
+## Factors to consider when choosing a clustering algorithm
+
+:::{.incremental .r-fit-text}
+- Nature of the data 
+  - Shape, size, & density of clusters; dimensionality & size of dataset; amount of noise; etc.
+- Cluster metaphor & interpretability
+  - Think about what a "cluster" means relative to your project 
+  - e.g. in genetic analysis, the theory may assume hierarchical structures 
+- Internal validity
+  - Does the algorithm produce clear-cut clusters for your data?
+- External validity
+  - Does the algorithm produces clusters that differ from each other in meaningful ways for your project?
+  - Does the algorithm produce clusters that match ground truth?
+- Cross-validity
+  - Does the algorithm produce similar clusters on different subsets of the data?
+
+:::
+
+

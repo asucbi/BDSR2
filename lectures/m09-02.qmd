@@ -1,7 +1,8 @@
 ---
 title: |
+  | More on
   | `hierarchical` & `k-means` clustering
-  | with penguins!
+  | (with penguins!)
 subtitle: | 
   | Behavioral Data Science in R II
   | Unit 2
@@ -10,6 +11,10 @@ format:
   revealjs:
     css: style.css
 ---
+
+## Penguins rule
+
+![](../imgs/penguins.webp)
 
 ## The `penguins` dataset
 

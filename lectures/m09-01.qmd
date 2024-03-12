@@ -18,13 +18,14 @@ library(tidyclust)
 library(tidyverse)
 ```
 
-
+:::{.incremental}
 Finding hidden structures in data without using labels
 
 - **Clustering**
 - Dimensionality reduction
   - Often useful in conjunction with clustering, when data is high-dimensional
 
+:::
 <!-- ask, if it isnt based on labels, what is it based on? -->
 
 ## Clustering can be used to...
@@ -47,9 +48,9 @@ Finding hidden structures in data without using labels
 - Anomaly detection
 :::
 
-## Common clustering methods
+## Basic types of clustering methods
 
-:::{.incremental}
+:::{.fragment}
 
 - Hierarchical
 - Centroid-based
@@ -211,19 +212,25 @@ hc_spec <- hier_clust(
   linkage_method = "average"
 )
 
-hc_fit <- hc_spec %>%
-  fit(~ .,
-    data = iris
-  )
+rec <- recipe(~ Sepal.Length + Sepal.Width, data = iris) %>% 
+  step_normalize(all_predictors())
+
+hc_fit <- workflow() %>% 
+  add_model(hc_spec) %>%
+  add_recipe(rec) %>% 
+  fit(data = iris)
 
 centroids = hc_fit %>% extract_centroids()
+clusters = hc_fit %>% extract_cluster_assignment()
 preds = hc_fit %>% augment(iris)
+
+mean(preds$.pred_cluster == clusters$.cluster)
 ```
 ::::
 
 ::::{.column width="50%"}
 ```{r, fig.height=5}
-hc_fit$fit %>% plot()
+hc_fit$fit$fit$fit %>% plot() # Note: have to do 3 layers of $fit$fit$fit because there are 3 steps in our workflow
 ```
 
 ```{r, fig.height=4}
@@ -265,12 +272,13 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
 #| echo: true
 kmeans_spec <- k_means(num_clusters = 3)
 
-kmeans_fit <- kmeans_spec %>%
-  fit(~ .,
-    data = iris
-  )
+kmeans_fit <- workflow() %>% 
+  add_model(kmeans_spec) %>%
+  add_recipe(rec) %>% 
+  fit(data = iris)
 
 centroids = kmeans_fit %>% extract_centroids()
+clusters = kmeans_fit %>% extract_cluster_assignment()
 preds = kmeans_fit %>% augment(iris)
 ```
 ::::
@@ -288,7 +296,7 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
 
 :::{style="font-size:50%;"}
 :::{.columns}
-::::{.column width="40%"}
+::::{.column width="40%" .fragment .semi-fade-out fragment-index=1}
 - Defines density at point _p_ as num. points within radius _epsilon_ of _p_
 - Classifies each datapoint as
   - Core point: 
@@ -301,7 +309,8 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
 
 ::::
 
-::::{.column width="60%"}
+::::{.column width="60%" }
+:::{.fragment .fade-in fragment-index=1}
 - Algorithm:
   - Classify all points
   - Remove noise points
@@ -310,7 +319,9 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
     - Connect all other core points that are within radius _epsilon_
   - For each border point:
     - Assign to nearest core-point cluster
-  
+
+:::
+
 ![](../imgs/dbscan.png){width=400}
 ::::
 :::
@@ -337,6 +348,9 @@ ggplot() +
 - Algorithm:
   - Fit the mean & variance of _k_ N-dimensional Gaussians to the data
   - Assign each point to the maximum-likelihood Gaussian
+  
+- Allows for "soft clustering"
+  - Each point has a probability associated with each cluster
   
 :::
 ::::
@@ -392,9 +406,9 @@ ggplot() +
 
 ![](../imgs/ClusteringComparison.png)
 
-## Comparison of Clustering Methods
+## Comparison of Clustering Methods {.nostretch}
 
-![](../imgs/ClusteringMethodComparison.png)
+![](../imgs/ClusteringMethodComparison.png){width=120%}
 
 ## Factors to consider when choosing a clustering algorithm
 

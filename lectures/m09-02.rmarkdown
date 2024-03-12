@@ -11,7 +11,9 @@ format:
     css: style.css
 ---
 
+
 ## The `penguins` dataset
+
 
 ```{r}
 library(tidymodels)
@@ -31,7 +33,9 @@ library(plotly)
 }
 ```
 
+
 :::{style="font-size:35%;"}
+
 ```{r}
 #| class-output: scrolling
 data("penguins", package = "modeldata")
@@ -54,10 +58,12 @@ datatable(penguins,
           height = '100px' # Table height
 )
 ```
+
 :::
 
 :::{.columns}
 ::::{.column width="60%"}
+
 ```{r, fig.width=6, fig.height=4}
 #par(mfrow=c(3,3))
 library(gridExtra)
@@ -78,9 +84,11 @@ p7<-ggplot(penguins) +
 
 grid.arrange(p1,p2,p3,p4,p5,p6,p7, ncol=3)
 ```
+
 ::::
 
 ::::{.column width="40%" .fragment}
+
 ```{r, out.width="100%", out.height="100%"}
 library(plotly)
 
@@ -166,6 +174,7 @@ fig
 
 ```
 
+
 ::::
 :::
 
@@ -173,6 +182,7 @@ fig
 
 :::{.columns}
 ::::{.column width="50%" style="font-size:60%;"}
+
 
 ```{r}
 #| echo: true
@@ -188,11 +198,12 @@ rec <- recipe(~ ., data = penguins) %>%
   step_normalize(all_predictors())
 rec %>% summary()
 ```
+
 ::::
 
 ::::{.column width="50%" style="font-size:60%;"}
+
 ```{r}
-#| echo: true
 hc_fit <- workflow() %>% 
   add_recipe(rec) %>% 
   add_model(hc_spec) %>% 
@@ -200,6 +211,7 @@ hc_fit <- workflow() %>%
 
 hc_fit$fit$fit$fit %>% plot() # Note: have to do 3 layers of $fit$fit$fit because there are 3 steps in our workflow
 ```
+
 ::::
 :::
 
@@ -207,6 +219,7 @@ hc_fit$fit$fit$fit %>% plot() # Note: have to do 3 layers of $fit$fit$fit becaus
 
 :::{.columns}
 ::::{.column width="50%" style="font-size:60%;"}
+
 ```{r}
 #| echo: true
 penguins_cv <- vfold_cv(penguins, v = 5)
@@ -232,6 +245,7 @@ res <- tune_cluster(
   metrics = cluster_metric_set(sse_ratio, silhouette_avg)
 )
 ```
+
 ::::
 
 ::::{.column width="50%"}
@@ -248,6 +262,7 @@ Low WSS/TSS ratio indicates well-separated clusters
 
 Elbow method
 
+
 ```{r, fig.width=5, fig.height=5}
 res_metrics <- res %>% collect_metrics()
 
@@ -261,6 +276,7 @@ res_metrics %>%
   xlab("Number of clusters") +
   scale_x_continuous(breaks = 1:10)
 ```
+
 ::::
 
 ::::{.fragment .fade-in-then-out}
@@ -274,6 +290,7 @@ Higher silhouette score indicates well-separated clusters
 
 Silhouette method
 
+
 ```{r, fig.width=5, fig.height=5}
 res_metrics %>%
   filter(.metric == "silhouette_avg") %>%
@@ -285,6 +302,7 @@ res_metrics %>%
   xlab("Number of clusters") +
   scale_x_continuous(breaks = 1:10)
 ```
+
 ::::
 
 :::
@@ -295,6 +313,7 @@ res_metrics %>%
 
 :::{.columns}
 ::::{.column width="50%" style="font-size:60%;"}
+
 ```{r}
 #| echo: true
 #| code-line-numbers: "5,6,7,8,9,10,11,12"
@@ -305,7 +324,6 @@ hc_tune_spec <- hier_clust(
 
 linkage_grid <- tibble(
   linkage_method = values_linkage_method)
-values_linkage_method
 ```
 
 ```{r}
@@ -323,9 +341,11 @@ res <- tune_cluster(
 )
 ```
 
+
 ::::
 
 ::::{.column width="50%"}
+
 
 ```{r, fig.width=5, fig.height=5}
 res_metrics <- res %>% collect_metrics()
@@ -338,10 +358,12 @@ res_metrics %>%
   xlab("Linkage method")
 ```
 
+
 ::::
 :::
 
 ## What do our clusters capture?
+
 
 ```{r}
 hc_spec <- hier_clust(
@@ -386,7 +408,9 @@ colored_bars(colors = the_bars, dend = dend, sort_by_labels_order = FALSE, rowLa
 
 ```
 
+
 ## `k-means` clustering
+
 
 ```{r}
 #| echo: true
@@ -400,9 +424,11 @@ kmeans_fit <- workflow() %>%
   fit(data = penguins)
 ```
 
+
 ## Using PCA to visualize clusters
 
 :::{style="font-size:60%;" .r-stretch}
+
 ```{r}
 #| echo: true
 library(factoextra)
@@ -415,9 +441,11 @@ fviz_cluster(res.km, data = penguins %>% select(-c(sex, species, island)),
              ellipse.type = "convex", 
              ggtheme = theme_bw())
 ```
+
 :::
 
 ## Do hierarchical and k-means find the same clusters?
+
 
 ```{r}
 #| echo: true
@@ -428,13 +456,17 @@ pengclust <- cbind(penguins,
 conf_mat(pengclust, truth=.hc_cluster, estimate=.km_cluster)
 ```
 
+
 ## Do hierarchical and k-means find the same clusters?
+
 
 ```{r}
 set.seed(123)
 ```
 
+
 :::{style="font-size:60%;"}
+
 ```{r}
 #| echo: true
 pca_rec <- rec %>%
@@ -446,11 +478,13 @@ pca_data <- cbind(pca_data,
                   kmeans_fit %>% extract_cluster_assignment() %>% rename(.km_cluster = .cluster), 
                   hc_fit %>% extract_cluster_assignment() %>% rename(.hc_cluster = .cluster))
 ```
+
 :::
 
 :::{.columns}
 ::::{.column width="50%"}
 k-means clusters
+
 ```{r}
 fig <- plot_ly() %>%
   add_trace(
@@ -475,10 +509,12 @@ fig <- plot_ly() %>%
 
 fig
 ```
+
 ::::
 
 ::::{.column width="50%"}
 hierarchical clusters
+
 ```{r}
 fig <- plot_ly() %>%
   add_trace(
@@ -503,12 +539,14 @@ fig <- plot_ly() %>%
 
 fig
 ```
+
 ::::
 :::
 
 ## Clustering on PCA data
 
 :::{style="font-size:60%;"}
+
 ```{r}
 set.seed(123)
 ```
@@ -525,7 +563,9 @@ kmeans_fit_pca <- kmeans_spec %>%
 
 pca_data <- cbind(pca_data, kmeans_fit_pca %>% extract_cluster_assignment())
 ```
+
 :::
+
 
 ```{r}
 fig <- plot_ly() %>%
@@ -553,61 +593,77 @@ fig <- plot_ly() %>%
 fig
 ```
 
+
 ## What do our clusters capture?
 
 ::: {.panel-tabset style="font-size:55%;"}
 
 ## species
 
+
 ```{r}
 ggplot(pca_data, aes(x = species, fill=.km_cluster)) +
   geom_bar(position="stack",stat="count")
 ```
 
+
 ## island
+
 
 ```{r}
 ggplot(pca_data, aes(x = island, fill=.km_cluster)) +
   geom_bar(position="stack",stat="count")
 ```
 
+
 ## sex
+
 
 ```{r}
 ggplot(pca_data, aes(x = sex, fill=.km_cluster)) +
   geom_bar(position="stack",stat="count")
 ```
 
+
 ## bill_length_mm
+
 
 ```{r}
 ggplot(pca_data, aes(x = bill_length_mm, fill=.km_cluster)) +
   geom_histogram(position="identity",alpha=.7)
 ```
 
+
 ## bill_depth_mm
+
 
 ```{r}
 ggplot(pca_data, aes(x = bill_depth_mm, fill=.km_cluster)) +
   geom_histogram(position="identity",alpha=.7)
 ```
 
+
 ## flipper_length_mm
+
 
 ```{r}
 ggplot(pca_data, aes(x = flipper_length_mm, fill=.km_cluster)) +
   geom_histogram(position="identity",alpha=.7)
 ```
 
+
 ## body_mass_g
+
 
 ```{r}
 ggplot(pca_data, aes(x = body_mass_g, fill=.km_cluster)) +
   geom_histogram(position="identity",alpha=.7)
 ```
+
 :::
 
 ## Using cluster assignments to support supervised learning
+
 
 ```{r}
 split <- initial_split(pca_data)
@@ -641,8 +697,4 @@ predictions_mn2 <- mn_lr_fit2 %>%
 
 predictions_mn2 %>% accuracy(truth= species, estimate=.pred_class, event_level="first")
 ```
-
-
-
-
 

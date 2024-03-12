@@ -1,0 +1,280 @@
+---
+title: "Module 9 Lab: Clustering with Mall Customer Data"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this lab are:
+
+-   Apply k-means and hierarchical clustering using the `tidyclust` package
+-   Tune clustering models and select the optimal number of clusters based on the Elbow method and Silhouette score
+-   Compare results of clustering algorithms to evaluate which approach is best for your data
+-   Use dimensionality reduction (PCA) to help visualize clustering results
+
+:::
+
+![](../imgs/mallcustomers.jpg)
+
+One common industry application for clustering is market segmentation--trying to group potential customers into subsets based on demographics, needs, priorities, common interests, etc. For this lab, we'll be looking at a dataset containing information on 200 mall customers, including their gender, age, annual income, and spending score (how much they spend at the mall). Our goal will be to attempt to discover useful groupings in the dataset--groupings that, for example, could be used to design targeted ads, or recommend products based on what other similar individuals have liked.
+
+## Library and data loading
+
+```{r, eval = FALSE}
+#| message = FALSE
+library(tidymodels)
+library(tidyverse)
+library(tidyclust)
+
+load("Mall_Customers.Rdata")
+```
+
+# Pt 1: Data visualization and exploration
+
+As always, our first step is to explore our data with some visualizations.
+
+::: {.callout-note icon="false"}
+## Exercise 1.A
+
+Begin by building histograms for `Age`, `AnnualIncome` and `SpendingScore`, and a plot showing the breakdown of `Gender` (it could also be a histogram, but bonus points for a pie chart)
+:::
+
+```{r}
+
+```
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 1.B
+
+Make scatterplots of every **pair** of variables in `Age`, `AnnualIncome` and `SpendingScore`:
+
+-   `Age` X `AnnualIncome`
+-   `Age` X `SpendingScore`
+-   `AnnualIncome` X `SpendingScore`
+
+In each scatterplot, color the points by `Gender`.
+:::
+
+```{r}
+
+```
+
+Do you notice any obvious clusters in the data? The first thing expect a clustering algorithm to do is to capture the patterns that we can visually detect. Of course, it may also be helpful for finding clusters in the data that we *can't* easily see--ones that cut across multiple dimensions--but we probably don't have high confidence in those if it doesn't find the ones that our obvious to the eye.
+
+Often, clustering is an exploratory process. There is no single "correct" way to assign data points into clusters, but instead we're looking for a *reasonable* way to chunk the data *for some purpose*. However, we can still use some rules of thumb to make reasonable decisions about which clustering algorithm to use, and to tune our model parameters.
+
+# Pt 2: Fitting the k-means model
+
+Let's first try clustering the customer data using the *k-means* algorithm. This algorithm requires us to specify _k_, the number of clusters (called `num_clusters` in the function). We might have a good guess about what _k_ should be for our data, based on initial visualization, but most of the time we'll want to try out a few different values.
+
+::: {.callout-note icon="false"}
+## Exercise 2.A.
+
+To start, specify a k-means model with `num_clusters` = 3
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 2.B.
+Next, build a recipe and formula for the model. In this case, there is no response variable, so there is nothing on the left side of our formula.
+
+As predictors, we'll include all of the *continuous* variables in our data--`Age`, `AnnualIncome`, and `SpendingScore`. We'll leave out `Gender` because it's a categorical variable--the k-means algorithm operates on the euclidean distance between points, which isn't inherently meaningful for categorical variables.
+
+Also, add a recipe to normalize all of our continuous variables, since the euclidean distance is also sensitive to different scales of variables. When we are clustering with multidimensional data, we will almost always want to normalize the data first.
+:::
+
+```{r}
+
+```
+
+We don't need to worry about creating a data split for this type of model. Normally, we would use a test set to evaluate our model performance. But in clustering, there is no response variable to predict, so we can use the complete dataset.
+
+::: {.callout-note icon="false"}
+## Exercise 2.C.
+
+Fit the k-means model using a tidymodels workflow. You will need to add the model specification, recipe, and then fit the model.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 2.D.
+
+Add the cluster assignments to the dataframe (you could do this with `extract_cluster_assignments()` or `augment()`/`predict()`). Then, make the same scatterplots you made above, for every pair of predictors in the model, but now color the data points by their cluster assignment. 
+
+Also, get the cluster centroids and add them to the plot as larger points with `shape = 'X'`. 
+
+::: {.callout-note icon="false" collapse="true"}
+## Hint
+
+Since we normalized our data in the recipe before fitting the clusters, if you extract the centroids directly from the model fit (e.g. using `extract_centroids()`), they won't match the scale of the raw variables. Therefore, you'll need to compute the centroids manually, by grouping by cluster and computing the mean of each variable. `summarise_all(mean)` is one helpful function here.
+:::
+:::
+
+```{r}
+
+```
+
+# Pt 3: Tuning the value of _k_
+
+The plots above show how the clusters divide our dataset, and it looks like our initial try with _k_ = 3 isn't capturing the clearest clusters in the dataset. Our next step is to compare the performance with different values of _k_ and decide which to use. Usually, we prefer to use the fewest number of clusters that successfully captures the variability in the data. 
+
+::: {.callout-note icon="false"}
+## Exercise 3.A.
+
+We'll use two methods to try to find the best value for _k_: (1) the Elbow method, using the SSE ratio, (2) The Silhouette method
+
+Make a metric set with the SSE Ratio and average silhouette score (see the `tidyclust` documentation).
+:::
+```{r}
+
+```
+
+Next, we will build a workflow to tune the value of _k_ and plot how the SSE ratio changes.
+
+::: {.callout-note icon="false"}
+## Exercise 3.B.
+
+First, we will need to set up cross-validation for model-tuning. Create a 5-fold split of the data.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.C.
+
+Create a k-means model specification set up to tune the number of clusters.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.D.
+
+Next, make a workflow called `kmeans_tune_wflow`, adding your model and recipe.
+:::
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.E.
+
+Then, make a grid of values for _k_, called `clust_num_grid`, with integers from 1-10. This should be a tibble with a single column named `num_clusters`.
+:::
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.F.
+
+Run the tuning process on the cross-validation folds, and save the result as `kmeans_tune_res`. Include your metric set with the SSE ratio and Silhouette score
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.G.
+
+Finally, make two plots showing the SSE ratio and average Silhouette score, respectively, as a function of _k_.
+:::
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.H.
+
+Based on the plots above, choose what you think is the optimal value for _k_, then build and fit a final model.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.I.
+
+Make the same scatterplots from step 2.D. again for this cluster assignment.
+:::
+```{r}
+
+```
+Do you think this clustering assignment is more reasonable than before?
+
+# Pt 4: Hierarchical Clustering
+
+Next, let's fit a hierarchical clustering algorithm to our data.
+
+::: {.callout-note icon="false"}
+## Exercise 4.A.
+
+Specify a hierarchical clustering model with `hier_clust()`, using the same number of clusters as you did for your final k-means model. Set `linkage_method` to "average". 
+:::
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 4.B.
+
+Fit the hierarchical clustering model and plot the dendrogram.
+:::
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 4.C.
+
+Make the same scatterplots from step 2.D. again for this cluster assignment.
+:::
+```{r}
+
+```
+Can you visually detect any differences from the k-means cluster assignments?
+
+
+# Pt 5: Dimensionality reduction
+
+Since clusters can cut across multiple variables, they may sometimes be difficult to visualize. Dimensionality reduction techniques are useful here, because they allow us to project high-dimensional data into a lower dimensional space for plotting. This is also useful when we have many variables and don't know which will be useful for clustering the data.
+
+::: {.callout-note icon="false"}
+## Exercise 5.A.
+
+First, let's use PCA to help us visualize the cluster assignments from our two models. 
+
+1. Make a recipe called `pca_rec` with all of the numeric predictors in the formula (as above), normalize the data, and add `step_pca` with `keep_original_cols = TRUE`
+2. Prep and bake the recipe to get the PCA estimates, and save the resulting dataframe as `pca_data`
+3. Augment `pca_data` with the cluster assignments from _both_ algorithms, ensuring that you give the columns different names (they may both be named `.cluster` or `.pred_cluster` by default, depending upon how you extract them)
+4. Make two scatter plots--one for each clustering algorithm--with the first two principal components on the x- and y-axes, points colored by their cluster assignment, and the centroids added as larger points with `shape = 'X'`
+:::
+```{r}
+
+```
+
+```{r}
+
+```
+# Pt 6: Interpreting your results
+
+Based on the plots you've produced, can you describe any interpretable patterns in your clusters? Imagine you were commissioned by a store owner to conduct this clustering analysis--can you offer them any insights about different subsets of customers that they could use for refining the product line, advertising, etc?  

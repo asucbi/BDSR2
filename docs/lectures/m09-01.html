@@ -10,7 +10,7 @@
 <link href="m09-01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.3.433">
 
-  <title>quarto-input9ac17ea2</title>
+  <title>quarto-inputcade3a59</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -401,14 +401,16 @@ Module 9</p><p></p>
 </section>
 <section id="unsupervised-learning" class="slide level2">
 <h2>Unsupervised Learning</h2>
+<div>
 <p>Finding hidden structures in data without using labels</p>
 <ul>
-<li><strong>Clustering</strong></li>
-<li>Dimensionality reduction
+<li class="fragment"><strong>Clustering</strong></li>
+<li class="fragment">Dimensionality reduction
 <ul>
-<li>Often useful in conjunction with clustering, when data is high-dimensional</li>
+<li class="fragment">Often useful in conjunction with clustering, when data is high-dimensional</li>
 </ul></li>
 </ul>
+</div>
 <!-- ask, if it isnt based on labels, what is it based on? -->
 </section>
 <section id="clustering-can-be-used-to" class="slide level2">
@@ -435,14 +437,14 @@ Module 9</p><p></p>
 </ul>
 </div>
 </section>
-<section id="common-clustering-methods" class="slide level2">
-<h2>Common clustering methods</h2>
-<div>
+<section id="basic-types-of-clustering-methods" class="slide level2">
+<h2>Basic types of clustering methods</h2>
+<div class="fragment">
 <ul>
-<li class="fragment">Hierarchical</li>
-<li class="fragment">Centroid-based</li>
-<li class="fragment">Density-based</li>
-<li class="fragment">Distribution-based</li>
+<li>Hierarchical</li>
+<li>Centroid-based</li>
+<li>Density-based</li>
+<li>Distribution-based</li>
 </ul>
 </div>
 <div class="fragment">
@@ -572,13 +574,22 @@ Module 9</p><p></p>
 <span id="cb1-11"><a href="#cb1-11"></a>  <span class="at">linkage_method =</span> <span class="st">"average"</span></span>
 <span id="cb1-12"><a href="#cb1-12"></a>)</span>
 <span id="cb1-13"><a href="#cb1-13"></a></span>
-<span id="cb1-14"><a href="#cb1-14"></a>hc_fit <span class="ot">&lt;-</span> hc_spec <span class="sc">%&gt;%</span></span>
-<span id="cb1-15"><a href="#cb1-15"></a>  <span class="fu">fit</span>(<span class="sc">~</span> .,</span>
-<span id="cb1-16"><a href="#cb1-16"></a>    <span class="at">data =</span> iris</span>
-<span id="cb1-17"><a href="#cb1-17"></a>  )</span>
-<span id="cb1-18"><a href="#cb1-18"></a></span>
-<span id="cb1-19"><a href="#cb1-19"></a>centroids <span class="ot">=</span> hc_fit <span class="sc">%&gt;%</span> <span class="fu">extract_centroids</span>()</span>
-<span id="cb1-20"><a href="#cb1-20"></a>preds <span class="ot">=</span> hc_fit <span class="sc">%&gt;%</span> <span class="fu">augment</span>(iris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb1-14"><a href="#cb1-14"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(<span class="sc">~</span> Sepal.Length <span class="sc">+</span> Sepal.Width, <span class="at">data =</span> iris) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-15"><a href="#cb1-15"></a>  <span class="fu">step_normalize</span>(<span class="fu">all_predictors</span>())</span>
+<span id="cb1-16"><a href="#cb1-16"></a></span>
+<span id="cb1-17"><a href="#cb1-17"></a>hc_fit <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb1-18"><a href="#cb1-18"></a>  <span class="fu">add_model</span>(hc_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb1-19"><a href="#cb1-19"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span> </span>
+<span id="cb1-20"><a href="#cb1-20"></a>  <span class="fu">fit</span>(<span class="at">data =</span> iris)</span>
+<span id="cb1-21"><a href="#cb1-21"></a></span>
+<span id="cb1-22"><a href="#cb1-22"></a>centroids <span class="ot">=</span> hc_fit <span class="sc">%&gt;%</span> <span class="fu">extract_centroids</span>()</span>
+<span id="cb1-23"><a href="#cb1-23"></a>clusters <span class="ot">=</span> hc_fit <span class="sc">%&gt;%</span> <span class="fu">extract_cluster_assignment</span>()</span>
+<span id="cb1-24"><a href="#cb1-24"></a>preds <span class="ot">=</span> hc_fit <span class="sc">%&gt;%</span> <span class="fu">augment</span>(iris)</span>
+<span id="cb1-25"><a href="#cb1-25"></a></span>
+<span id="cb1-26"><a href="#cb1-26"></a><span class="fu">mean</span>(preds<span class="sc">$</span>.pred_cluster <span class="sc">==</span> clusters<span class="sc">$</span>.cluster)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.9666667</code></pre>
+</div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
@@ -637,15 +648,16 @@ Module 9</p><p></p>
 <div class="columns">
 <div class="column r-fit-text" style="width:50%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>kmeans_spec <span class="ot">&lt;-</span> <span class="fu">k_means</span>(<span class="at">num_clusters =</span> <span class="dv">3</span>)</span>
-<span id="cb2-2"><a href="#cb2-2"></a></span>
-<span id="cb2-3"><a href="#cb2-3"></a>kmeans_fit <span class="ot">&lt;-</span> kmeans_spec <span class="sc">%&gt;%</span></span>
-<span id="cb2-4"><a href="#cb2-4"></a>  <span class="fu">fit</span>(<span class="sc">~</span> .,</span>
-<span id="cb2-5"><a href="#cb2-5"></a>    <span class="at">data =</span> iris</span>
-<span id="cb2-6"><a href="#cb2-6"></a>  )</span>
-<span id="cb2-7"><a href="#cb2-7"></a></span>
-<span id="cb2-8"><a href="#cb2-8"></a>centroids <span class="ot">=</span> kmeans_fit <span class="sc">%&gt;%</span> <span class="fu">extract_centroids</span>()</span>
-<span id="cb2-9"><a href="#cb2-9"></a>preds <span class="ot">=</span> kmeans_fit <span class="sc">%&gt;%</span> <span class="fu">augment</span>(iris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>kmeans_spec <span class="ot">&lt;-</span> <span class="fu">k_means</span>(<span class="at">num_clusters =</span> <span class="dv">3</span>)</span>
+<span id="cb3-2"><a href="#cb3-2"></a></span>
+<span id="cb3-3"><a href="#cb3-3"></a>kmeans_fit <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb3-4"><a href="#cb3-4"></a>  <span class="fu">add_model</span>(kmeans_spec) <span class="sc">%&gt;%</span></span>
+<span id="cb3-5"><a href="#cb3-5"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span> </span>
+<span id="cb3-6"><a href="#cb3-6"></a>  <span class="fu">fit</span>(<span class="at">data =</span> iris)</span>
+<span id="cb3-7"><a href="#cb3-7"></a></span>
+<span id="cb3-8"><a href="#cb3-8"></a>centroids <span class="ot">=</span> kmeans_fit <span class="sc">%&gt;%</span> <span class="fu">extract_centroids</span>()</span>
+<span id="cb3-9"><a href="#cb3-9"></a>clusters <span class="ot">=</span> kmeans_fit <span class="sc">%&gt;%</span> <span class="fu">extract_cluster_assignment</span>()</span>
+<span id="cb3-10"><a href="#cb3-10"></a>preds <span class="ot">=</span> kmeans_fit <span class="sc">%&gt;%</span> <span class="fu">augment</span>(iris)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </div><div class="column" style="width:50%;">
 <div class="cell">
@@ -661,7 +673,7 @@ Module 9</p><p></p>
 <h4 id="density-based-spectral-clustering-of-applications-with-noise">Density-based spectral clustering of applications with noise</h4>
 <div style="font-size:50%;">
 <div class="columns">
-<div class="column" style="width:40%;">
+<div class="column fragment semi-fade-out" data-fragment-index="1" style="width:40%;">
 <ul>
 <li>Defines density at point <em>p</em> as num. points within radius <em>epsilon</em> of <em>p</em></li>
 <li>Classifies each datapoint as
@@ -681,6 +693,7 @@ Module 9</p><p></p>
 </ul></li>
 </ul>
 </div><div class="column" style="width:60%;">
+<div class="fragment fade-in" data-fragment-index="1">
 <ul>
 <li>Algorithm:
 <ul>
@@ -697,20 +710,21 @@ Module 9</p><p></p>
 </ul></li>
 </ul></li>
 </ul>
+</div>
 <p><img data-src="../imgs/dbscan.png" width="400"></p>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a><span class="fu">library</span>(dbscan)</span>
-<span id="cb3-2"><a href="#cb3-2"></a></span>
-<span id="cb3-3"><a href="#cb3-3"></a>dbscan_fit <span class="ot">&lt;-</span> <span class="fu">dbscan</span>(iris, <span class="at">eps =</span> .<span class="dv">5</span>, <span class="at">minPts =</span> <span class="dv">8</span>)</span>
-<span id="cb3-4"><a href="#cb3-4"></a></span>
-<span id="cb3-5"><a href="#cb3-5"></a>tmp <span class="ot">&lt;-</span> <span class="fu">cbind</span>(iris, dbscan_fit<span class="sc">$</span>cluster)</span>
-<span id="cb3-6"><a href="#cb3-6"></a></span>
-<span id="cb3-7"><a href="#cb3-7"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
-<span id="cb3-8"><a href="#cb3-8"></a>  <span class="fu">geom_point</span>(<span class="at">data=</span>tmp, <span class="fu">aes</span>(<span class="at">x =</span> Sepal.Length, <span class="at">y =</span> Sepal.Width, </span>
-<span id="cb3-9"><a href="#cb3-9"></a>                           <span class="at">color=</span> <span class="fu">factor</span>(<span class="st">`</span><span class="at">dbscan_fit$cluster</span><span class="st">`</span>))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">library</span>(dbscan)</span>
+<span id="cb4-2"><a href="#cb4-2"></a></span>
+<span id="cb4-3"><a href="#cb4-3"></a>dbscan_fit <span class="ot">&lt;-</span> <span class="fu">dbscan</span>(iris, <span class="at">eps =</span> .<span class="dv">5</span>, <span class="at">minPts =</span> <span class="dv">8</span>)</span>
+<span id="cb4-4"><a href="#cb4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5"></a>tmp <span class="ot">&lt;-</span> <span class="fu">cbind</span>(iris, dbscan_fit<span class="sc">$</span>cluster)</span>
+<span id="cb4-6"><a href="#cb4-6"></a></span>
+<span id="cb4-7"><a href="#cb4-7"></a><span class="fu">ggplot</span>() <span class="sc">+</span> </span>
+<span id="cb4-8"><a href="#cb4-8"></a>  <span class="fu">geom_point</span>(<span class="at">data=</span>tmp, <span class="fu">aes</span>(<span class="at">x =</span> Sepal.Length, <span class="at">y =</span> Sepal.Width, </span>
+<span id="cb4-9"><a href="#cb4-9"></a>                           <span class="at">color=</span> <span class="fu">factor</span>(<span class="st">`</span><span class="at">dbscan_fit$cluster</span><span class="st">`</span>))) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img data-src="m09-01_files/figure-revealjs/unnamed-chunk-12-1.png" width="960"></p>
 </div>
@@ -727,6 +741,10 @@ Module 9</p><p></p>
 <li>Fit the mean &amp; variance of <em>k</em> N-dimensional Gaussians to the data</li>
 <li>Assign each point to the maximum-likelihood Gaussian</li>
 </ul></li>
+<li>Allows for “soft clustering”
+<ul>
+<li>Each point has a probability associated with each cluster</li>
+</ul></li>
 </ul>
 </div>
 </div><div class="column" style="width:60%;">
@@ -737,13 +755,13 @@ Module 9</p><p></p>
 <section id="gmm-implementation" class="slide level2">
 <h2>GMM implementation</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">library</span>(ClusterR)</span>
-<span id="cb4-2"><a href="#cb4-2"></a></span>
-<span id="cb4-3"><a href="#cb4-3"></a>gmm_fit <span class="ot">=</span> <span class="fu">GMM</span>(iris, <span class="at">gaussian_comps =</span> <span class="dv">3</span>, <span class="at">dist_mode =</span> <span class="st">"eucl_dist"</span>)</span>
-<span id="cb4-4"><a href="#cb4-4"></a>centroids <span class="ot">=</span> <span class="fu">data.frame</span>(gmm_fit<span class="sc">$</span>centroids)</span>
-<span id="cb4-5"><a href="#cb4-5"></a></span>
-<span id="cb4-6"><a href="#cb4-6"></a>tmp <span class="ot">&lt;-</span> <span class="fu">cbind</span>(iris, <span class="fu">predict</span>(gmm_fit, <span class="at">newdata =</span> iris))</span>
-<span id="cb4-7"><a href="#cb4-7"></a><span class="fu">colnames</span>(tmp) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'x'</span>,<span class="st">'y'</span>,<span class="st">'cluster'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a><span class="fu">library</span>(ClusterR)</span>
+<span id="cb5-2"><a href="#cb5-2"></a></span>
+<span id="cb5-3"><a href="#cb5-3"></a>gmm_fit <span class="ot">=</span> <span class="fu">GMM</span>(iris, <span class="at">gaussian_comps =</span> <span class="dv">3</span>, <span class="at">dist_mode =</span> <span class="st">"eucl_dist"</span>)</span>
+<span id="cb5-4"><a href="#cb5-4"></a>centroids <span class="ot">=</span> <span class="fu">data.frame</span>(gmm_fit<span class="sc">$</span>centroids)</span>
+<span id="cb5-5"><a href="#cb5-5"></a></span>
+<span id="cb5-6"><a href="#cb5-6"></a>tmp <span class="ot">&lt;-</span> <span class="fu">cbind</span>(iris, <span class="fu">predict</span>(gmm_fit, <span class="at">newdata =</span> iris))</span>
+<span id="cb5-7"><a href="#cb5-7"></a><span class="fu">colnames</span>(tmp) <span class="ot">=</span> <span class="fu">c</span>(<span class="st">'x'</span>,<span class="st">'y'</span>,<span class="st">'cluster'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 <img data-src="m09-01_files/figure-revealjs/unnamed-chunk-14-1.png" width="960" class="r-stretch"></section>
@@ -751,10 +769,10 @@ Module 9</p><p></p>
 <h2>Comparison of Clustering Methods</h2>
 
 <img data-src="../imgs/ClusteringComparison.png" class="r-stretch"></section>
-<section id="comparison-of-clustering-methods-1" class="slide level2">
+<section id="comparison-of-clustering-methods-1" class="slide level2 nostretch">
 <h2>Comparison of Clustering Methods</h2>
-
-<img data-src="../imgs/ClusteringMethodComparison.png" class="r-stretch"></section>
+<p><img data-src="../imgs/ClusteringMethodComparison.png" style="width:120.0%"></p>
+</section>
 <section id="factors-to-consider-when-choosing-a-clustering-algorithm" class="slide level2">
 <h2>Factors to consider when choosing a clustering algorithm</h2>
 <div class="r-fit-text">

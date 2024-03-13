@@ -384,6 +384,16 @@
       margin-right: 0; 
     }
   </style>
+  
+  <script src="m10-04_files/libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+  <link href="m10-04_files/libs/datatables-css-0.0.0/datatables-crosstalk.css" rel="stylesheet">
+  <script src="m10-04_files/libs/datatables-binding-0.32/datatables.js"></script>
+  <script src="m10-04_files/libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <link href="m10-04_files/libs/dt-core-1.13.6/css/jquery.dataTables.min.css" rel="stylesheet">
+  <link href="m10-04_files/libs/dt-core-1.13.6/css/jquery.dataTables.extra.css" rel="stylesheet">
+  <script src="m10-04_files/libs/dt-core-1.13.6/js/jquery.dataTables.min.js"></script>
+  <link href="m10-04_files/libs/crosstalk-1.2.1/css/crosstalk.min.css" rel="stylesheet">
+  <script src="m10-04_files/libs/crosstalk-1.2.1/js/crosstalk.min.js"></script>
 </head>
 <body class="quarto-light">
   <div class="reveal">
@@ -397,55 +407,53 @@
 </div>
 
 </section>
-<section class="slide level2">
-
+<section id="recommender-systems-applications" class="slide level2">
+<h2>Recommender Systems: Applications</h2>
 <div class="hidden">
 
 </div>
-</section>
-<section id="recommender-systems-applications" class="slide level2">
-<h2>Recommender Systems: Applications</h2>
-<ul>
-<li>Recommendations for movies, music, shows, clothing, etc.</li>
-</ul>
-</section>
+
+<img data-src="../imgs/recsys-companies.png" class="r-stretch"></section>
 <section id="collaborative-filtering" class="slide level2">
 <h2>Collaborative filtering</h2>
 <p>Use similarities between items and users to predict what items a user will like.</p>
 
 <img data-src="../imgs/recsys-collab-filter.png" class="r-stretch"></section>
-<section id="machine-learning-recommender-systems" class="slide level2">
-<h2>Machine Learning &amp; Recommender Systems</h2>
-</section>
 <section id="recommenderlab-package" class="slide level2">
 <h2><code>recommenderlab</code> package</h2>
+<ul>
+<li><code>recommenderlab</code> implements several recommendation-system algorithms</li>
+<li>and tools for evaluating them via cross-validation</li>
+</ul>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(recommenderlab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="movielense-data" class="slide level2">
 <h2>MovieLense Data</h2>
+<div style="font-size: 50%;">
 <div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 8 × 8
-  `Toy Story (1995)` `GoldenEye (1995)` `Four Rooms (1995)` `Get Shorty (1995)`
-               &lt;dbl&gt;              &lt;dbl&gt;               &lt;dbl&gt;               &lt;dbl&gt;
-1                  5                  3                   4                   3
-2                  4                 NA                  NA                  NA
-3                 NA                 NA                  NA                  NA
-4                 NA                 NA                  NA                  NA
-5                  4                  3                  NA                  NA
-6                  4                 NA                  NA                  NA
-7                 NA                 NA                  NA                   5
-8                 NA                 NA                  NA                  NA
-# ℹ 4 more variables: `Copycat (1995)` &lt;dbl&gt;, `Twelve Monkeys (1995)` &lt;dbl&gt;,
-#   `Babe (1995)` &lt;dbl&gt;, `Dead Man Walking (1995)` &lt;dbl&gt;</code></pre>
+<div class="cell-output-display">
+
+<div class="datatables html-widget html-fill-item" id="htmlwidget-62ca08865066c0f75918" style="width:100%;height:auto;"></div>
+<script type="application/json" data-for="htmlwidget-62ca08865066c0f75918">{"x":{"filter":"none","vertical":false,"data":[["1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24"],[5,4,null,null,4,4,null,null,null,4,null,null,3,null,1,5,4,5,null,3,5,null,5,null],[3,null,null,null,3,null,null,null,null,null,null,null,3,null,null,null,null,null,null,null,null,2,null,null],[4,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[3,null,null,null,null,null,5,null,null,4,null,5,5,null,null,5,null,3,4,null,null,5,null,null],[3,null,null,null,null,null,null,null,null,null,null,null,1,null,null,null,null,null,null,null,2,null,null,null],[4,null,null,null,null,2,5,3,4,4,null,null,2,5,1,5,4,null,null,null,5,null,4,4],[1,null,null,null,null,4,5,null,null,null,4,null,4,null,null,5,null,5,5,null,null,null,4,5],[5,null,null,null,null,4,5,null,null,4,5,null,3,4,4,5,3,5,null,null,5,null,null,5],[3,2,null,null,null,null,4,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null],[2,null,null,4,null,null,3,3,null,4,2,null,1,null,null,5,null,null,null,2,null,null,null,5],[5,null,null,null,null,4,5,null,null,5,2,null,5,5,null,5,null,5,null,null,null,null,null,5],[5,4,null,null,null,2,null,null,null,3,null,null,5,4,1,null,3,5,null,null,null,null,4,null]],"container":"<table class=\"display\">\n  <thead>\n    <tr>\n      <th> <\/th>\n      <th>Toy Story (1995)<\/th>\n      <th>GoldenEye (1995)<\/th>\n      <th>Four Rooms (1995)<\/th>\n      <th>Get Shorty (1995)<\/th>\n      <th>Copycat (1995)<\/th>\n      <th>Twelve Monkeys (1995)<\/th>\n      <th>Babe (1995)<\/th>\n      <th>Dead Man Walking (1995)<\/th>\n      <th>Richard III (1995)<\/th>\n      <th>Seven (Se7en) (1995)<\/th>\n      <th>Usual Suspects, The (1995)<\/th>\n      <th>Mighty Aphrodite (1995)<\/th>\n    <\/tr>\n  <\/thead>\n<\/table>","options":{"columnDefs":[{"className":"dt-right","targets":[1,2,3,4,5,6,7,8,9,10,11,12]},{"orderable":false,"targets":0},{"name":" ","targets":0},{"name":"Toy Story (1995)","targets":1},{"name":"GoldenEye (1995)","targets":2},{"name":"Four Rooms (1995)","targets":3},{"name":"Get Shorty (1995)","targets":4},{"name":"Copycat (1995)","targets":5},{"name":"Twelve Monkeys (1995)","targets":6},{"name":"Babe (1995)","targets":7},{"name":"Dead Man Walking (1995)","targets":8},{"name":"Richard III (1995)","targets":9},{"name":"Seven (Se7en) (1995)","targets":10},{"name":"Usual Suspects, The (1995)","targets":11},{"name":"Mighty Aphrodite (1995)","targets":12}],"order":[],"autoWidth":false,"orderClasses":false}},"evals":[],"jsHooks":[]}</script>
+</div>
 </div>
 </div>
 </section>
 <section id="user-based-recommender-system" class="slide level2">
 <h2>User-based recommender system</h2>
-<p><img data-src="../imgs/user-based-rec.png"> - Find <span class="math inline">\(k\)</span> similar users - Compute average rating for item among similar users - Possibly: weighted by similarity of users</p>
+
+<img data-src="../imgs/user-based-rec.png" class="r-stretch"><ul>
+<li>Find <span class="math inline">\(k\)</span> similar users</li>
+<li>Compute average rating for item among similar users
+<ul>
+<li>Possibly: weighted by similarity of users</li>
+</ul></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>ubcf <span class="ot">&lt;-</span> <span class="fu">Recommender</span>(train, <span class="at">method =</span> <span class="st">"UBCF"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="item-based-recommender-system" class="slide level2">
 <h2>Item-based recommender system</h2>
@@ -454,13 +462,16 @@
 <li>Compute weighted average of users’ ratings on similar items</li>
 <li>Typically more efficient than user-based recommendation (usually have fewer items than users)</li>
 </ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>ibcf <span class="ot">&lt;-</span> <span class="fu">Recommender</span>(train, <span class="at">method =</span> <span class="st">"IBCF"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="matrix-factorization-approaches" class="slide level2">
 <h2>Matrix Factorization approaches</h2>
 
 <img data-src="../imgs/matrix-factorization-rec-intro1.png" class="r-stretch"></section>
-<section id="matrix-factorization-for-recommendation" class="slide level2">
-<h2>Matrix factorization for recommendation</h2>
+<section id="matrix-factorization-for-recommendation-1d" class="slide level2">
+<h2>Matrix factorization for recommendation (1d)</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><img data-src="../imgs/recsys-1d-matrix.png"></p>
@@ -469,8 +480,8 @@
 </div>
 </div>
 </section>
-<section id="matrix-factorization-for-recommendation-2" class="slide level2">
-<h2>Matrix factorization for recommendation 2</h2>
+<section id="matrix-factorization-for-recommendation-2d" class="slide level2">
+<h2>Matrix factorization for recommendation (2d)</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
 <p><img data-src="../imgs/recsys-2d-matrix.png"></p>
@@ -485,83 +496,96 @@
 </section>
 <section id="funk-svd-for-recommendation" class="slide level2">
 <h2>Funk-SVD for Recommendation</h2>
-<p>Diagram for this</p>
-<blockquote>
-<p>A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that.</p>
-</blockquote>
-</section>
-<section id="fund-svd-in-recommenderlab" class="slide level2">
-<h2>Fund-SVD in <code>recommenderlab</code></h2>
-</section>
-<section id="generating-user-and-item-embeddings" class="slide level2">
-<h2>Generating User and Item Embeddings</h2>
+
+<img data-src="../imgs/funk-svd.png" class="r-stretch"></section>
+<section id="funk-svd-in-recommenderlab" class="slide level2">
+<h2>Funk-SVD in <code>recommenderlab</code></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>svfd <span class="ot">&lt;-</span> <span class="fu">Recommender</span>(train, <span class="at">method =</span> <span class="st">"SVDF"</span>, <span class="at">parameter =</span> <span class="fu">list</span>(<span class="at">k =</span> <span class="dv">20</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
 </section>
 <section id="examining-item-embeddings" class="slide level2">
 <h2>Examining item embeddings</h2>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>items <span class="ot">&lt;-</span> <span class="fu">get_item_embeddings</span>(svfd, train)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div style="font-size: 50%;">
+<div class="columns">
+<div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">nearest_neighbors</span>(<span class="st">"Terminator 2: Judgment Day (1991)"</span>, items)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 591 × 2
-   item                                       dist
-   &lt;chr&gt;                                     &lt;dbl&gt;
- 1 Terminator 2: Judgment Day (1991)         1    
- 2 Terminator, The (1984)                    0.900
- 3 Jurassic Park (1993)                      0.837
- 4 Raiders of the Lost Ark (1981)            0.795
- 5 Blues Brothers, The (1980)                0.778
- 6 Fugitive, The (1993)                      0.778
- 7 Men in Black (1997)                       0.770
- 8 Back to the Future (1985)                 0.737
- 9 Indiana Jones and the Last Crusade (1989) 0.736
-10 True Lies (1994)                          0.729
+   item                                      similarity
+   &lt;chr&gt;                                          &lt;dbl&gt;
+ 1 Terminator 2: Judgment Day (1991)              1    
+ 2 Terminator, The (1984)                         0.900
+ 3 Jurassic Park (1993)                           0.837
+ 4 Raiders of the Lost Ark (1981)                 0.795
+ 5 Blues Brothers, The (1980)                     0.778
+ 6 Fugitive, The (1993)                           0.778
+ 7 Men in Black (1997)                            0.770
+ 8 Back to the Future (1985)                      0.737
+ 9 Indiana Jones and the Last Crusade (1989)      0.736
+10 True Lies (1994)                               0.729
 # ℹ 581 more rows</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">nearest_neighbors</span>(<span class="st">"Scream (1996)"</span>, items)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 591 × 2
-   item                               dist
-   &lt;chr&gt;                             &lt;dbl&gt;
- 1 Scream (1996)                     1    
- 2 Happy Gilmore (1996)              0.817
- 3 Scream 2 (1997)                   0.812
- 4 Seven (Se7en) (1995)              0.789
- 5 Nightmare on Elm Street, A (1984) 0.777
- 6 Cape Fear (1991)                  0.752
- 7 Omen, The (1976)                  0.739
- 8 Private Parts (1997)              0.735
- 9 Ace Ventura: Pet Detective (1994) 0.727
-10 Starship Troopers (1997)          0.719
+   item                              similarity
+   &lt;chr&gt;                                  &lt;dbl&gt;
+ 1 Scream (1996)                          1    
+ 2 Happy Gilmore (1996)                   0.817
+ 3 Scream 2 (1997)                        0.812
+ 4 Seven (Se7en) (1995)                   0.789
+ 5 Nightmare on Elm Street, A (1984)      0.777
+ 6 Cape Fear (1991)                       0.752
+ 7 Omen, The (1976)                       0.739
+ 8 Private Parts (1997)                   0.735
+ 9 Ace Ventura: Pet Detective (1994)      0.727
+10 Starship Troopers (1997)               0.719
 # ℹ 581 more rows</code></pre>
 </div>
+</div>
+</div><div class="column" style="width:50%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">nearest_neighbors</span>(<span class="st">"Trainspotting (1996)"</span>, items)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 591 × 2
-   item                                             dist
-   &lt;chr&gt;                                           &lt;dbl&gt;
- 1 Trainspotting (1996)                            1    
- 2 People vs. Larry Flynt, The (1996)              0.910
- 3 Boogie Nights (1997)                            0.904
- 4 True Romance (1993)                             0.883
- 5 Clockwork Orange, A (1971)                      0.878
- 6 Jackie Brown (1997)                             0.876
- 7 Welcome to the Dollhouse (1995)                 0.871
- 8 City of Lost Children, The (1995)               0.844
- 9 Cook the Thief His Wife &amp; Her Lover, The (1989) 0.843
-10 Reservoir Dogs (1992)                           0.825
+   item                                            similarity
+   &lt;chr&gt;                                                &lt;dbl&gt;
+ 1 Trainspotting (1996)                                 1    
+ 2 People vs. Larry Flynt, The (1996)                   0.910
+ 3 Boogie Nights (1997)                                 0.904
+ 4 True Romance (1993)                                  0.883
+ 5 Clockwork Orange, A (1971)                           0.878
+ 6 Jackie Brown (1997)                                  0.876
+ 7 Welcome to the Dollhouse (1995)                      0.871
+ 8 City of Lost Children, The (1995)                    0.844
+ 9 Cook the Thief His Wife &amp; Her Lover, The (1989)      0.843
+10 Reservoir Dogs (1992)                                0.825
 # ℹ 581 more rows</code></pre>
 </div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">nearest_neighbors</span>(<span class="st">"Lion King, The (1994)"</span>, items)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 591 × 2
-   item                       dist
-   &lt;chr&gt;                     &lt;dbl&gt;
- 1 Lion King, The (1994)     1    
- 2 Aladdin (1992)            0.880
- 3 Top Gun (1986)            0.837
- 4 Pretty Woman (1990)       0.819
- 5 Fly Away Home (1996)      0.815
- 6 Firm, The (1993)          0.811
- 7 Rainmaker, The (1997)     0.803
- 8 Mr. Holland's Opus (1995) 0.799
- 9 Kiss the Girls (1997)     0.793
-10 Apollo 13 (1995)          0.789
+   item                      similarity
+   &lt;chr&gt;                          &lt;dbl&gt;
+ 1 Lion King, The (1994)          1    
+ 2 Aladdin (1992)                 0.880
+ 3 Top Gun (1986)                 0.837
+ 4 Pretty Woman (1990)            0.819
+ 5 Fly Away Home (1996)           0.815
+ 6 Firm, The (1993)               0.811
+ 7 Rainmaker, The (1997)          0.803
+ 8 Mr. Holland's Opus (1995)      0.799
+ 9 Kiss the Girls (1997)          0.793
+10 Apollo 13 (1995)               0.789
 # ℹ 581 more rows</code></pre>
+</div>
+</div>
+</div>
 </div>
 </div>
 <div class="footer footer-default">

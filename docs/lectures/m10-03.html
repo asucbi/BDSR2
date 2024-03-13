@@ -573,27 +573,40 @@
 <section id="matrix-factorization" class="slide level2">
 <h2>Matrix factorization</h2>
 <ul>
-<li>get a big term-term matrix of skip-gram PMI</li>
+<li>Get a big term-term matrix of skip-gram PMI</li>
 <li>“factorize” this matrix</li>
+<li>i.e.: split it apart</li>
 </ul>
 </section>
 <section id="matrix-multiplication-basics" class="slide level2">
 <h2>Matrix multiplication basics</h2>
-<p>vectors (and matrices) transposed vectors (and matrices) output sizes</p>
-</section>
-<section id="singular-value-decomposition" class="slide level2">
-<h2>Singular Value Decomposition</h2>
+
+<img data-src="../imgs/matrix-mult-demo.png" class="r-stretch"></section>
+<section id="matrix-decomposition" class="slide level2">
+<h2>Matrix decomposition</h2>
+<div style="font-size: 80%;">
 <ul>
-<li>Decompose a matrix into two others</li>
-<li>This is related to PCA</li>
+<li>We can reverse the process of matrix multiplication to pull a matrix apart into the product of several matrices</li>
+<li>One method is called the Singular Value Decomposition
+<ul>
+<li>(closely related to PCA)</li>
+</ul></li>
 </ul>
+</div>
+<p><img data-src="../imgs/svd-example-tai-dane-bradley.jpg">{fig-align:“center”}</p>
+<div style="font-size: 50%;">
+<p>(credit: Tai-Dane Bradley)</p>
+</div>
 </section>
 <section id="making-word-vectors" class="slide level2">
 <h2>Making word vectors</h2>
-<ul>
-<li>Choose an embedding dimension, keep only first <span class="math inline">\(k\)</span> rows/columns of the U matrix (ordered by “importance” aka singular values)</li>
-</ul>
-</section>
+<p>Choose an embedding dimension, keep only first <span class="math inline">\(k\)</span> rows/columns of the U matrix (ordered by “importance” aka singular values)</p>
+
+<img data-src="../imgs/building-word-vecs.png" class="r-stretch"></section>
+<section id="visualizing-word-vectors" class="slide level2">
+<h2>Visualizing word vectors</h2>
+
+<img data-src="m10-03_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
 <section id="references" class="slide level2">
 <h2>References</h2>
 <p>You can use pandoc citation style to add citations. Let’s use the convention: <code>[@author1.author2YEAR]</code> and <code>[@author.etalYEAR]</code> A bibliography is automatically created.</p>

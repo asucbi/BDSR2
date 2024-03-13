@@ -439,15 +439,46 @@
 <li>As a direction and distance from origin (i.e.&nbsp;center of space)</li>
 </ul>
 </div><div class="column" style="width:50%;">
-<p>&lt; diagrams for these &gt;</p>
+<p><span class="math display">\[\begin{align}
+    y &amp;= \begin{bmatrix}
+           x_{1} \\
+           x_{2} \\
+           \vdots \\
+           x_{m}
+         \end{bmatrix}
+  \end{align}
+  \]</span> <img data-src="../imgs/vector-demo.svg"></p>
 </div>
 </div>
 </section>
 <section id="dot-product" class="slide level2">
 <h2>Dot product</h2>
-<ul>
-<li>As casting shadow on vector</li>
-</ul>
+<div class="callout callout-caution no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Notation</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math display">\[\overrightarrow{U} \cdot \overrightarrow{V} = u_1 \cdot v_1 + u_2 \cdot v_2 + ... u_m \cdot v_m\]</span></p>
+</div>
+</div>
+</div>
+<p>If <span class="math inline">\(a = [5, -2]\)</span> and <span class="math inline">\(b = [-4, -1]\)</span>:</p>
+<p><span class="math display">\[\overrightarrow{a} \cdot \overrightarrow{b} = 5(-4) + -2(-1) = -18 \]</span></p>
+</section>
+<section id="dot-product-interpretation" class="slide level2">
+<h2>Dot product interpretation</h2>
+<p>You can think of the dot product as the length of the shadow one vector casts on another</p>
+<div class="quarto-layout-panel">
+<div class="quarto-layout-row quarto-layout-valign-top">
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="../imgs/vector-shadow.png"></p>
+</div>
+<div class="quarto-layout-cell" style="flex-basis: 50.0%;justify-content: center;">
+<p><img data-src="../imgs/vector-dotproduct-shadow.png"></p>
+</div>
+</div>
+</div>
 </section>
 <section id="cosine-similarity" class="slide level2">
 <h2>Cosine similarity</h2>
@@ -463,12 +494,14 @@
 </div>
 <div class="columns">
 <div class="column" style="width:70%;">
+<div style="font-size: 75%;">
 <ul>
 <li>Based on the angle between vectors in a space</li>
 <li>Scale-invariant comparison of similarity of vectors</li>
 <li>Ranges from -1 to 1</li>
 <li>Technically not a distance measure, but instead a similarity measure</li>
 </ul>
+</div>
 </div><div class="column" style="width:30%;">
 <p><img data-src="../imgs/dist-cosine.png"></p>
 </div>
@@ -478,8 +511,15 @@
 <h2>Deeper undertanding of vectors</h2>
 <p>Grant Sanderson (3blue1brown) offers an excellent description of basic Linear Algebra concepts.</p>
 <p><strong>Youtube</strong></p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/fNk_zzaMoSs?si=dzP555swbJlFSK2a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
+<div class="columns">
+<div class="column" style="width:50%;">
+<iframe width="480" height="270" src="https://www.youtube.com/embed/fNk_zzaMoSs?si=dzP555swbJlFSK2a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
 </iframe>
+</div><div class="column" style="width:50%;">
+<iframe width="480" height="270" src="https://www.youtube.com/embed/LyGKycYT2v0?si=gCeObxsnlH_Sh5tY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
+</iframe>
+</div>
+</div>
 <div class="footer footer-default">
 
 </div>

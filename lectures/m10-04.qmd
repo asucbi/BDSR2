@@ -7,6 +7,10 @@ format:
 bibliography: ../references.bib
 ---
 
+
+
+## Recommender Systems: Applications
+
 ::: {.hidden}
 ```{r}
 library(tidyverse)
@@ -14,9 +18,7 @@ library(tidyverse)
 
 :::
 
-## Recommender Systems: Applications
-
-- Recommendations for movies, music, shows, clothing, etc.
+![](../imgs/recsys-companies.png)
 
 ## Collaborative filtering
 
@@ -24,9 +26,11 @@ Use similarities between items and users to predict what items a user will like.
 
 ![](../imgs/recsys-collab-filter.png)
 
-## Machine Learning \& Recommender Systems
 
 ## `recommenderlab` package
+
+- `recommenderlab` implements several recommendation-system algorithms 
+- and tools for evaluating them via cross-validation
 
 ```{r}
 #| message: false
@@ -36,24 +40,30 @@ library(recommenderlab)
 
 ## MovieLense Data
 
+::: {style="font-size: 50%;"}
+
 ```{r}
 #| echo: false
 data("MovieLense")
 
 MovieLense100 <- MovieLense[, colCounts(MovieLense) > 50]
 train <- MovieLense100[1:800]
-
-as(train[1:8, 1:8], "matrix") %>% as_tibble()
+library(DT)
+datatable(as(train[1:24, 1:12], "matrix") %>% as_tibble())
 ```
+:::
+
 
 ## User-based recommender system
 
 ![](../imgs/user-based-rec.png)
+
 - Find $k$ similar users
 - Compute average rating for item among similar users
   - Possibly: weighted by similarity of users
 
 ```{r}
+#| echo: true
 ubcf <- Recommender(train, method = "UBCF")
 ```
 
@@ -65,6 +75,7 @@ ubcf <- Recommender(train, method = "UBCF")
 - Typically more efficient than user-based recommendation (usually have fewer items than users)
 
 ```{r}
+#| echo: true
 ibcf <- Recommender(train, method = "IBCF")
 ```
 
@@ -73,7 +84,7 @@ ibcf <- Recommender(train, method = "IBCF")
 ![](../imgs/matrix-factorization-rec-intro1.png)
 
 
-## Matrix factorization for recommendation
+## Matrix factorization for recommendation (1d)
 
 :::: {.columns}
 ::: {.column width="50%"}
@@ -85,7 +96,7 @@ ibcf <- Recommender(train, method = "IBCF")
 ::::
 
 
-## Matrix factorization for recommendation 2
+## Matrix factorization for recommendation (2d)
 
 :::: {.columns}
 ::: {.column width="50%"}
@@ -102,17 +113,16 @@ Of course, the big idea is that we don't have to specify these representations f
 
 ## Funk-SVD for Recommendation
 
-Diagram for this
+![](../imgs/funk-svd.png)
 
-> A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that.
-
-## Fund-SVD in `recommenderlab`
+## Funk-SVD in `recommenderlab`
 
 ```{r}
+#| echo: true
 svfd <- Recommender(train, method = "SVDF", parameter = list(k = 20))
 ```
 
-## Generating User and Item Embeddings
+
 
 ```{r}
 #| echo: false
@@ -137,7 +147,14 @@ get_user_embeddings <- function(rec_result){
 items <- get_item_embeddings(svfd, train)
 ```
 
+
 ## Examining item embeddings
+
+```{r}
+#| echo: true
+items <- get_item_embeddings(svfd, train)
+```
+
 
 ```{r}
 #| echo: false
@@ -161,20 +178,39 @@ nearest_neighbors <- function(item_name, items_data){
     pivot_longer(-item) %>% 
     group_by(item) %>% 
     summarize(
-      dist = cos_sim(item_emb, value)
+      similarity = cos_sim(item_emb, value)
     ) %>% 
-    arrange(-dist)
+    arrange(-similarity)
 }
 
 ```
 
+
+::: {style="font-size: 50%;"}
+
+:::: {.columns}
+::: {.column width="50%"}
 ```{r}
+#| echo: true
+
 nearest_neighbors("Terminator 2: Judgment Day (1991)", items)
 
 nearest_neighbors("Scream (1996)", items)
+
+```
+:::
+::: {.column width="50%"}
+```{r}
+#| echo: true
 
 nearest_neighbors("Trainspotting (1996)", items)
 
 nearest_neighbors("Lion King, The (1994)", items)
 ```
+
+:::
+::::
+:::
+
+
 

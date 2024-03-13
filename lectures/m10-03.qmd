@@ -177,23 +177,50 @@ etc.
 
 ## Matrix factorization
 
-- get a big term-term matrix of skip-gram PMI
+- Get a big term-term matrix of skip-gram PMI
 - "factorize" this matrix
+- i.e.: split it apart
 
 ## Matrix multiplication basics
 
-vectors (and matrices)
-transposed vectors (and matrices)
-output sizes
+![](../imgs/matrix-mult-demo.png)
 
-## Singular Value Decomposition
+## Matrix decomposition
+::: {style="font-size: 80%;"}
 
-- Decompose a matrix into two others
-- This is related to PCA
+- We can reverse the process of matrix multiplication to pull a matrix apart into the product of several matrices
+- One method is called the Singular Value Decomposition
+  - (closely related to PCA)
+
+:::
+
+![](../imgs/svd-example-tai-dane-bradley.jpg){fig-align:"center"}
+
+::: {style="font-size: 50%;"}
+(credit: Tai-Dane Bradley)
+:::
+
 
 ## Making word vectors
 
-- Choose an embedding dimension, keep only first $k$ rows/columns of the U matrix (ordered by "importance" aka singular values)
+Choose an embedding dimension, keep only first $k$ rows/columns of the U matrix (ordered by "importance" aka singular values)
+
+![](../imgs/building-word-vecs.png)
+
+## Visualizing word vectors
+
+```{r}
+glove_df[100:200,0:25] %>% 
+  pivot_longer(-word) %>% 
+  ggplot(aes(y = word, x= name, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  theme_minimal(base_size = 7) +
+  theme(aspect.ratio = 2) +
+  labs(x = "Dimension", y = "Token")
+  
+```
+
 
 ## References
 

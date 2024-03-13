@@ -21,7 +21,8 @@ euc_dist <- function(x1, y1, x2, y2){
 
 capitals_geo <- read_csv("data/us-state-capitals.csv") %>% 
   filter(!(name %in% c("Alaska", "Hawaii"))) %>% 
-  rename(state = name, city = description)
+  rename(state = name, city = description) %>% 
+  select(-city)
 
 capitals_geo_std <- capitals_geo %>% 
   mutate(
@@ -39,13 +40,15 @@ capitals_dists <- cross_join(capitals_geo, capitals_geo) %>%
 :::: {.columns}
 ::: {.column width="50%"}
 ```{r}
-capitals_geo %>% 
-  select(-city)
+#| echo: true
+capitals_geo
+  
 ```
 
 :::
 ::: {.column width="50%"}
 ```{r}
+#| fig-width: 5
 capitals_dists %>% 
   pivot_longer(cols = -state.x, names_to = "state.y") %>% 
   ggplot(aes(x = state.x, y = state.y, fill = value)) +
@@ -53,8 +56,9 @@ capitals_dists %>%
   scale_fill_viridis_c() +
   scale_x_discrete(position="top", labels = abbreviate) +
   scale_y_discrete(limits = rev) +
+  theme_minimal(base_size = 5) +
   theme(axis.text.x = element_text(angle=90), aspect.ratio=1) +
-  labs(x="",y="", fill = "Dist") 
+  labs(x="",y="", fill = "Dist")
 ```
 :::
 ::::
@@ -74,8 +78,15 @@ mds_fit$points %>%
   mutate(state = capitals_dists$state.x) %>% 
   ggplot(aes(x=V1, y = V2)) +
   geom_point(color = "red") +
-  geom_text_repel(aes(label = state), alpha = .75)
+  geom_text_repel(aes(label = state), alpha = .75) +
+  theme_bw()
 ```
+
+## More about MDS
+
+- Unsupervised dimensionality reduction technique mapping pairwise distances to coordinates.
+- Variety of flavors of MDS and estimation techniques
+- Methods for metric (numerical) and non-metric (ordinal) similarity/distance data
 
 ## Representation and Psychological spaces
 
@@ -83,30 +94,45 @@ Often, cognitive scientists and psychologists think of mental constructs as loca
 
 :::: {.columns}
 ::: {.column width="50%"}
-![](../imgs/lab-space-color-wiki.png)
+![](../imgs/lab-space-color-wiki.png){height=300px}
 :::
 ::: {.column width="50%"}
-![](../imgs/dog-category-ex.png)
+![](../imgs/dog-category-ex.png){height=300px}
 :::
 ::::
 
-## Emotion similarity ratings
+## MDS of Facial Expressions
 
-introduce emotion dataset of similarity ratings
+:::: {.columns}
+::: {.column width="50%"}
+
+- Abelson and Sermat (1962) presented participants with 15 photos of an actress making facial expressions under different cues
+- Participatns were shown two different expressions and asked to rate how similar they were to one another.
+:::
+::: {.column width="50%"}
+![](../imgs/facial-expressions-pair-dalle.webp)
+:::
+::::
+
+
+## Facial Expression Similarity Data
+
+::: {style="font-size: 75%;"}
+
+```{r}
+#| message: false
+#| echo: true
+emo_dists <- read_csv("data/abelson-sermat-emotion-similarities.csv")
+emo_dists
+```
+:::
+
 
 ## MDS and latent dimensions of emotion
 
 MDS offers one way to explore these latent spaces.
 
 ```{r}
-#|message: false
-emo_dists <- read_csv("data/abelson-sermat-emotion-similarities.csv")
-emo_dists
-```
-
-```{r}
-
-
 emo_fit <- cmdscale(emo_dists %>% select(contains("id_")), eig=TRUE, k=2) 
 
 emo_fit$points %>% 

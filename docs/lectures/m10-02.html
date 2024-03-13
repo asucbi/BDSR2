@@ -402,6 +402,7 @@
 <div class="columns">
 <div class="column" style="width:50%;">
 <div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>capitals_geo</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 48 × 3
    state       latitude longitude
@@ -422,7 +423,7 @@
 </div><div class="column" style="width:50%;">
 <div class="cell">
 <div class="cell-output-display">
-<p><img data-src="m10-02_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
+<p><img data-src="m10-02_files/figure-revealjs/unnamed-chunk-3-1.png" width="480"></p>
 </div>
 </div>
 </div>
@@ -431,30 +432,43 @@
 <section id="mds" class="slide level2">
 <h2>MDS</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>dists <span class="ot">&lt;-</span> capitals_dists <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>state.x)</span>
-<span id="cb2-2"><a href="#cb2-2"></a>mds_fit <span class="ot">&lt;-</span> <span class="fu">cmdscale</span>(dists, <span class="at">eig=</span><span class="cn">TRUE</span>, <span class="at">k=</span><span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>dists <span class="ot">&lt;-</span> capitals_dists <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>state.x)</span>
+<span id="cb3-2"><a href="#cb3-2"></a>mds_fit <span class="ot">&lt;-</span> <span class="fu">cmdscale</span>(dists, <span class="at">eig=</span><span class="cn">TRUE</span>, <span class="at">k=</span><span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 
 <img data-src="m10-02_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+<section id="more-about-mds" class="slide level2">
+<h2>More about MDS</h2>
+<ul>
+<li>Unsupervised dimensionality reduction technique mapping pairwise distances to coordinates.</li>
+<li>Variety of flavors of MDS and estimation techniques</li>
+<li>Methods for metric (numerical) and non-metric (ordinal) similarity/distance data</li>
+</ul>
+</section>
 <section id="representation-and-psychological-spaces" class="slide level2">
 <h2>Representation and Psychological spaces</h2>
 <p>Often, cognitive scientists and psychologists think of mental constructs as located in some latent psychological “space”.</p>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><img data-src="../imgs/lab-space-color-wiki.png"></p>
+<p><img data-src="../imgs/lab-space-color-wiki.png" height="300"></p>
 </div><div class="column" style="width:50%;">
-<p><img data-src="../imgs/dog-category-ex.png"></p>
+<p><img data-src="../imgs/dog-category-ex.png" height="300"></p>
 </div>
 </div>
 </section>
-<section id="emotion-similarity-ratings" class="slide level2">
-<h2>Emotion similarity ratings</h2>
-<p>introduce emotion dataset of similarity ratings</p>
+<section id="mds-of-facial-expressions" class="slide level2">
+<h2>MDS of Facial Expressions</h2>
+<ul>
+<li>Abelson and Sermat (1962) presented participants with 15 photos of an actress making facial expressions under different cues</li>
+<li>Participatns were shown two different expressions and asked to rate how similar they were to one another.</li>
+</ul>
 </section>
-<section id="mds-and-latent-dimensions-of-emotion" class="slide level2">
-<h2>MDS and latent dimensions of emotion</h2>
-<p>MDS offers one way to explore these latent spaces.</p>
+<section id="facial-expression-similarity-data" class="slide level2">
+<h2>Facial Expression Similarity Data</h2>
+<div style="font-size: 75%;">
 <div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>emo_dists <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/abelson-sermat-emotion-similarities.csv"</span>)</span>
+<span id="cb4-2"><a href="#cb4-2"></a>emo_dists</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 13 × 15
    emotion     id     id_7 id_13 id_15 id_16 id_20 id_28 id_29 id_30 id_32 id_36
@@ -475,6 +489,11 @@
 # ℹ 3 more variables: id_37 &lt;dbl&gt;, id_51 &lt;dbl&gt;, id_56 &lt;dbl&gt;</code></pre>
 </div>
 </div>
+</div>
+</section>
+<section id="mds-and-latent-dimensions-of-emotion" class="slide level2">
+<h2>MDS and latent dimensions of emotion</h2>
+<p>MDS offers one way to explore these latent spaces.</p>
 
 <img data-src="m10-02_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"><div class="footer footer-default">
 

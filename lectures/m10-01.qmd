@@ -148,13 +148,43 @@ Hamming distance between:
 
 :::
 ::: {.column width="50%"}
-< diagrams for these >
+$$\begin{align}
+    y &= \begin{bmatrix}
+           x_{1} \\
+           x_{2} \\
+           \vdots \\
+           x_{m}
+         \end{bmatrix}
+  \end{align}
+  $$
+![](../imgs/vector-demo.svg)
 :::
 ::::
 
 ## Dot product
 
-- As casting shadow on vector
+::: {.callout-caution icon="false"}
+## Notation
+
+$$\overrightarrow{U} \cdot \overrightarrow{V} = u_1 \cdot v_1 + u_2 \cdot v_2 + ... u_m \cdot v_m$$
+:::
+
+
+If $a = [5, -2]$ and $b = [-4, -1]$:
+
+$$\overrightarrow{a} \cdot \overrightarrow{b} = 5(-4) + -2(-1) = -18 $$
+
+## Dot product interpretation
+
+You can think of the dot product as the length of the shadow one vector casts on another
+
+::: {layout-ncol=2}
+![](../imgs/vector-shadow.png)
+
+![](../imgs/vector-dotproduct-shadow.png)
+:::
+
+
 
 ## Cosine similarity
 
@@ -168,10 +198,14 @@ $$S_c(A,B) = cos(\theta) = \frac{A \cdot B}{||A|| \ ||B||} = \frac{\sum_i^n{A_iB
 :::: {.columns}
 ::: {.column width="70%"}
 
+::: {style="font-size: 75%;"}
 - Based on the angle between vectors in a space
 - Scale-invariant comparison of similarity of vectors
 - Ranges from -1 to 1
 - Technically not a distance measure, but instead a similarity measure
+
+:::
+
 
 :::
 ::: {.column width="30%"}
@@ -185,5 +219,14 @@ Grant Sanderson (3blue1brown) offers an excellent description of basic Linear Al
 
 **Youtube**
 
-<iframe width="560" height="315" src="https://www.youtube.com/embed/fNk_zzaMoSs?si=dzP555swbJlFSK2a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+:::: {.columns}
+::: {.column width="50%"}
+
+<iframe width="480" height="270" src="https://www.youtube.com/embed/fNk_zzaMoSs?si=dzP555swbJlFSK2a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+
+:::
+::: {.column width="50%"}
+<iframe width="480" height="270" src="https://www.youtube.com/embed/LyGKycYT2v0?si=gCeObxsnlH_Sh5tY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+:::
+::::
 

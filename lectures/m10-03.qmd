@@ -1,5 +1,5 @@
 ---
-title: "Recommender systems via Collaborative Filtering"
+title: "Text Embeddings"
 subtitle: Behavioral Data Science in R II
 format: 
   revealjs:
@@ -7,171 +7,198 @@ format:
 bibliography: ../references.bib
 ---
 
-::: {.hidden}
+## Embeddings: Vector Representations
+
+An **embedding** is a representation of something as a vector of numbers
+
+## Term frequency embeddings
+
+Term-frequency embeddings are a way to represent documents.
+
 ```{r}
+#| echo: false
 library(tidyverse)
+tf_df <- tibble(
+  doc = c("A", "B", "C", "D"),
+  mozarella = c(0, 1, 3, 29),
+  pepperoni = c(0, 1, 3, 17),
+  tidy = c(5, 23, 1, 4),
+  calculate = c(9, 33, 0, 1),
+  bake = c(3, 9, 3, 45),
+)
+
+tf_df
 ```
 
-:::
+## Document similarity
 
-## Recommender Systems: Applications
-
-- Recommendations for movies, music, shows, clothing, etc.
-
-## Collaborative filtering
-
-Use similarities between items and users to predict what items a user will like.
-
-![](../imgs/recsys-collab-filter.png)
-
-## Machine Learning \& Recommender Systems
-
-## `recommenderlab` package
+The similarity between documents can be best calculated using cosine similarity.
 
 ```{r}
-#| message: false
-#| echo: true
-library(recommenderlab)
-```
-
-## MovieLense Data
-
-```{r}
-#| echo: false
-data("MovieLense")
-
-MovieLense100 <- MovieLense[, colCounts(MovieLense) > 50]
-train <- MovieLense100[1:800]
-
-as(train[1:8, 1:8], "matrix") %>% as_tibble()
-```
-
-## User-based recommender system
-
-![](../imgs/user-based-rec.png)
-- Find $k$ similar users
-- Compute average rating for item among similar users
-  - Possibly: weighted by similarity of users
-
-```{r}
-ubcf <- Recommender(train, method = "UBCF")
-```
-
-
-## Item-based recommender system
-
-- Find similar items
-- Compute weighted average of users' ratings on similar items
-- Typically more efficient than user-based recommendation (usually have fewer items than users)
-
-```{r}
-ibcf <- Recommender(train, method = "IBCF")
-```
-
-## Matrix Factorization approaches
-
-![](../imgs/matrix-factorization-rec-intro1.png)
-
-
-## Matrix factorization for recommendation
-
-:::: {.columns}
-::: {.column width="50%"}
-![](../imgs/recsys-1d-matrix.png)
-:::
-::: {.column width="50%"}
-![](../imgs/recsys-1d-space.png)
-:::
-::::
-
-
-## Matrix factorization for recommendation 2
-
-:::: {.columns}
-::: {.column width="50%"}
-![](../imgs/recsys-2d-matrix.png)
-:::
-::: {.column width="50%"}
-![](../imgs/recsys-2d-space.png)
-:::
-::::
-
-## Learning user and item matrices
-
-Of course, the big idea is that we don't have to specify these representations for users and items based on any theory, but instead we can learn them from data.
-
-## Funk-SVD for Recommendation
-
-Diagram for this
-
-> A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that.
-
-## Fund-SVD in `recommenderlab`
-
-```{r}
-svfd <- Recommender(train, method = "SVDF", parameter = list(k = 20))
-```
-
-## Generating User and Item Embeddings
-
-```{r}
-#| echo: false
-
-get_item_embeddings <- function(rec_result, rec_data){
-  mod <- getModel(rec_result)
-  mat <- mod$svd$V
-
-  d <- mat %>% 
-    as_tibble() %>% 
-    mutate(item = colnames(rec_data)) %>% 
-    relocate(item)
-  
-  return(d)
-}
-
-get_user_embeddings <- function(rec_result){
-  mod <- getModel(rec_result)
-  return(mod$svd$U)
-}
-
-items <- get_item_embeddings(svfd, train)
-```
-
-## Examining item embeddings
-
-```{r}
-#| echo: false
-
-
-# get nearest neighbors
-euc_dist <- function(x, y){
-  sqrt(sum((x - y)^2))
-}
-
-nearest_neighbors <- function(item_name, items_data){
-  item_emb <- items_data %>% 
-    pivot_longer(-item) %>% 
-    filter(item == item_name) %>%  # Terminator 2: Judgment Day (1991)
-    pull(value)
-
-  items_data %>% 
-    pivot_longer(-item) %>% 
-    group_by(item) %>% 
-    summarize(
-      dist = cos_sim(item_emb, value)
+tf_dists <- cross_join(tf_df, tf_df) %>% 
+  pivot_longer(cols = c(-doc.x, -doc.y), names_to = "word", values_to = "count") %>% 
+  mutate(
+    count_from = str_sub(word, -1, -1),
+    word = str_sub(word, 0, -3)
     ) %>% 
-    arrange(-dist)
+  pivot_wider(names_from = count_from, values_from = count) %>% 
+  group_by(`doc.x`, `doc.y`) %>% 
+  summarize(
+    euclidean = sqrt(sum((x - y)^2)),
+    cos_sim = sum(x*y)/(sqrt(sum(x^2))*sqrt(sum(y^2)))
+    )
+  
+```
+
+## Word Embeddings
+
+- Word embeddings represent the meaning of a word as a vector of numbers
+- Different approaches to building, e.g.:
+  - Word2Vec
+  - GloVE
+- But all based on the co-occurrence of words together in a corpus of real text
+
+```{r}
+#| echo: false
+glove_df <- read_delim(
+  "local/glove.6B.50d.txt", 
+  delim = " ",
+  col_names = c("word", paste0("dim", sprintf("%02d", seq(1,50,1)))),
+  quote = ""
+  )
+
+glove <- function(text){
+  glove_df %>% 
+    filter(word==text) %>% 
+    select(-word) %>% 
+    as.numeric()
+}
+
+cos_sim <- function(x, y){
+  sum(x*y)/(sqrt(sum(x^2))*sqrt(sum(y^2)))
 }
 
 ```
 
+## GloVe Embedding
+
+Two computer representation of "queen":
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**GloVe**
+
 ```{r}
-nearest_neighbors("Terminator 2: Judgment Day (1991)", items)
+#| echo: true
+#| eval: false
 
-nearest_neighbors("Scream (1996)", items)
-
-nearest_neighbors("Trainspotting (1996)", items)
-
-nearest_neighbors("Lion King, The (1994)", items)
+glove("queen")
 ```
 
+```{r}
+round(glove("queen"), 2)
+```
+:::
+::: {.column width="50%"}
+
+**DALL-E 3**
+
+![](../imgs/queen - DALL·E 2024-03-09.webp)
+:::
+::::
+
+
+## Calculating cosine similarity
+
+```{r}
+#| echo: true
+
+cos_sim(glove("fortress"), glove("castle"))
+
+cos_sim(glove("grape"), glove("cherry"))
+
+cos_sim(glove("grape"), glove("castle"))
+
+cos_sim(glove("cherry"), glove("fortress"))
+```
+
+
+## Capturing meaning with word embeddings
+
+![](../imgs/glove-example.png)
+
+
+## Capturing meaning with word embeddings in `R`
+
+```{r}
+#| echo: true
+cos_sim(
+  glove("queen") - glove("king") + glove("princess"),
+  glove("princess") - glove("prince")
+  )
+
+cos_sim(
+  glove("phoenix") - glove("arizona"),
+  glove("milwaukee") - glove("wisconsin")
+  )
+```
+
+# Creating word embeddings
+
+## Compression as understanding
+
+> Presumably there are some generalities to be found in there, something more concise and descriptive than 8.5 billion completely independent and unrelated ratings. [...] A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that. ---Simon Funk (aka Brandyn Webb)
+
+::: callout-tip
+See [@rissanan1978], [@grunwald.roos2020] and further writings on the idea of **minimum descriptive length** for more formal treatments.
+:::
+
+## How to make word embeddings
+
+- Start with a large corpus of naturalistic text
+- Count up the frequencies of words and word co-occurrences
+- Tabulate these into a big table (matrix) of word-word co-occurrence probabilities 
+- Translate probabilities into Pointwise Mutual Information (PMI)
+- "Factorize" this matrix (table) into two new matrices
+- Keep $k$ columns of the first of these matrices: the rows are your word embedding vectors
+
+## Skip-grams
+
+- Measure probability of occurrence of word $w_2$ in context of word $w_1$: $P(w_2|w_1)$
+- For skip-grams, "context" is within some number of words (allowing for "skipping" of words)
+  - E.g. within 5 words, $\text{dog}|\text{fox}$ in  "the quick brown **fox** jumped over the lazy **dog**."
+  
+## Pointwise Mutual Information
+
+- calculate PMI
+definition
+etc.
+
+## Matrix factorization
+
+- get a big term-term matrix of skip-gram PMI
+- "factorize" this matrix
+
+## Matrix multiplication basics
+
+vectors (and matrices)
+transposed vectors (and matrices)
+output sizes
+
+## Singular Value Decomposition
+
+- Decompose a matrix into two others
+- This is related to PCA
+
+## Making word vectors
+
+- Choose an embedding dimension, keep only first $k$ rows/columns of the U matrix (ordered by "importance" aka singular values)
+
+## References
+
+You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
+
+I've started off the references with our main text [@gareth.etal2014]. 
+
+---

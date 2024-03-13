@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<script src="m10-01_files/libs/clipboard/clipboard.min.js"></script>
-<script src="m10-01_files/libs/quarto-html/tabby.min.js"></script>
-<script src="m10-01_files/libs/quarto-html/popper.min.js"></script>
-<script src="m10-01_files/libs/quarto-html/tippy.umd.min.js"></script>
-<link href="m10-01_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="m10-01_files/libs/quarto-html/light-border.css" rel="stylesheet">
-<link href="m10-01_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
-<link href="m10-01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+<script src="m10-04_files/libs/clipboard/clipboard.min.js"></script>
+<script src="m10-04_files/libs/quarto-html/tabby.min.js"></script>
+<script src="m10-04_files/libs/quarto-html/popper.min.js"></script>
+<script src="m10-04_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="m10-04_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="m10-04_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="m10-04_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="m10-04_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.3.450">
 
-  <title>Distance and similarity measures</title>
+  <title>Recommender systems via Collaborative Filtering</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
-  <link rel="stylesheet" href="m10-01_files/libs/revealjs/dist/reset.css">
-  <link rel="stylesheet" href="m10-01_files/libs/revealjs/dist/reveal.css">
+  <link rel="stylesheet" href="m10-04_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="m10-04_files/libs/revealjs/dist/reveal.css">
   <style>
     code{white-space: pre-wrap;}
     span.smallcaps{font-variant: small-caps;}
@@ -28,13 +28,78 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
   </style>
-  <link rel="stylesheet" href="m10-01_files/libs/revealjs/dist/theme/quarto.css">
+  <link rel="stylesheet" href="m10-04_files/libs/revealjs/dist/theme/quarto.css">
   <link rel="stylesheet" href="style.css">
-  <link href="m10-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
-  <link href="m10-01_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
-  <link href="m10-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
-  <link href="m10-01_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <link href="m10-04_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="m10-04_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="m10-04_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="m10-04_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
   <style type="text/css">
 
   .callout {
@@ -325,182 +390,201 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Distance and similarity measures</h1>
+  <h1 class="title">Recommender systems via Collaborative Filtering</h1>
   <p class="subtitle">Behavioral Data Science in R II</p>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="similarity-as-distance" class="slide level2">
-<h2>Similarity as distance</h2>
+<section class="slide level2">
+
+<div class="hidden">
+
+</div>
+</section>
+<section id="recommender-systems-applications" class="slide level2">
+<h2>Recommender Systems: Applications</h2>
 <ul>
-<li>It is common in Machine Learning applications to model the similarity of two data points using some <strong>distance measure</strong></li>
-<li>The notion of distance in a <strong>psychological space</strong> is a crucial one in psychology and cognitive science</li>
+<li>Recommendations for movies, music, shows, clothing, etc.</li>
 </ul>
 </section>
-<section id="different-ways-to-measure-distance" class="slide level2">
-<h2>Different ways to measure distance</h2>
-<p>Straight line (as the crow flies): 18.6 mi</p>
+<section id="collaborative-filtering" class="slide level2">
+<h2>Collaborative filtering</h2>
+<p>Use similarities between items and users to predict what items a user will like.</p>
+
+<img data-src="../imgs/recsys-collab-filter.png" class="r-stretch"></section>
+<section id="machine-learning-recommender-systems" class="slide level2">
+<h2>Machine Learning &amp; Recommender Systems</h2>
+</section>
+<section id="recommenderlab-package" class="slide level2">
+<h2><code>recommenderlab</code> package</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="fu">library</span>(recommenderlab)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="movielense-data" class="slide level2">
+<h2>MovieLense Data</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 8 × 8
+  `Toy Story (1995)` `GoldenEye (1995)` `Four Rooms (1995)` `Get Shorty (1995)`
+               &lt;dbl&gt;              &lt;dbl&gt;               &lt;dbl&gt;               &lt;dbl&gt;
+1                  5                  3                   4                   3
+2                  4                 NA                  NA                  NA
+3                 NA                 NA                  NA                  NA
+4                 NA                 NA                  NA                  NA
+5                  4                  3                  NA                  NA
+6                  4                 NA                  NA                  NA
+7                 NA                 NA                  NA                   5
+8                 NA                 NA                  NA                  NA
+# ℹ 4 more variables: `Copycat (1995)` &lt;dbl&gt;, `Twelve Monkeys (1995)` &lt;dbl&gt;,
+#   `Babe (1995)` &lt;dbl&gt;, `Dead Man Walking (1995)` &lt;dbl&gt;</code></pre>
+</div>
+</div>
+</section>
+<section id="user-based-recommender-system" class="slide level2">
+<h2>User-based recommender system</h2>
+<p><img data-src="../imgs/user-based-rec.png"> - Find <span class="math inline">\(k\)</span> similar users - Compute average rating for item among similar users - Possibly: weighted by similarity of users</p>
+</section>
+<section id="item-based-recommender-system" class="slide level2">
+<h2>Item-based recommender system</h2>
+<ul>
+<li>Find similar items</li>
+<li>Compute weighted average of users’ ratings on similar items</li>
+<li>Typically more efficient than user-based recommendation (usually have fewer items than users)</li>
+</ul>
+</section>
+<section id="matrix-factorization-approaches" class="slide level2">
+<h2>Matrix Factorization approaches</h2>
+
+<img data-src="../imgs/matrix-factorization-rec-intro1.png" class="r-stretch"></section>
+<section id="matrix-factorization-for-recommendation" class="slide level2">
+<h2>Matrix factorization for recommendation</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p>Driving: 26.4 mi <img data-src="../imgs/tempe-west-dist-driving.png"></p>
+<p><img data-src="../imgs/recsys-1d-matrix.png"></p>
 </div><div class="column" style="width:50%;">
-<p>Walking: 22.3 mi <img data-src="../imgs/tempe-west-dist-walking.png"></p>
+<p><img data-src="../imgs/recsys-1d-space.png"></p>
 </div>
 </div>
 </section>
-<section id="different-distance-measures" class="slide level2">
-<h2>Different distance measures</h2>
-
-<img data-src="../imgs/distance-metric-examples.png" class="r-stretch quarto-figure-center"></section>
-<section id="properties-of-distance-measures" class="slide level2">
-<h2>Properties of distance measures</h2>
-<ul>
-<li>Minimality: Distance from a point to itself is zero</li>
-<li>Positivity: distances cannot be negative</li>
-<li>Symmetry: distance from a to b is the same as from b to a</li>
-<li>Triangle inequality: <span class="math inline">\(d(x,z) \leq d(x,y) + d(y, z)\)</span>
-<ul>
-<li>i.e.&nbsp;the shortest path between two points is a straight line</li>
-</ul></li>
-</ul>
-</section>
-<section id="euclidean-manhattan-distance" class="slide level2">
-<h2>Euclidean &amp; Manhattan distance</h2>
-<div class="columns">
-<div class="column" style="width:30%;">
-<p><img data-src="../imgs/Manhattan_distance.svg"></p>
-</div><div class="column" style="width:70%;">
-<div class="callout callout-caution no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Euclidean Distance in <span class="math inline">\(\mathbb{R}^2\)</span></strong></p>
-</div>
-<div class="callout-content">
-<p><span class="math display">\[ d_2((x_1, y_1), (x_2, y_2)) = \sqrt{(x_2 - x_1)^2 + (y_2 - y_1)^2} \]</span></p>
-</div>
-</div>
-</div>
-<div class="callout callout-caution no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Manhattan Distance in <span class="math inline">\(\mathbb{R}^2\)</span></strong></p>
-</div>
-<div class="callout-content">
-<p><span class="math display">\[ d_1((x_1, y_1), (x_2, y_2)) = |x_2 - x_1| + |y_2 - y_1| \]</span></p>
-</div>
-</div>
-</div>
-</div>
-</div>
-<ul>
-<li><span style="color: green;">Green: Euclidean distance</span></li>
-<li>Others: Manhattan distance (all equal)</li>
-</ul>
-</section>
-<section id="pitfalls-of-d_2-and-d_1" class="slide level2">
-<h2>Pitfalls of <span class="math inline">\(d_2\)</span> and <span class="math inline">\(d_1\)</span></h2>
-<p>Euclidean and Manhattan distances are scale-dependent: need to be careful about scale of dimensions and may need to normalize dimensions</p>
-
-<img data-src="m10-01_files/figure-revealjs/unnamed-chunk-1-1.png" width="960" class="r-stretch quarto-figure-center"></section>
-<section id="hamming-distance" class="slide level2">
-<h2>Hamming distance</h2>
-<div class="callout callout-caution no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Definition</strong></p>
-</div>
-<div class="callout-content">
-<p>The Hamming distance between two equal-length strings of symbols is the number of positions at which the corresponding symbols are different.</p>
-</div>
-</div>
-</div>
-<p><strong>Examples</strong></p>
-<p>Hamming distance between:</p>
-<ul>
-<li>“ka<span style="color: red;">rol</span>in” and “ka<span style="color: red;">thr</span>in” is 3</li>
-<li><span style="color: red;">0000</span> and <span style="color: red;">1111</span> is 4</li>
-<li>[<span style="color: red;">“tall”</span>, “smart”, <span style="color: red;">“18-35”</span>] and [<span style="color: red;">“short”</span>, “smart”, <span style="color: red;">“45-55”</span>] is 2</li>
-</ul>
-</section>
-<section>
-<section id="understanding-vectors" class="title-slide slide level1 center">
-<h1>Understanding Vectors</h1>
-
-</section>
-<section id="vectors" class="slide level2">
-<h2>Vectors</h2>
+<section id="matrix-factorization-for-recommendation-2" class="slide level2">
+<h2>Matrix factorization for recommendation 2</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<ul>
-<li>As set of numbers</li>
-<li>As a direction and magnitude in space</li>
-<li>As a direction and distance from origin (i.e.&nbsp;center of space)</li>
-</ul>
+<p><img data-src="../imgs/recsys-2d-matrix.png"></p>
 </div><div class="column" style="width:50%;">
-<p>&lt; diagrams for these &gt;</p>
+<p><img data-src="../imgs/recsys-2d-space.png"></p>
 </div>
 </div>
 </section>
-<section id="dot-product" class="slide level2">
-<h2>Dot product</h2>
-<ul>
-<li>As casting shadow on vector</li>
-</ul>
+<section id="learning-user-and-item-matrices" class="slide level2">
+<h2>Learning user and item matrices</h2>
+<p>Of course, the big idea is that we don’t have to specify these representations for users and items based on any theory, but instead we can learn them from data.</p>
 </section>
-<section id="cosine-similarity" class="slide level2">
-<h2>Cosine similarity</h2>
-<div class="callout callout-caution no-icon callout-titled callout-style-default">
-<div class="callout-body">
-<div class="callout-title">
-<p><strong>Definition</strong></p>
-</div>
-<div class="callout-content">
-<p><span class="math display">\[S_c(A,B) = cos(\theta) = \frac{A \cdot B}{||A|| \ ||B||} = \frac{\sum_i^n{A_iB_i}}{ \sqrt{\sum_i^n{A_i}^2} \cdot \sqrt{\sum_i^n{B_i}^2}} \]</span></p>
-</div>
-</div>
-</div>
-<div class="columns">
-<div class="column" style="width:70%;">
-<ul>
-<li>Based on the angle between vectors in a space</li>
-<li>Scale-invariant comparison of similarity of vectors</li>
-<li>Ranges from -1 to 1</li>
-<li>Technically not a distance measure, but instead a similarity measure</li>
-</ul>
-</div><div class="column" style="width:30%;">
-<p><img data-src="../imgs/dist-cosine.png"></p>
-</div>
-</div>
+<section id="funk-svd-for-recommendation" class="slide level2">
+<h2>Funk-SVD for Recommendation</h2>
+<p>Diagram for this</p>
+<blockquote>
+<p>A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that.</p>
+</blockquote>
 </section>
-<section id="deeper-undertanding-of-vectors" class="slide level2">
-<h2>Deeper undertanding of vectors</h2>
-<p>Grant Sanderson (3blue1brown) offers an excellent description of basic Linear Algebra concepts.</p>
-<p><strong>Youtube</strong></p>
-<iframe width="560" height="315" src="https://www.youtube.com/embed/fNk_zzaMoSs?si=dzP555swbJlFSK2a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen="">
-</iframe>
+<section id="fund-svd-in-recommenderlab" class="slide level2">
+<h2>Fund-SVD in <code>recommenderlab</code></h2>
+</section>
+<section id="generating-user-and-item-embeddings" class="slide level2">
+<h2>Generating User and Item Embeddings</h2>
+</section>
+<section id="examining-item-embeddings" class="slide level2">
+<h2>Examining item embeddings</h2>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 591 × 2
+   item                                       dist
+   &lt;chr&gt;                                     &lt;dbl&gt;
+ 1 Terminator 2: Judgment Day (1991)         1    
+ 2 Terminator, The (1984)                    0.900
+ 3 Jurassic Park (1993)                      0.837
+ 4 Raiders of the Lost Ark (1981)            0.795
+ 5 Blues Brothers, The (1980)                0.778
+ 6 Fugitive, The (1993)                      0.778
+ 7 Men in Black (1997)                       0.770
+ 8 Back to the Future (1985)                 0.737
+ 9 Indiana Jones and the Last Crusade (1989) 0.736
+10 True Lies (1994)                          0.729
+# ℹ 581 more rows</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 591 × 2
+   item                               dist
+   &lt;chr&gt;                             &lt;dbl&gt;
+ 1 Scream (1996)                     1    
+ 2 Happy Gilmore (1996)              0.817
+ 3 Scream 2 (1997)                   0.812
+ 4 Seven (Se7en) (1995)              0.789
+ 5 Nightmare on Elm Street, A (1984) 0.777
+ 6 Cape Fear (1991)                  0.752
+ 7 Omen, The (1976)                  0.739
+ 8 Private Parts (1997)              0.735
+ 9 Ace Ventura: Pet Detective (1994) 0.727
+10 Starship Troopers (1997)          0.719
+# ℹ 581 more rows</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 591 × 2
+   item                                             dist
+   &lt;chr&gt;                                           &lt;dbl&gt;
+ 1 Trainspotting (1996)                            1    
+ 2 People vs. Larry Flynt, The (1996)              0.910
+ 3 Boogie Nights (1997)                            0.904
+ 4 True Romance (1993)                             0.883
+ 5 Clockwork Orange, A (1971)                      0.878
+ 6 Jackie Brown (1997)                             0.876
+ 7 Welcome to the Dollhouse (1995)                 0.871
+ 8 City of Lost Children, The (1995)               0.844
+ 9 Cook the Thief His Wife &amp; Her Lover, The (1989) 0.843
+10 Reservoir Dogs (1992)                           0.825
+# ℹ 581 more rows</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 591 × 2
+   item                       dist
+   &lt;chr&gt;                     &lt;dbl&gt;
+ 1 Lion King, The (1994)     1    
+ 2 Aladdin (1992)            0.880
+ 3 Top Gun (1986)            0.837
+ 4 Pretty Woman (1990)       0.819
+ 5 Fly Away Home (1996)      0.815
+ 6 Firm, The (1993)          0.811
+ 7 Rainmaker, The (1997)     0.803
+ 8 Mr. Holland's Opus (1995) 0.799
+ 9 Kiss the Girls (1997)     0.793
+10 Apollo 13 (1995)          0.789
+# ℹ 581 more rows</code></pre>
+</div>
+</div>
 <div class="footer footer-default">
 
 </div>
-</section></section>
+</section>
     </div>
   </div>
 
   <script>window.backupDefine = window.define; window.define = undefined;</script>
-  <script src="m10-01_files/libs/revealjs/dist/reveal.js"></script>
+  <script src="m10-04_files/libs/revealjs/dist/reveal.js"></script>
   <!-- reveal.js plugins -->
-  <script src="m10-01_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
-  <script src="m10-01_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
-  <script src="m10-01_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
-  <script src="m10-01_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
-  <script src="m10-01_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/quarto-support/support.js"></script>
   
 
-  <script src="m10-01_files/libs/revealjs/plugin/notes/notes.js"></script>
-  <script src="m10-01_files/libs/revealjs/plugin/search/search.js"></script>
-  <script src="m10-01_files/libs/revealjs/plugin/zoom/zoom.js"></script>
-  <script src="m10-01_files/libs/revealjs/plugin/math/math.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="m10-04_files/libs/revealjs/plugin/math/math.js"></script>
   <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
 
   <script>

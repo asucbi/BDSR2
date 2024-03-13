@@ -10,7 +10,7 @@
 <link href="m10-02_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.3.450">
 
-  <title>Embeddings</title>
+  <title>Representation and latent spaces</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -93,26 +93,7 @@
     code span.va { color: #111111; } /* Variable */
     code span.vs { color: #20794d; } /* VerbatimString */
     code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
-    /* CSS for citations */
-    div.csl-bib-body { }
-    div.csl-entry {
-      clear: both;
-    }
-    .hanging-indent div.csl-entry {
-      margin-left:2em;
-      text-indent:-2em;
-    }
-    div.csl-left-margin {
-      min-width:2em;
-      float:left;
-    }
-    div.csl-right-inline {
-      margin-left:2em;
-      padding-left:1em;
-    }
-    div.csl-indent {
-      margin-left: 2em;
-    }  </style>
+  </style>
   <link rel="stylesheet" href="m10-02_files/libs/revealjs/dist/theme/quarto.css">
   <link rel="stylesheet" href="style.css">
   <link href="m10-02_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -409,133 +390,94 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Embeddings</h1>
+  <h1 class="title">Representation and latent spaces</h1>
   <p class="subtitle">Behavioral Data Science in R II</p>
 
 <div class="quarto-title-authors">
 </div>
 
 </section>
-<section id="embeddings-vector-representations" class="slide level2">
-<h2>Embeddings: Vector Representations</h2>
-<p>An <strong>embedding</strong> is a representation of something as a vector of numbers</p>
-</section>
-<section id="term-frequency-embeddings" class="slide level2">
-<h2>Term frequency embeddings</h2>
-<p>Term-frequency embeddings are a way to represent documents.</p>
-<div class="cell">
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 6
-  doc   mozarella pepperoni  tidy calculate  bake
-  &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
-1 A             0         0     5         9     3
-2 B             1         1    23        33     9
-3 C             3         3     1         0     3
-4 D            29        17     4         1    45</code></pre>
-</div>
-</div>
-</section>
-<section id="document-similarity" class="slide level2">
-<h2>Document similarity</h2>
-<p>The similarity between documents can be best calculated using cosine similarity.</p>
-</section>
-<section id="word-embeddings" class="slide level2">
-<h2>Word Embeddings</h2>
-<p>Word embeddings represent the meaning of a word as a vector of numbers.</p>
-<ul>
-<li>Word2Vec</li>
-<li>GloVE</li>
-</ul>
-</section>
-<section id="glove-embedding" class="slide level2">
-<h2>GloVe Embedding</h2>
-<p>Two computer representation of “queen”:</p>
+<section id="representation" class="slide level2">
+<h2>Representation</h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<p><strong>GloVe</strong></p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">glove</span>(<span class="st">"queen"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
-<pre><code> [1]  0.38  1.82 -1.26 -0.10  0.36  0.60 -0.18  0.84 -0.06 -0.76  0.23  0.99
-[13]  0.61 -0.31  0.29  0.56 -0.77  0.07 -0.57  0.21  0.58  0.39 -0.13  0.28
-[25]  0.28 -1.81 -1.04 -0.19 -0.55 -0.05  1.56  0.39 -0.25  0.34  0.45  0.16
-[37]  0.52 -0.07 -0.84 -1.03  0.46  0.25 -0.18 -0.73 -0.20  0.23 -0.56 -2.28
-[49]  0.01 -0.60</code></pre>
+<pre><code># A tibble: 48 × 3
+   state       latitude longitude
+   &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+ 1 Alabama         32.4     -86.3
+ 2 Arizona         33.4    -112. 
+ 3 Arkansas        34.7     -92.3
+ 4 California      38.6    -121. 
+ 5 Colorado        39.7    -105. 
+ 6 Connecticut     41.8     -72.7
+ 7 Delaware        39.2     -75.5
+ 8 Florida         30.4     -84.3
+ 9 Georgia         33.7     -84.4
+10 Idaho           43.6    -116. 
+# ℹ 38 more rows</code></pre>
 </div>
 </div>
 </div><div class="column" style="width:50%;">
-<p><strong>DALL-E 3</strong></p>
-<p><img data-src="../imgs/queen%20-%20DALL·E%202024-03-09.webp"></p>
-</div>
-</div>
-</section>
-<section id="calculating-cosine-similarity" class="slide level2">
-<h2>Calculating cosine similarity</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"fortress"</span>), <span class="fu">glove</span>(<span class="st">"castle"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.7501371</code></pre>
+<div class="cell-output-display">
+<p><img data-src="m10-02_files/figure-revealjs/unnamed-chunk-3-1.png" width="960"></p>
 </div>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"grape"</span>), <span class="fu">glove</span>(<span class="st">"cherry"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.6739833</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"grape"</span>), <span class="fu">glove</span>(<span class="st">"castle"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.03978528</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"cherry"</span>), <span class="fu">glove</span>(<span class="st">"fortress"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] -0.005650201</code></pre>
 </div>
 </div>
 </section>
-<section id="capturing-meaning-with-word-embeddings" class="slide level2">
-<h2>Capturing meaning with word embeddings</h2>
-
-<img data-src="../imgs/glove-example.png" class="r-stretch"></section>
-<section id="capturing-meaning-with-word-embeddings-in-r" class="slide level2">
-<h2>Capturing meaning with word embeddings in <code>R</code></h2>
+<section id="mds" class="slide level2">
+<h2>MDS</h2>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">cos_sim</span>(</span>
-<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">glove</span>(<span class="st">"queen"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"king"</span>) <span class="sc">+</span> <span class="fu">glove</span>(<span class="st">"princess"</span>),</span>
-<span id="cb12-3"><a href="#cb12-3"></a>  <span class="fu">glove</span>(<span class="st">"princess"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"prince"</span>)</span>
-<span id="cb12-4"><a href="#cb12-4"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.6588081</code></pre>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>dists <span class="ot">&lt;-</span> capitals_dists <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>state.x)</span>
+<span id="cb2-2"><a href="#cb2-2"></a>mds_fit <span class="ot">&lt;-</span> <span class="fu">cmdscale</span>(dists, <span class="at">eig=</span><span class="cn">TRUE</span>, <span class="at">k=</span><span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">cos_sim</span>(</span>
-<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">glove</span>(<span class="st">"phoenix"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"arizona"</span>),</span>
-<span id="cb14-3"><a href="#cb14-3"></a>  <span class="fu">glove</span>(<span class="st">"milwaukee"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"wisconsin"</span>)</span>
-<span id="cb14-4"><a href="#cb14-4"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.5928891</code></pre>
-</div>
-</div>
-</section>
-<section id="creating-word-embeddings" class="slide level2">
-<h2>Creating word embeddings</h2>
-<ul>
-<li>Based on co-occurrences</li>
-<li>Captures the meaning of words</li>
-</ul>
-</section>
-<section id="references" class="slide level2">
-<h2>References</h2>
-<p>You can use pandoc citation style to add citations. Let’s use the convention: <code>[@author1.author2YEAR]</code> and <code>[@author.etalYEAR]</code> A bibliography is automatically created.</p>
-<p>I’ve started off the references with our main text <span class="citation" data-cites="gareth.etal2014">(<a href="#/references" role="doc-biblioref" onclick="">James et al. 2014</a>)</span>.</p>
-</section>
-<section class="slide level2 smaller scrollable" id="references">
 
-<div class="footer footer-default">
+<img data-src="m10-02_files/figure-revealjs/unnamed-chunk-5-1.png" width="960" class="r-stretch"></section>
+<section id="representation-and-psychological-spaces" class="slide level2">
+<h2>Representation and Psychological spaces</h2>
+<p>Often, cognitive scientists and psychologists think of mental constructs as located in some latent psychological “space”.</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><img data-src="../imgs/lab-space-color-wiki.png"></p>
+</div><div class="column" style="width:50%;">
+<p><img data-src="../imgs/dog-category-ex.png"></p>
+</div>
+</div>
+</section>
+<section id="emotion-similarity-ratings" class="slide level2">
+<h2>Emotion similarity ratings</h2>
+<p>introduce emotion dataset of similarity ratings</p>
+</section>
+<section id="mds-and-latent-dimensions-of-emotion" class="slide level2">
+<h2>MDS and latent dimensions of emotion</h2>
+<p>MDS offers one way to explore these latent spaces.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 13 × 15
+   emotion     id     id_7 id_13 id_15 id_16 id_20 id_28 id_29 id_30 id_32 id_36
+   &lt;chr&gt;       &lt;chr&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt; &lt;dbl&gt;
+ 1 grief at d… id_7   0     4.05  8.25  5.57  1.15  2.97  4.34  4.9   6.25  1.55
+ 2 savoring a… id_13  4.05  0     2.54  2.69  2.67  3.88  8.53  1.31  1.88  4.84
+ 3 very pleas… id_15  8.25  2.54  0     2.11  8.98  9.27 11.9   2.56  0.74  9.25
+ 4 maternal l… id_16  5.57  2.69  2.11  0     3.78  6.05  9.78  4.21  0.45  4.92
+ 5 physical e… id_20  1.15  2.67  8.98  3.78  0     2.34  7.12  5.9   4.77  2.22
+ 6 anger at s… id_28  2.97  3.88  9.27  6.05  2.34  0     1.36  5.18  5.45  4.17
+ 7 anxiety-so… id_29  4.34  8.53 11.9   9.78  7.12  1.36  0     8.47 10.2   5.44
+ 8 physical s… id_30  4.9   1.31  2.56  4.21  5.9   5.18  8.47  0     2.63  5.45
+ 9 unexpected… id_32  6.25  1.88  0.74  0.45  4.77  5.45 10.2   2.63  0     7.1 
+10 revulsion   id_36  1.55  4.84  9.25  4.92  2.22  4.17  5.44  5.45  7.1   0   
+11 extreme pa… id_37  1.68  5.81  7.92  5.42  4.34  4.72  4.31  3.79  6.58  1.98
+12 knows her … id_51  6.57  7.43  8.3   8.93  8.16  4.66  1.57  6.49  9.77  4.93
+13 light sleep id_56  3.93  4.51  8.47  3.48  1.6   4.89  9.18  6.05  6.55  4.12
+# ℹ 3 more variables: id_37 &lt;dbl&gt;, id_51 &lt;dbl&gt;, id_56 &lt;dbl&gt;</code></pre>
+</div>
+</div>
 
-</div>
-<div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-gareth.etal2014" class="csl-entry" role="listitem">
-James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in r</em>. Springer Publishing Company, Incorporated.
-</div>
+<img data-src="m10-02_files/figure-revealjs/unnamed-chunk-7-1.png" width="960" class="r-stretch"><div class="footer footer-default">
+
 </div>
 </section>
     </div>

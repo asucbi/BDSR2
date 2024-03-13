@@ -1,0 +1,180 @@
+---
+title: "Recommender systems via Collaborative Filtering"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+::: {.hidden}
+```{r}
+library(tidyverse)
+```
+
+:::
+
+## Recommender Systems: Applications
+
+- Recommendations for movies, music, shows, clothing, etc.
+
+## Collaborative filtering
+
+Use similarities between items and users to predict what items a user will like.
+
+![](../imgs/recsys-collab-filter.png)
+
+## Machine Learning \& Recommender Systems
+
+## `recommenderlab` package
+
+```{r}
+#| message: false
+#| echo: true
+library(recommenderlab)
+```
+
+## MovieLense Data
+
+```{r}
+#| echo: false
+data("MovieLense")
+
+MovieLense100 <- MovieLense[, colCounts(MovieLense) > 50]
+train <- MovieLense100[1:800]
+
+as(train[1:8, 1:8], "matrix") %>% as_tibble()
+```
+
+## User-based recommender system
+
+![](../imgs/user-based-rec.png)
+- Find $k$ similar users
+- Compute average rating for item among similar users
+  - Possibly: weighted by similarity of users
+
+```{r}
+ubcf <- Recommender(train, method = "UBCF")
+```
+
+
+## Item-based recommender system
+
+- Find similar items
+- Compute weighted average of users' ratings on similar items
+- Typically more efficient than user-based recommendation (usually have fewer items than users)
+
+```{r}
+ibcf <- Recommender(train, method = "IBCF")
+```
+
+## Matrix Factorization approaches
+
+![](../imgs/matrix-factorization-rec-intro1.png)
+
+
+## Matrix factorization for recommendation
+
+:::: {.columns}
+::: {.column width="50%"}
+![](../imgs/recsys-1d-matrix.png)
+:::
+::: {.column width="50%"}
+![](../imgs/recsys-1d-space.png)
+:::
+::::
+
+
+## Matrix factorization for recommendation 2
+
+:::: {.columns}
+::: {.column width="50%"}
+![](../imgs/recsys-2d-matrix.png)
+:::
+::: {.column width="50%"}
+![](../imgs/recsys-2d-space.png)
+:::
+::::
+
+## Learning user and item matrices
+
+Of course, the big idea is that we don't have to specify these representations for users and items based on any theory, but instead we can learn them from data.
+
+## Funk-SVD for Recommendation
+
+Diagram for this
+
+> A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that.
+
+## Fund-SVD in `recommenderlab`
+
+```{r}
+svfd <- Recommender(train, method = "SVDF", parameter = list(k = 20))
+```
+
+## Generating User and Item Embeddings
+
+```{r}
+#| echo: false
+
+get_item_embeddings <- function(rec_result, rec_data){
+  mod <- getModel(rec_result)
+  mat <- mod$svd$V
+
+  d <- mat %>% 
+    as_tibble() %>% 
+    mutate(item = colnames(rec_data)) %>% 
+    relocate(item)
+  
+  return(d)
+}
+
+get_user_embeddings <- function(rec_result){
+  mod <- getModel(rec_result)
+  return(mod$svd$U)
+}
+
+items <- get_item_embeddings(svfd, train)
+```
+
+## Examining item embeddings
+
+```{r}
+#| echo: false
+
+cos_sim <- function(x, y){
+  sum(x*y)/(sqrt(sum(x^2))*sqrt(sum(y^2)))
+}
+
+# get nearest neighbors
+euc_dist <- function(x, y){
+  sqrt(sum((x - y)^2))
+}
+
+nearest_neighbors <- function(item_name, items_data){
+  item_emb <- items_data %>% 
+    pivot_longer(-item) %>% 
+    filter(item == item_name) %>%  # Terminator 2: Judgment Day (1991)
+    pull(value)
+
+  items_data %>% 
+    pivot_longer(-item) %>% 
+    group_by(item) %>% 
+    summarize(
+      dist = cos_sim(item_emb, value)
+    ) %>% 
+    arrange(-dist)
+}
+
+```
+
+```{r}
+nearest_neighbors("Terminator 2: Judgment Day (1991)", items)
+
+nearest_neighbors("Scream (1996)", items)
+
+nearest_neighbors("Trainspotting (1996)", items)
+
+nearest_neighbors("Lion King, The (1994)", items)
+```
+

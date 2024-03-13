@@ -135,9 +135,28 @@ Hamming distance between:
 - [0000]{style="color: red;"} and [1111]{style="color: red;"} is 4
 - [["tall"]{style="color: red;"}, "smart", ["18-35"]{style="color: red;"}] and [["short"]{style="color: red;"}, "smart", ["45-55"]{style="color: red;"}] is 2
 
+# Understanding Vectors
+
+## Vectors
+
+:::: {.columns}
+::: {.column width="50%"}
+
+- As set of numbers
+- As a direction and magnitude in space
+- As a direction and distance from origin (i.e. center of space)
+
+:::
+::: {.column width="50%"}
+< diagrams for these >
+:::
+::::
+
+## Dot product
+
+- As casting shadow on vector
 
 ## Cosine similarity
-
 
 ::: {.callout-caution icon="false"}
 
@@ -160,14 +179,11 @@ $$S_c(A,B) = cos(\theta) = \frac{A \cdot B}{||A|| \ ||B||} = \frac{\sum_i^n{A_iB
 :::
 ::::
 
-
-
-## Document similarity with cosine similarity
-
-Document term-frequency matrix
-
-
-
 ## Deeper undertanding of vectors
 
-Refer to threeblueonebrown
+Grant Sanderson (3blue1brown) offers an excellent description of basic Linear Algebra concepts.
+
+**Youtube**
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/fNk_zzaMoSs?si=dzP555swbJlFSK2a" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+

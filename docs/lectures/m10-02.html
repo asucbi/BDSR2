@@ -28,6 +28,71 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
+    /* CSS for syntax highlighting */
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
     /* CSS for citations */
     div.csl-bib-body { }
     div.csl-entry {
@@ -351,18 +416,104 @@
 </div>
 
 </section>
-<section id="vector-representations" class="slide level2">
-<h2>Vector representations</h2>
+<section id="embeddings-vector-representations" class="slide level2">
+<h2>Embeddings: Vector Representations</h2>
 <p>An <strong>embedding</strong> is a representation of something as a vector of numbers</p>
+</section>
+<section id="term-frequency-embeddings" class="slide level2">
+<h2>Term frequency embeddings</h2>
+<p>Term-frequency embeddings are a way to represent documents.</p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 4 × 6
+  doc   mozarella pepperoni  tidy calculate  bake
+  &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
+1 A             0         0     5         9     3
+2 B             1         1    23        33     9
+3 C             3         3     1         0     3
+4 D            29        17     4         1    45</code></pre>
+</div>
+</div>
+</section>
+<section id="document-similarity" class="slide level2">
+<h2>Document similarity</h2>
+<p>The similarity between documents can be best calculated using cosine similarity.</p>
 </section>
 <section id="word-embeddings" class="slide level2">
 <h2>Word Embeddings</h2>
+<p>Word embeddings represent the meaning of a word as a vector of numbers.</p>
+<ul>
+<li>Word2Vec</li>
+<li>GloVE</li>
+</ul>
 </section>
-<section id="cosine-similarity" class="slide level2">
-<h2>Cosine Similarity</h2>
+<section id="glove-embedding" class="slide level2">
+<h2>GloVe Embedding</h2>
+<p>Two computer representation of “queen”:</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<p><strong>GloVe</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a><span class="fu">glove</span>(<span class="st">"queen"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> [1]  0.38  1.82 -1.26 -0.10  0.36  0.60 -0.18  0.84 -0.06 -0.76  0.23  0.99
+[13]  0.61 -0.31  0.29  0.56 -0.77  0.07 -0.57  0.21  0.58  0.39 -0.13  0.28
+[25]  0.28 -1.81 -1.04 -0.19 -0.55 -0.05  1.56  0.39 -0.25  0.34  0.45  0.16
+[37]  0.52 -0.07 -0.84 -1.03  0.46  0.25 -0.18 -0.73 -0.20  0.23 -0.56 -2.28
+[49]  0.01 -0.60</code></pre>
+</div>
+</div>
+</div><div class="column" style="width:50%;">
+<p><strong>DALL-E 3</strong></p>
+<p><img data-src="../imgs/queen%20-%20DALL·E%202024-03-09.webp"></p>
+</div>
+</div>
 </section>
 <section id="calculating-cosine-similarity" class="slide level2">
 <h2>Calculating cosine similarity</h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"fortress"</span>), <span class="fu">glove</span>(<span class="st">"castle"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.7501371</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"grape"</span>), <span class="fu">glove</span>(<span class="st">"cherry"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6739833</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"grape"</span>), <span class="fu">glove</span>(<span class="st">"castle"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.03978528</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a><span class="fu">cos_sim</span>(<span class="fu">glove</span>(<span class="st">"cherry"</span>), <span class="fu">glove</span>(<span class="st">"fortress"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] -0.005650201</code></pre>
+</div>
+</div>
+</section>
+<section id="capturing-meaning-with-word-embeddings" class="slide level2">
+<h2>Capturing meaning with word embeddings</h2>
+
+<img data-src="../imgs/glove-example.png" class="r-stretch"></section>
+<section id="capturing-meaning-with-word-embeddings-in-r" class="slide level2">
+<h2>Capturing meaning with word embeddings in <code>R</code></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">cos_sim</span>(</span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">glove</span>(<span class="st">"queen"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"king"</span>) <span class="sc">+</span> <span class="fu">glove</span>(<span class="st">"princess"</span>),</span>
+<span id="cb12-3"><a href="#cb12-3"></a>  <span class="fu">glove</span>(<span class="st">"princess"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"prince"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.6588081</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">cos_sim</span>(</span>
+<span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">glove</span>(<span class="st">"phoenix"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"arizona"</span>),</span>
+<span id="cb14-3"><a href="#cb14-3"></a>  <span class="fu">glove</span>(<span class="st">"milwaukee"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"wisconsin"</span>)</span>
+<span id="cb14-4"><a href="#cb14-4"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 0.5928891</code></pre>
+</div>
+</div>
 </section>
 <section id="creating-word-embeddings" class="slide level2">
 <h2>Creating word embeddings</h2>
@@ -370,9 +521,6 @@
 <li>Based on co-occurrences</li>
 <li>Captures the meaning of words</li>
 </ul>
-</section>
-<section id="solving-analogies-with-word-embeddings" class="slide level2">
-<h2>Solving Analogies with word embeddings</h2>
 </section>
 <section id="references" class="slide level2">
 <h2>References</h2>
@@ -601,6 +749,44 @@ James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>A
         ]
       });
     </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
     <script id="quarto-html-after-body" type="application/javascript">
     window.document.addEventListener("DOMContentLoaded", function (event) {
       const toggleBodyColorMode = (bsSheetEl) => {

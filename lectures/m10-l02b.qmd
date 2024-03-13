@@ -1,0 +1,93 @@
+---
+title: "Representation and latent spaces"
+subtitle: Behavioral Data Science in R II
+format: 
+  revealjs:
+    css: style.css
+bibliography: ../references.bib
+---
+
+## Representation
+
+```{r}
+library(tidyverse)
+library(tidymodels)
+library(tidyclust)
+
+euc_dist <- function(x1, y1, x2, y2){
+  sqrt((x2-x1)^2 + (y2-y1)^2)
+}
+
+capitals_geo <- read_csv("data/us-state-capitals.csv") %>% 
+  filter(!(name %in% c("Alaska", "Hawaii"))) %>% 
+  rename(state = name, city = description)
+
+capitals_geo_std <- capitals_geo %>% 
+  mutate(
+    latitude = (latitude - mean(latitude))/sd(latitude),
+    longitude = (longitude - mean(longitude))/sd(longitude),
+    )
+
+capitals_dists <- cross_join(capitals_geo, capitals_geo) %>% 
+  mutate(distance = euc_dist(latitude.x, longitude.x, latitude.y, longitude.y)) %>% 
+  select(state.x, state.y, distance) %>% 
+  spread(state.y, distance)
+
+```
+
+:::: {.columns}
+::: {.column width="50%"}
+```{r}
+capitals_geo %>% 
+  select(-city)
+```
+
+:::
+::: {.column width="50%"}
+```{r}
+capitals_dists %>% 
+  pivot_longer(cols = -state.x, names_to = "state.y") %>% 
+  ggplot(aes(x = state.x, y = state.y, fill = value)) +
+  geom_tile() + 
+  scale_fill_viridis_c() +
+  scale_x_discrete(position="top", labels = abbreviate) +
+  scale_y_discrete(limits = rev) +
+  theme(axis.text.x = element_text(angle=90), aspect.ratio=1) +
+  labs(x="",y="", fill = "Dist") 
+```
+:::
+::::
+
+
+## MDS
+
+```{r}
+#| echo: true
+dists <- capitals_dists %>% select(-state.x)
+mds_fit <- cmdscale(dists, eig=TRUE, k=2) 
+```
+
+```{r}
+mds_fit$points %>% 
+  as_tibble() %>% 
+  mutate(state = capitals_dists$state.x) %>% 
+  ggplot(aes(x=V1, y = V2)) +
+  geom_point(color = "red") +
+  geom_text(aes(label = state), alpha = .75)
+```
+
+## Representation and "Latent" spaces
+
+## Emotion similarity ratings
+
+introduce emotion dataset of similarity ratings
+
+## MDS and latent dimensions of emotion
+
+do MDS on it and recover meaningful dimensions
+
+## Changing spaces
+
+## Polar coordinates
+
+## Color spaces

@@ -1,5 +1,5 @@
 ---
-title: "Embeddings"
+title: "Text Embeddings"
 subtitle: Behavioral Data Science in R II
 format: 
   revealjs:
@@ -11,18 +11,189 @@ bibliography: ../references.bib
 
 An **embedding** is a representation of something as a vector of numbers
 
+## Term frequency embeddings
+
+Term-frequency embeddings are a way to represent documents.
+
+```{r}
+#| echo: false
+library(tidyverse)
+tf_df <- tibble(
+  doc = c("A", "B", "C", "D"),
+  mozarella = c(0, 1, 3, 29),
+  pepperoni = c(0, 1, 3, 17),
+  tidy = c(5, 23, 1, 4),
+  calculate = c(9, 33, 0, 1),
+  bake = c(3, 9, 3, 45),
+)
+
+tf_df
+```
+
+## Document similarity
+
+The similarity between documents can be best calculated using cosine similarity.
+
+```{r}
+tf_dists <- cross_join(tf_df, tf_df) %>% 
+  pivot_longer(cols = c(-doc.x, -doc.y), names_to = "word", values_to = "count") %>% 
+  mutate(
+    count_from = str_sub(word, -1, -1),
+    word = str_sub(word, 0, -3)
+    ) %>% 
+  pivot_wider(names_from = count_from, values_from = count) %>% 
+  group_by(`doc.x`, `doc.y`) %>% 
+  summarize(
+    euclidean = sqrt(sum((x - y)^2)),
+    cos_sim = sum(x*y)/(sqrt(sum(x^2))*sqrt(sum(y^2)))
+    )
+  
+```
+
 ## Word Embeddings
 
-## Cosine Similarity 
+- Word embeddings represent the meaning of a word as a vector of numbers
+- Different approaches to building, e.g.:
+  - Word2Vec
+  - GloVE
+- But all based on the co-occurrence of words together in a corpus of real text
+
+```{r}
+#| echo: false
+glove_df <- read_delim(
+  "local/glove.6B.50d.txt", 
+  delim = " ",
+  col_names = c("word", paste0("dim", sprintf("%02d", seq(1,50,1)))),
+  quote = ""
+  )
+
+glove <- function(text){
+  glove_df %>% 
+    filter(word==text) %>% 
+    select(-word) %>% 
+    as.numeric()
+}
+
+cos_sim <- function(x, y){
+  sum(x*y)/(sqrt(sum(x^2))*sqrt(sum(y^2)))
+}
+
+```
+
+## GloVe Embedding
+
+Two computer representation of "queen":
+
+:::: {.columns}
+::: {.column width="50%"}
+
+**GloVe**
+
+```{r}
+#| echo: true
+#| eval: false
+
+glove("queen")
+```
+
+```{r}
+round(glove("queen"), 2)
+```
+:::
+::: {.column width="50%"}
+
+**DALL-E 3**
+
+![](../imgs/queen - DALL·E 2024-03-09.webp)
+:::
+::::
+
 
 ## Calculating cosine similarity
 
-## Solving Analogies with word embeddings
+```{r}
+#| echo: true
 
-## Creating word embeddings
+cos_sim(glove("fortress"), glove("castle"))
 
-- Based on co-occurrences
-- Captures the meaning of words
+cos_sim(glove("grape"), glove("cherry"))
+
+cos_sim(glove("grape"), glove("castle"))
+
+cos_sim(glove("cherry"), glove("fortress"))
+```
+
+
+## Capturing meaning with word embeddings
+
+![](../imgs/glove-example.png)
+
+
+## Capturing meaning with word embeddings in `R`
+
+```{r}
+#| echo: true
+cos_sim(
+  glove("queen") - glove("king") + glove("princess"),
+  glove("princess") - glove("prince")
+  )
+
+cos_sim(
+  glove("phoenix") - glove("arizona"),
+  glove("milwaukee") - glove("wisconsin")
+  )
+```
+
+# Creating word embeddings
+
+## Compression as understanding
+
+> Presumably there are some generalities to be found in there, something more concise and descriptive than 8.5 billion completely independent and unrelated ratings. [...] A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that. ---Simon Funk (aka Brandyn Webb)
+
+::: callout-tip
+See [@rissanan1978], [@grunwald.roos2020] and further writings on the idea of **minimum descriptive length** for more formal treatments.
+:::
+
+## How to make word embeddings
+
+- Start with a large corpus of naturalistic text
+- Count up the frequencies of words and word co-occurrences
+- Tabulate these into a big table (matrix) of word-word co-occurrence probabilities 
+- Translate probabilities into Pointwise Mutual Information (PMI)
+- "Factorize" this matrix (table) into two new matrices
+- Keep $k$ columns of the first of these matrices: the rows are your word embedding vectors
+
+## Skip-grams
+
+- Measure probability of occurrence of word $w_2$ in context of word $w_1$: $P(w_2|w_1)$
+- For skip-grams, "context" is within some number of words (allowing for "skipping" of words)
+  - E.g. within 5 words, $\text{dog}|\text{fox}$ in  "the quick brown **fox** jumped over the lazy **dog**."
+  
+## Pointwise Mutual Information
+
+- calculate PMI
+definition
+etc.
+
+## Matrix factorization
+
+- get a big term-term matrix of skip-gram PMI
+- "factorize" this matrix
+
+## Matrix multiplication basics
+
+vectors (and matrices)
+transposed vectors (and matrices)
+output sizes
+
+## Singular Value Decomposition
+
+- Decompose a matrix into two others
+- This is related to PCA
+
+## Making word vectors
+
+- Choose an embedding dimension, keep only first $k$ rows/columns of the U matrix (ordered by "importance" aka singular values)
 
 ## References
 

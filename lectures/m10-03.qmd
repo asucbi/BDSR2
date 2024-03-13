@@ -30,16 +30,18 @@ Use similarities between items and users to predict what items a user will like.
 
 ```{r}
 #| message: false
+#| echo: true
 library(recommenderlab)
 ```
 
 ## MovieLense Data
 
 ```{r}
+#| echo: false
 data("MovieLense")
 
-MovieLense100 <- MovieLense[rowCounts(MovieLense) > 100, ]
-train <- MovieLense100[1:300]
+MovieLense100 <- MovieLense[, colCounts(MovieLense) > 50]
+train <- MovieLense100[1:800]
 
 as(train[1:8, 1:8], "matrix") %>% as_tibble()
 ```
@@ -47,8 +49,9 @@ as(train[1:8, 1:8], "matrix") %>% as_tibble()
 ## User-based recommender system
 
 ![](../imgs/user-based-rec.png)
-- Find similar users
+- Find $k$ similar users
 - Compute average rating for item among similar users
+  - Possibly: weighted by similarity of users
 
 ```{r}
 ubcf <- Recommender(train, method = "UBCF")
@@ -69,13 +72,6 @@ ibcf <- Recommender(train, method = "IBCF")
 
 ![](../imgs/matrix-factorization-rec-intro1.png)
 
-## Matrix multiplication basics
-
-vectors (and matrices)
-transposed vectors (and matrices)
-output sizes
-
-## SVD
 
 ## Matrix factorization for recommendation
 
@@ -100,24 +96,82 @@ output sizes
 :::
 ::::
 
+## Learning user and item matrices
+
+Of course, the big idea is that we don't have to specify these representations for users and items based on any theory, but instead we can learn them from data.
 
 ## Funk-SVD for Recommendation
 
 Diagram for this
 
+> A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that.
+
 ## Fund-SVD in `recommenderlab`
 
 ```{r}
-svfd <- Recommender(train, method = "SVDF")
+svfd <- Recommender(train, method = "SVDF", parameter = list(k = 20))
 ```
 
 ## Generating User and Item Embeddings
 
 ```{r}
+#| echo: false
 
+get_item_embeddings <- function(rec_result, rec_data){
+  mod <- getModel(rec_result)
+  mat <- mod$svd$V
+
+  d <- mat %>% 
+    as_tibble() %>% 
+    mutate(item = colnames(rec_data)) %>% 
+    relocate(item)
+  
+  return(d)
+}
+
+get_user_embeddings <- function(rec_result){
+  mod <- getModel(rec_result)
+  return(mod$svd$U)
+}
+
+items <- get_item_embeddings(svfd, train)
 ```
 
 ## Examining item embeddings
 
-with k-means?
----
+```{r}
+#| echo: false
+
+
+# get nearest neighbors
+euc_dist <- function(x, y){
+  sqrt(sum((x - y)^2))
+}
+
+nearest_neighbors <- function(item_name, items_data){
+  item_emb <- items_data %>% 
+    pivot_longer(-item) %>% 
+    filter(item == item_name) %>%  # Terminator 2: Judgment Day (1991)
+    pull(value)
+
+  items_data %>% 
+    pivot_longer(-item) %>% 
+    group_by(item) %>% 
+    summarize(
+      dist = cos_sim(item_emb, value)
+    ) %>% 
+    arrange(-dist)
+}
+
+```
+
+```{r}
+nearest_neighbors("Terminator 2: Judgment Day (1991)", items)
+
+nearest_neighbors("Scream (1996)", items)
+
+nearest_neighbors("Trainspotting (1996)", items)
+
+nearest_neighbors("Lion King, The (1994)", items)
+```
+

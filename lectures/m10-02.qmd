@@ -64,7 +64,7 @@ capitals_dists %>%
 ::::
 
 
-## MDS
+## Multidimensional Scaling (MDS)
 
 ```{r}
 #| echo: true
@@ -107,7 +107,7 @@ Often, cognitive scientists and psychologists think of mental constructs as loca
 ::: {.column width="50%"}
 
 - Abelson and Sermat (1962) presented participants with 15 photos of an actress making facial expressions under different cues
-- Participatns were shown two different expressions and asked to rate how similar they were to one another.
+- Participants were shown two different expressions and asked to rate how similar they were to one another.
 :::
 ::: {.column width="50%"}
 ![](../imgs/facial-expressions-pair-dalle.webp)

@@ -429,24 +429,25 @@
   doc   mozarella pepperoni  tidy calculate  bake
   &lt;chr&gt;     &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;
 1 A             0         0     5         9     3
-2 B             1         1    23        33     9
-3 C             3         3     1         0     3
-4 D            29        17     4         1    45</code></pre>
+2 B             1         1    41        55    12
+3 C             5         7     1         0     3
+4 D            81        63     4         1    45</code></pre>
 </div>
 </div>
 </section>
 <section id="document-similarity" class="slide level2">
 <h2>Document similarity</h2>
 <p>The similarity between documents can be best calculated using cosine similarity.</p>
-</section>
+
+<img data-src="m10-03_files/figure-revealjs/unnamed-chunk-2-1.png" width="960" class="r-stretch"></section>
 <section id="word-embeddings" class="slide level2">
 <h2>Word Embeddings</h2>
 <ul>
 <li>Word embeddings represent the meaning of a word as a vector of numbers</li>
 <li>Different approaches to building, e.g.:
 <ul>
-<li>Word2Vec</li>
-<li>GloVE</li>
+<li>Word2Vec <span class="citation" data-cites="mikolov2013">(<a href="#/references" role="doc-biblioref" onclick="">Mikolov et al. 2013</a>)</span></li>
+<li>GloVE <span class="citation" data-cites="pennington.etal2014">(<a href="#/references" role="doc-biblioref" onclick="">Pennington, Socher, and Manning 2014</a>)</span></li>
 </ul></li>
 <li>But all based on the co-occurrence of words together in a corpus of real text</li>
 </ul>
@@ -504,11 +505,11 @@
 <h2>Capturing meaning with word embeddings in <code>R</code></h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a><span class="fu">cos_sim</span>(</span>
-<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">glove</span>(<span class="st">"queen"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"king"</span>) <span class="sc">+</span> <span class="fu">glove</span>(<span class="st">"princess"</span>),</span>
-<span id="cb12-3"><a href="#cb12-3"></a>  <span class="fu">glove</span>(<span class="st">"princess"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"prince"</span>)</span>
+<span id="cb12-2"><a href="#cb12-2"></a>  <span class="fu">glove</span>(<span class="st">"queen"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"king"</span>) ,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>  <span class="fu">glove</span>(<span class="st">"woman"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"man"</span>)</span>
 <span id="cb12-4"><a href="#cb12-4"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 0.6588081</code></pre>
+<pre><code>[1] 0.5970327</code></pre>
 </div>
 <div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">cos_sim</span>(</span>
 <span id="cb14-2"><a href="#cb14-2"></a>  <span class="fu">glove</span>(<span class="st">"phoenix"</span>) <span class="sc">-</span> <span class="fu">glove</span>(<span class="st">"arizona"</span>),</span>
@@ -526,19 +527,22 @@
 </section>
 <section id="compression-as-understanding" class="slide level2">
 <h2>Compression as understanding</h2>
+<div style="font-size: 65%;">
 <blockquote>
-<p>Presumably there are some generalities to be found in there, something more concise and descriptive than 8.5 billion completely independent and unrelated ratings. […] A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that. —Simon Funk (aka Brandyn Webb)</p>
+<p>Presumably there are some generalities to be found in there, something more concise and descriptive than 8.5 billion completely independent and unrelated ratings. […] A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that.</p>
+<p>—Simon Funk (aka Brandyn Webb)</p>
 </blockquote>
+</div>
 <div class="callout callout-tip callout-titled callout-style-default">
 <div class="callout-body">
 <div class="callout-title">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
-<p><strong>Tip</strong></p>
+<p><strong>Further reading</strong></p>
 </div>
 <div class="callout-content">
-<p>See <span class="citation" data-cites="rissanan1978">(<a href="#/references" role="doc-biblioref" onclick=""><strong>rissanan1978?</strong></a>)</span>, <span class="citation" data-cites="grunwald.roos2020">(<a href="#/references" role="doc-biblioref" onclick=""><strong>grunwald.roos2020?</strong></a>)</span> and further writings on the idea of <strong>minimum descriptive length</strong> for more formal treatments.</p>
+<p>See <span class="citation" data-cites="rissanen1978">(<a href="#/references" role="doc-biblioref" onclick="">Rissanen 1978</a>)</span> further writings on the idea of <strong>minimum descriptive length</strong> for more formal treatments.</p>
 </div>
 </div>
 </div>
@@ -566,17 +570,77 @@
 </section>
 <section id="pointwise-mutual-information" class="slide level2">
 <h2>Pointwise Mutual Information</h2>
+<div class="callout callout-caution no-icon callout-titled callout-style-default">
+<div class="callout-body">
+<div class="callout-title">
+<p><strong>Definition: Pointwise Mutual Information</strong></p>
+</div>
+<div class="callout-content">
+<p><span class="math display">\[\text{pmi}(x;y) = \text{log}_2 \frac{p(x,y)}{p(x)p(y)} =  \text{log}_2 \frac{p(x|y)}{p(x)} \]</span></p>
+</div>
+</div>
+</div>
 <ul>
-<li>calculate PMI definition etc.</li>
+<li>Measure of association between discrete variables</li>
+<li>Compares the probability of two events occurring together to what this probability would be if the events were independent</li>
+<li>PMI is symmetric: <span class="math inline">\(\text{pmi}(x;y) = \text{pmi}(y;x)\)</span></li>
 </ul>
 </section>
 <section id="matrix-factorization" class="slide level2">
 <h2>Matrix factorization</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
 <li>Get a big term-term matrix of skip-gram PMI</li>
-<li>“factorize” this matrix</li>
+<li>“Factorize” this matrix
+<ul>
 <li>i.e.: split it apart</li>
+</ul></li>
 </ul>
+</div><div class="column" style="width:50%;">
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th>w1</th>
+<th>w2</th>
+<th>w3</th>
+<th>w4</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>w1</td>
+<td>.5</td>
+<td>.1</td>
+<td>.9</td>
+<td>.1</td>
+</tr>
+<tr class="even">
+<td>w2</td>
+<td>.1</td>
+<td>.3</td>
+<td>.8</td>
+<td>.9</td>
+</tr>
+<tr class="odd">
+<td>w3</td>
+<td>.4</td>
+<td>.8</td>
+<td>.4</td>
+<td>.2</td>
+</tr>
+<tr class="even">
+<td>w4</td>
+<td>.4</td>
+<td>.6</td>
+<td>.7</td>
+<td>.7</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 <section id="matrix-multiplication-basics" class="slide level2">
 <h2>Matrix multiplication basics</h2>
@@ -607,19 +671,20 @@
 <h2>Visualizing word vectors</h2>
 
 <img data-src="m10-03_files/figure-revealjs/unnamed-chunk-8-1.png" width="960" class="r-stretch"></section>
-<section id="references" class="slide level2">
-<h2>References</h2>
-<p>You can use pandoc citation style to add citations. Let’s use the convention: <code>[@author1.author2YEAR]</code> and <code>[@author.etalYEAR]</code> A bibliography is automatically created.</p>
-<p>I’ve started off the references with our main text <span class="citation" data-cites="gareth.etal2014">(<a href="#/references" role="doc-biblioref" onclick="">James et al. 2014</a>)</span>.</p>
-</section>
 <section class="slide level2 smaller scrollable" id="references">
 
 <div class="footer footer-default">
 
 </div>
 <div id="refs" class="references csl-bib-body hanging-indent" role="list">
-<div id="ref-gareth.etal2014" class="csl-entry" role="listitem">
-James, Gareth, Daniela Witten, Trevor Hastie, and Robert Tibshirani. 2014. <em>An Introduction to Statistical Learning: With Applications in r</em>. Springer Publishing Company, Incorporated.
+<div id="ref-mikolov2013" class="csl-entry" role="listitem">
+Mikolov, Tomas, Kai Chen, Greg Corrado, and Jeffrey Dean. 2013. <span>“Efficient <span>Estimation</span> of <span>Word Representations</span> in <span>Vector Space</span>.”</span> arXiv. <a href="https://doi.org/10.48550/arXiv.1301.3781">https://doi.org/10.48550/arXiv.1301.3781</a>.
+</div>
+<div id="ref-pennington.etal2014" class="csl-entry" role="listitem">
+Pennington, Jeffrey, Richard Socher, and Christopher D. Manning. 2014. <span>“GloVe: Global Vectors for Word Representation.”</span> In <em>Empirical Methods in Natural Language Processing (EMNLP)</em>, 1532–43. <a href="http://www.aclweb.org/anthology/D14-1162">http://www.aclweb.org/anthology/D14-1162</a>.
+</div>
+<div id="ref-rissanen1978" class="csl-entry" role="listitem">
+Rissanen, J. 1978. <span>“Modeling by Shortest Data Description.”</span> <em>Automatica</em> 14 (5): 465–71. https://doi.org/<a href="https://doi.org/10.1016/0005-1098(78)90005-5">https://doi.org/10.1016/0005-1098(78)90005-5</a>.
 </div>
 </div>
 </section></section>

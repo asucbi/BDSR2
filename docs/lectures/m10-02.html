@@ -429,8 +429,8 @@
 </div>
 </div>
 </section>
-<section id="mds" class="slide level2">
-<h2>MDS</h2>
+<section id="multidimensional-scaling-mds" class="slide level2">
+<h2>Multidimensional Scaling (MDS)</h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>dists <span class="ot">&lt;-</span> capitals_dists <span class="sc">%&gt;%</span> <span class="fu">select</span>(<span class="sc">-</span>state.x)</span>
 <span id="cb3-2"><a href="#cb3-2"></a>mds_fit <span class="ot">&lt;-</span> <span class="fu">cmdscale</span>(dists, <span class="at">eig=</span><span class="cn">TRUE</span>, <span class="at">k=</span><span class="dv">2</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
@@ -458,10 +458,16 @@
 </section>
 <section id="mds-of-facial-expressions" class="slide level2">
 <h2>MDS of Facial Expressions</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
 <ul>
 <li>Abelson and Sermat (1962) presented participants with 15 photos of an actress making facial expressions under different cues</li>
-<li>Participatns were shown two different expressions and asked to rate how similar they were to one another.</li>
+<li>Participants were shown two different expressions and asked to rate how similar they were to one another.</li>
 </ul>
+</div><div class="column" style="width:50%;">
+<p><img data-src="../imgs/facial-expressions-pair-dalle.webp"></p>
+</div>
+</div>
 </section>
 <section id="facial-expression-similarity-data" class="slide level2">
 <h2>Facial Expression Similarity Data</h2>

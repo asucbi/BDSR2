@@ -18,13 +18,15 @@ Term-frequency embeddings are a way to represent documents.
 ```{r}
 #| echo: false
 library(tidyverse)
+library(patchwork)
+
 tf_df <- tibble(
   doc = c("A", "B", "C", "D"),
-  mozarella = c(0, 1, 3, 29),
-  pepperoni = c(0, 1, 3, 17),
-  tidy = c(5, 23, 1, 4),
-  calculate = c(9, 33, 0, 1),
-  bake = c(3, 9, 3, 45),
+  mozarella = c(0, 1, 5, 81),
+  pepperoni = c(0, 1, 7, 63),
+  tidy = c(5, 41, 1, 4),
+  calculate = c(9, 55, 0, 1),
+  bake = c(3, 12, 3, 45),
 )
 
 tf_df
@@ -35,6 +37,8 @@ tf_df
 The similarity between documents can be best calculated using cosine similarity.
 
 ```{r}
+#| message: false
+
 tf_dists <- cross_join(tf_df, tf_df) %>% 
   pivot_longer(cols = c(-doc.x, -doc.y), names_to = "word", values_to = "count") %>% 
   mutate(
@@ -46,16 +50,38 @@ tf_dists <- cross_join(tf_df, tf_df) %>%
   summarize(
     euclidean = sqrt(sum((x - y)^2)),
     cos_sim = sum(x*y)/(sqrt(sum(x^2))*sqrt(sum(y^2)))
-    )
-  
+    ) %>% 
+  ungroup() %>% 
+  pivot_longer(c(euclidean, cos_sim))
+
+tf_dists %>% 
+  filter(name == "cos_sim") %>% 
+  ggplot(aes(x=doc.x, y = doc.y, fill = value)) +
+  geom_tile() +
+  scale_fill_viridis_c() +
+  labs(fill = "similarity", title = "Cosine Similarity") + 
+  scale_y_discrete(limits = rev) +
+  theme_minimal() +
+  theme(aspect.ratio = 1) +
+
+
+tf_dists %>% 
+  filter(name == "euclidean") %>% 
+  ggplot(aes(x=doc.x, y = doc.y, fill = value)) +
+  geom_tile()  +
+  scale_fill_viridis_c() +
+  labs(fill = "distance", title = "Euclidean Distance") +
+  scale_y_discrete(limits = rev) +
+  theme_minimal() +
+  theme(aspect.ratio = 1)
 ```
 
 ## Word Embeddings
 
 - Word embeddings represent the meaning of a word as a vector of numbers
 - Different approaches to building, e.g.:
-  - Word2Vec
-  - GloVE
+  - Word2Vec [@mikolov2013]
+  - GloVE [@pennington.etal2014]
 - But all based on the co-occurrence of words together in a corpus of real text
 
 ```{r}
@@ -134,8 +160,8 @@ cos_sim(glove("cherry"), glove("fortress"))
 ```{r}
 #| echo: true
 cos_sim(
-  glove("queen") - glove("king") + glove("princess"),
-  glove("princess") - glove("prince")
+  glove("queen") - glove("king") ,
+  glove("woman") - glove("man")
   )
 
 cos_sim(
@@ -148,10 +174,16 @@ cos_sim(
 
 ## Compression as understanding
 
-> Presumably there are some generalities to be found in there, something more concise and descriptive than 8.5 billion completely independent and unrelated ratings. [...] A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that. ---Simon Funk (aka Brandyn Webb)
+::: {style="font-size: 65%;"}
+> Presumably there are some generalities to be found in there, something more concise and descriptive than 8.5 billion completely independent and unrelated ratings. [...] A fun property of machine learning is that this reasoning works in reverse too: If meaningful generalities can help you represent your data with fewer numbers, finding a way to represent your data in fewer numbers can often help you find meaningful generalities. Compression is akin to understanding and all that. 
+> 
+> ---Simon Funk (aka Brandyn Webb)
+
+:::
 
 ::: callout-tip
-See [@rissanan1978], [@grunwald.roos2020] and further writings on the idea of **minimum descriptive length** for more formal treatments.
+## Further reading
+See [@rissanen1978] further writings on the idea of **minimum descriptive length** for more formal treatments.
 :::
 
 ## How to make word embeddings
@@ -171,19 +203,38 @@ See [@rissanan1978], [@grunwald.roos2020] and further writings on the idea of **
   
 ## Pointwise Mutual Information
 
-- calculate PMI
-definition
-etc.
+::: {.callout-caution icon="false"}
+## Definition: Pointwise Mutual Information
+
+$$\text{pmi}(x;y) = \text{log}_2 \frac{p(x,y)}{p(x)p(y)} =  \text{log}_2 \frac{p(x|y)}{p(x)} $$
+:::
+
+- Measure of association between discrete variables
+- Compares the probability of two events occurring together to what this probability would be if the events were independent
+- PMI is symmetric: $\text{pmi}(x;y) = \text{pmi}(y;x)$
 
 ## Matrix factorization
-
+:::: {.columns}
+::: {.column width="50%"}
 - Get a big term-term matrix of skip-gram PMI
-- "factorize" this matrix
-- i.e.: split it apart
+- "Factorize" this matrix
+  - i.e.: split it apart
+:::
+::: {.column width="50%"}
+|    | w1 | w2 | w3 | w4 |
+|----|----|----|----|----|
+| w1 | .5 | .1 | .9 | .1 |
+| w2 | .1 | .3 | .8 | .9 |
+| w3 | .4 | .8 | .4 | .2 |
+| w4 | .4 | .6 | .7 | .7 |
+:::
+::::
+
 
 ## Matrix multiplication basics
 
 ![](../imgs/matrix-mult-demo.png)
+
 
 ## Matrix decomposition
 ::: {style="font-size: 80%;"}
@@ -220,12 +271,5 @@ glove_df[100:200,0:25] %>%
   labs(x = "Dimension", y = "Token")
   
 ```
-
-
-## References
-
-You can use pandoc citation style to add citations. Let's use the convention: `[@author1.author2YEAR]` and `[@author.etalYEAR]` A bibliography is automatically created.
-
-I've started off the references with our main text [@gareth.etal2014]. 
 
 ---

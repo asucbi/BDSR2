@@ -83,6 +83,15 @@ ibcf <- Recommender(train, method = "IBCF")
 
 ![](../imgs/matrix-factorization-rec-intro1.png)
 
+## Matrix multiplication basics
+
+![](../imgs/matrix-mult-demo.png)
+
+
+## Matrix multiplication dimensions
+
+![](../imgs/matrix-mult-dim-diagram.png)
+
 
 ## Matrix factorization for recommendation (1d)
 

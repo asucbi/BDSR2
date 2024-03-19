@@ -5,7 +5,7 @@ bibliography: ../references.bib
 editor: source
 ---
 
-:: {.callout-caution icon="false"}
+::: {.callout-caution icon="false"}
 ## Learning Objectives
 
 Our learning objectives for this homework are:
@@ -18,12 +18,12 @@ Our learning objectives for this homework are:
 :::
 
 ::: columns
-::: {.column width="50%"}
-![](~/Documents/Github/BDSR2/imgs/bikephone.jpg)
+::: {.column width="55%"}
+![](../imgs/bikephone.jpg)
 :::
 
-::: {.column width="50%"}
-![](~/Documents/Github/BDSR2/imgs/runphone.jpg)
+::: {.column width="45%"}
+![](../imgs/runphone.jpg)
 :::
 :::
 
@@ -31,7 +31,7 @@ For this homework, we are going to return to the 'human activity recognition' da
 
 This time around, we'll try using principal components analysis (PCA) to reduce our dataset to just the top 3 dimensions that capture the most variance. Then, we will use k-means and hierarchical clustering to detect clusters in these dimensions, and we will add cluster assignments to our dataset as new predictors. Then, we will see whether the cluster assignments from either (or both) methods can help improve the fit of a Naive Bayes model predicting the `Activity`
 
-```{r}
+```{r, eval=FALSE}
 library(themis)
 library(tidyverse)
 library(tidymodels)
@@ -79,7 +79,7 @@ Make two scatterplots of the `pca_data`, showing the 1st and 2nd component, and 
 ```
 
 Below, you can use my code to make a 3D plot of the PCA data.
-```{r}
+```{r, eval=FALSE}
 library(plotly)
 
 fig <- plot_ly() %>%

@@ -18,3 +18,5 @@ for(i in 1:4){
   groups= c(groups, list(cur_group))
   students = students[! students %in% cur_group]
 }
+
+groups

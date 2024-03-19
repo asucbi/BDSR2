@@ -1,0 +1,175 @@
+---
+title: "Unit 4 Homework Project"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+:: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this homework are:
+
+-   Apply k-means and hierarchical clustering using the `tidyclust` package
+-   Tune clustering models and select the optimal number of clusters based on the Elbow method and Silhouette score
+-   Compare results of clustering algorithms to evaluate which approach is best for your data
+-   Use dimensionality reduction (PCA) in conjunction with clustering to make new features for supervised learning
+
+:::
+
+::: columns
+::: {.column width="50%"}
+![](~/Documents/Github/BDSR2/imgs/bikephone.jpg)
+:::
+
+::: {.column width="50%"}
+![](~/Documents/Github/BDSR2/imgs/runphone.jpg)
+:::
+:::
+
+For this homework, we are going to return to the 'human activity recognition' dataset that we previously used in the Module 5 lab. The original dataset contains summarized data (i.e. means, maxs, mins, etc) from the accelerometer, gyroscope, and gravity sensor of a smartwatch while participants performed various actions. One of the challenges we encountered previously is that we have a large number of potential predictor variables (112) and we aren't sure which are useful.
+
+This time around, we'll try using principal components analysis (PCA) to reduce our dataset to just the top 3 dimensions that capture the most variance. Then, we will use k-means and hierarchical clustering to detect clusters in these dimensions, and we will add cluster assignments to our dataset as new predictors. Then, we will see whether the cluster assignments from either (or both) methods can help improve the fit of a Naive Bayes model predicting the `Activity`
+
+```{r}
+library(themis)
+library(tidyverse)
+library(tidymodels)
+library(tidyclust)
+library(ggplot2)
+
+load('HumanActivityRecognition_original.Rdata')
+```
+::: {.callout-note icon="false"}
+## Exercise 1
+
+First, make a bar plot showing the number of observations for each `Activity`.
+:::
+```{r}
+
+```
+
+Please set the randomizer seed to 1 now, to help make your results consistent with mine to make grading easier. Don't set the seed again in this exercise.
+```{r}
+set.seed(1)
+```
+
+
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Let's use PCA to make our data easier to visualize. Below you should:
+1. Make a recipe called `pca_rec`, with a formula containing `Activity` as the outcome variable and all other columns as predictors. Add a `step_normalize` and `step_pca`. In the latter, set `num_comp = 3` to get the first three components.
+2. `prep()` the recipe and save the result as `pca_estimates`
+3. `bake()` the result of step 2 and save it as `pca_data`
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+Make two scatterplots of the `pca_data`, showing the 1st and 2nd component, and the 2nd and 3rd component, respectively.
+:::
+
+```{r}
+
+```
+
+Below, you can use my code to make a 3D plot of the PCA data.
+```{r}
+library(plotly)
+
+fig <- plot_ly() %>%
+  add_trace(
+    data = pca_data,
+    x = ~PC1, y = ~PC2, z = ~PC3, color=~Activity,
+    opacity = .75,
+    type = 'scatter3d', mode = 'markers',
+    marker = list(size = 5, symbol = 'circle'),
+    showlegend=F
+  ) %>% 
+  layout(
+    scene = list(
+      xaxis = list(title = 'PC1'),
+      yaxis = list(title = 'PC2'),
+      zaxis = list(title = 'PC3'),
+      camera = list(eye = list(x = 2.5, y = -.1, z = .8))
+    ),
+    autosize = F, width = 400, height = 400,
+    margin = list(l = 0, r = 0, b = 0, t = 0, pad = 0),
+    legend = list(x = 0.0, y = 1)
+  ) 
+
+
+fig
+```
+::: {.callout-note icon="false"}
+## Exercise 4
+
+Next, tune a k-means model to find the optimal number of clusters for the pca_data. To be clear, you should only be using the `pca_data` for all subsequent processing -- `df` will not be used anymore.
+
+The steps in this exercise are:
+1. Make a `cluster_metric_set` with the SSE ratio and average silhouette score as metrics
+2. Make a `k_means` specification with `num_clusters` set to tune.
+3. Make a recipe called `kmeans_rec`. The formula should have no outcome variable, and all variables as predictors. Include this additional step to exclude `Activity` as a predictor: `update_role(all_factor(), new_role = "id_var")`
+4. Make a grid of values to try for `k`, from 2 to 20
+5. Make a set of crossfolds 
+6. Use `tune_cluster` to get the results
+7. Plot the silhouette score and SSE ratio as a function of k
+:::
+```{r}
+
+```
+
+
+::: {.callout-note icon="false"}
+## Exercise 5
+
+Do the same as above using the hierarchical clustering algorithm.
+
+:::
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 6
+
+Based on the above tuning results, choose the optimal k for each algorithm. Then:
+1. Fit a final model for each algorithm, using the chosen value of k
+2. Extract the cluster assignments for each model
+3. Add each model's cluster assignments as new columns in pca_data. E.g. you could add the columns `.cluster_k` and `.cluster_h`.
+:::
+
+```{r}
+
+```
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 7
+
+Now, we'll fit a series of Naive Bayes models. 
+1. First, make a test/train split (using `strata = Activity`). 
+2. Then, fit a model predicting `Activity` from just `PC1`, `PC2`, and `PC3`. Get the `bal_accuracy` of the model on the test set.
+3. Make another model with the first 3 PCs, but also include the k-means cluster assignments as a predictor.
+4. Make another model, but now use the hierarchical cluster assignments instead of the k-means ones.
+
+Does adding either set of cluster assignments improve the model fit? Does one do better than the other?
+:::
+
+```{r}
+
+```
+```{r}
+
+```
+
+```{r}
+
+```

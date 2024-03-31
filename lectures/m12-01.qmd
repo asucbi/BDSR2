@@ -1,0 +1,77 @@
+---
+title: |
+  | Computer Vision &
+  | Convolutional Neural Networks
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 5
+  | Module 12
+format: 
+  revealjs:
+    css: style.css
+---
+
+## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
+### For processing images
+
+:::{.fragment fragment-index=1}
+Inspired by the brain's visual pathway
+:::
+
+::::{style="font-size:100%;"}
+:::{.columns}
+::::{.column width=50% .fragment fragment-index=1}
+![](../imgs/visualpathway.png)
+::::
+
+::::{.column width=50% .fragment fragment-index=2}
+![](../imgs/featuredetectors.png)
+::::
+:::
+::::
+
+## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
+### Basic architecture
+
+![](../imgs/cnnBasicArchitecture.png)
+
+## Image Encoding
+
+![](../imgs/imageEncoding.png)
+
+## Convolutional Filters
+
+::::{style="font-size:100%;"}
+:::{.columns}
+::::{.column width=50%}
+![](../imgs/convolution.gif)
+
+:::{.r-stack}
+::::{.fragment .fade-in-then-out fragment-index=2}
+![](../imgs/conv1.png){.absolute top=450 left=10 width=50%}
+::::
+
+::::{.fragment fragment-index=3}
+![](../imgs/conv2.png){.absolute top=450 left=15 width=49.5%}
+::::
+:::
+::::
+
+::::{.column width=50%}
+::::{.fragment fragment-index=1}
+![](../imgs/cnnKernels.webp)
+::::
+
+::::{.fragment fragment-index=4}
+![](../imgs/CNNfilters.webp){.absolute top=420 left=550 width=49.5%}
+::::
+::::
+:::
+::::
+
+## Pooling 
+![](../imgs/pooling.gif)
+
+## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
+
+![](../imgs/cnnarchitecture2.png)

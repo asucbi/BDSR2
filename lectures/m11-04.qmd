@@ -1,0 +1,776 @@
+---
+title: |
+  | Intro to ANNs, Part 4
+  | `Building a Multi-layer`
+  | `Perceptron with`
+  | `Backpropagation`
+  | `from Scratch`
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 5
+  | Module 11
+format: 
+  revealjs:
+    width: 1200
+    css: style.css
+---
+
+## The simplest possible MLP
+
+```{r}
+library(tidyverse)
+```
+
+```{css, echo=FALSE}
+.title {
+  font-size: 60px !important;
+}
+
+.subtitle {
+  font-size: 40px !important;
+  color: blue
+}
+```
+
+![](../imgs/mlp.png)
+
+## Making a Perceptron in `R`
+### for `x | y`
+
+![](../imgs/mlp.png){.absolute top="-30" right="30" width="25%"}
+
+::: {style="font-size:60%;"}
+::: columns
+::: {.column width="33%"}
+```{r}
+set.seed(1)
+```
+
+```{r}
+#| echo: true
+Inputs = matrix(
+  c(0,0,
+    1,0,
+    0,1,
+    1,1),
+  ncol=2, byrow = T
+)
+
+Targets = c(0, 1, 1, 1)
+
+W_i_h = matrix( # input->hidden weights
+  runif(n= 4, min = -1, max = 1), 
+  nrow = 2, ncol = 2) 
+
+# input->hidden bias
+b_i_h = runif(n= 2, min = -1, max = 1)
+
+W_h_o = matrix( # hidden->output weights
+  runif(n= 2, min = -1, max = 1), 
+  nrow = 2, ncol = 1) 
+
+# hidden->output bias
+b_h_o = runif(n= 1, min = -1, max = 1)
+
+# sigmoid activation function
+sigmoid <- function(y){
+  z = 1/(1+exp(-y))
+  return(z)
+}
+```
+:::
+
+::: {.column width="33%"}
+::: {.fragment fragment-index="1"}
+Input (1 x 2)
+
+```{r}
+#| echo: true
+I = Inputs[2, , drop=F]
+I
+```
+:::
+
+::: {.fragment .fade-in-then-semi-out fragment-index="3"}
+1.  Multiply input by weights and add bias to get $Y^h$
+
+```{r}
+#| echo: true
+# `%*%` is the matrix 
+# multiplication operator
+Y_h = I %*% W_i_h + b_i_h 
+Y_h
+```
+:::
+
+::: {.fragment fragment-index="4"}
+2.  Pass $Y^h$ through activation function to get $Z^h$
+
+```{r}
+#| echo: true
+Z_h = sigmoid(Y_h)
+Z_h
+```
+:::
+:::
+
+::: {.column width="33%"}
+::: {.fragment fragment-index="1"}
+$Weights^{i->h}$ (2 x 2)
+
+```{r}
+#| echo: true
+W_i_h
+```
+:::
+
+::: {.fragment .fade-in-then-semi-out fragment-index="5"}
+3.  Repeat for hidden -\> output
+
+```{r}
+#| echo: true
+Y_o = Z_h %*% W_h_o + b_h_o
+Z_o = sigmoid(Y_o)
+Z_o
+```
+:::
+
+::: {.fragment fragment-index="6"}
+4.  Calculate error
+
+```{r}
+#| echo: true
+E = Targets[2] - Z_o
+E
+```
+:::
+
+::: {.fragment fragment-index="7"}
+::: {style="font-size:120%;color:red;text-align:center;"}
+That's it for the "forward pass"!
+:::
+:::
+:::
+:::
+:::
+
+![](../imgs/matrixMultiplication.png){.absolute .fragment .fade-in-then-out right="200" bottom="0" width="40%" fragment-index="2"}
+
+## Making a Perceptron in `R`
+### The "Backward Pass" (Backprop)
+
+![](../imgs/mlp.png){.absolute top="-30" right="30" width="25%"}
+
+::: {style="font-size:75%;"}
+-   Sigmoid:
+    -   $\sigma(x) = \frac{1}{1+e^{-x}}$
+-   Derivative of sigmoid:
+    -   $\sigma'(x) = \sigma(x) \cdot (1-\sigma(x))$
+
+```{r}
+#| echo: true
+# this function assumes the input `z` 
+# is the output of a sigmoid function
+
+sigmoid_deriv <- function(z){
+  y = z * (1-z)
+  return(y)
+}
+```
+:::
+
+## Making a Perceptron in `R`
+### The "Backward Pass" (Backprop)
+
+![](../imgs/mlp.png){.absolute top="-30" right="30" width="25%"}
+
+```{css}
+/* Set font size for regular text */
+.slidestyle {
+  font-size: 45%; /* or your preferred size for regular text */
+}
+
+/* Set font size for code blocks and code output */
+.slidestyle pre {
+  font-size: 65%; /* or your preferred size for code */
+}
+```
+
+
+::: {.slidestyle}
+ \
+ 
+::::{.columns}
+::: {.column width="39%"}
+:::: {.fragment .fade-in-then-semi-out}
+1.  Get the <U>total</U> error for $W^{h->o}$ by chain rule
+    -   Multiply $E$ by the derivative of $Z_o$
+
+```{r}
+#| echo: true
+delta_h_o = E * sigmoid_deriv(Z_o)
+delta_h_o
+```
+::::
+
+ \
+ 
+:::: {.fragment .fade-in-then-semi-out}
+2.  Apply chain rule again to get the <U>total</U> error for $W^{i->h}$
+    -   Pass $\delta_{h->o}$ through $W_{h->o}$ in reverse
+        -   We need to **transpose** $W_{h->o}$ 
+    -   Then multiply by derivative of $Z_h$
+
+```{r}
+#| echo: true
+delta_i_h = delta_h_o %*% t(W_h_o) * sigmoid_deriv(Z_h)
+delta_i_h
+```
+
+::::
+:::
+
+::: {.column width="34%"}
+:::: {.fragment .fade-in-then-semi-out}
+3.  Get the change in weights
+    -   Divide the **total** error for each layer across the weights by multiplying by the input to each layer
+        -   Again we need to transpose the inputs to go backwards
+    -   Multiply by the learning rate so we don't over-correct
+
+```{r}
+#| echo: true
+LearningRate = .1
+
+W_h_o_ch = t(Z_h) %*% delta_h_o * LearningRate
+W_h_o_ch
+```
+
+```{r}
+#| echo: true
+W_i_h_ch = t(I) %*% delta_i_h * LearningRate
+W_i_h_ch
+```
+::::
+:::
+
+::: {.column width="27%"}
+:::: {.fragment .fade-in-then-semi-out}
+4.  Get the change in the bias nodes too
+
+```{r}
+#| echo: true
+b_i_h_ch = delta_i_h * LearningRate
+
+b_h_o_ch = delta_h_o * LearningRate
+```
+::::
+
+ \
+ 
+::::{.fragment}
+5.  Finally, update all the parameters
+
+```{r}
+#| echo: true
+W_i_h = W_i_h + W_i_h_ch
+
+W_h_o = W_h_o + W_h_o_ch
+
+b_i_h = b_i_h + b_i_h_ch
+
+b_h_o = b_h_o + b_h_o_ch
+```
+::::
+:::
+::::
+:::
+
+## Let's see if our error has improved
+
+:::{style="font-size:80%;"}
+Previous Error:
+
+```{r}
+E_old = E
+E_old
+```
+
+::: fragment
+Running the forward pass again:
+
+```{r}
+#| echo: true
+Y_h = I %*% W_i_h + b_i_h 
+Z_h = sigmoid(Y_h)
+Y_o = Z_h %*% W_h_o + b_h_o
+Z_o = sigmoid(Y_o)
+E = Targets[2] - Z_o
+E
+```
+:::
+
+::: fragment
+ 
+```{r}
+#| echo: true
+E - E_old
+```
+:::
+:::
+
+## [We're gonna need some more training time]{style="font-size:75%;"}
+
+```{css, echo=FALSE}
+.noscroll code {
+  max-height: 100% !important;
+}
+```
+
+::: {style="font-size:50%;"}
+::: columns
+::: {.column width="50%"}
+```{r}
+#| echo: true
+#| class-source: .noscroll
+epochs=10000
+
+MSEs=c() # make an empty vector for storing mean sq errors
+for(epoch in 1:epochs){
+
+  errs=c() # make an empty vector for storing errors
+  for(i in 1:4){ # loop through each of our 4 input vectors
+    I = Inputs[i, , drop=F] # get the current input
+    Target = Targets[i] # get the current target
+
+    # forward pass
+    Y_h = I %*% W_i_h + b_i_h
+    Z_h = sigmoid(Y_h)
+    Y_o = Z_h %*% W_h_o + b_h_o
+    Z_o = sigmoid(Y_o)
+    E = Targets[i] - Z_o
+
+    # save the errors for the four inputs on this loop
+    errs=c(errs, E)
+
+    # backward pass
+    delta_h_o = E * sigmoid_deriv(Z_o)
+    delta_i_h = delta_h_o %*% t(W_h_o) * sigmoid_deriv(Z_h)
+    W_h_o_ch = t(Z_h) %*% delta_h_o * LearningRate
+    W_i_h_ch = t(I) %*% delta_i_h * LearningRate
+    b_i_h_ch=delta_i_h*LearningRate
+    b_h_o_ch=delta_h_o*LearningRate
+
+    # update parameters
+    W_i_h = W_i_h + W_i_h_ch
+    W_h_o = W_h_o + W_h_o_ch
+    b_i_h = b_i_h + b_i_h_ch
+    b_h_o = b_h_o + b_h_o_ch
+  }
+  # get the mean sq error for this epoch and add it to the list
+  MSE = mean(errs^2)
+  MSEs = c(MSEs, MSE)
+}
+```
+:::
+
+::: {.column width="50%"}
+- We can train for some pre-specified number of "epochs"
+  - Each epoch is a loop through the full training set (usually)
+  - Our training set has 4 inputs, so each epoch has 4 iterations
+
+  \
+  \
+  \
+```{r, fig.width=5, fig.height=4}
+plot(MSEs)
+```
+:::
+:::
+:::
+
+## [We're gonna need some more training time]{style="font-size:75%;"}
+
+```{r}
+set.seed(1)
+W_i_h = matrix( # input->hidden weights
+  runif(n= 4, min = -1, max = 1), 
+  nrow = 2, ncol = 2) 
+
+# input->hidden bias
+b_i_h = runif(n= 2, min = -1, max = 1)
+
+W_h_o = matrix( # hidden->output weights
+  runif(n= 2, min = -1, max = 1), 
+  nrow = 2, ncol = 1) 
+
+# hidden->output bias
+b_h_o = runif(n= 1, min = -1, max = 1)
+```
+
+::: {style="font-size:50%;"}
+::: columns
+::: {.column width="50%"}
+```{r}
+#| echo: true
+#| class-source: .noscroll
+#| code-line-numbers: "1,2,3,6"
+err_threshold = .001
+MSE = 1 # initially set the error to some value above the threshold
+max_epochs=10000
+
+MSEs=c() # make an empty vector for storing mean sq errors
+while(MSE > err_threshold){
+
+  errs=c() # make an empty vector for storing errors
+  for(i in 1:4){ # loop through each of our 4 input vectors
+    I = Inputs[i, , drop=F] # get the current input
+    Target = Targets[i] # get the current target
+
+    # forward pass
+    Y_h = I %*% W_i_h + b_i_h
+    Z_h = sigmoid(Y_h)
+    Y_o = Z_h %*% W_h_o + b_h_o
+    Z_o = sigmoid(Y_o)
+    E = Targets[i] - Z_o
+
+    # save the errors for the four inputs on this loop
+    errs=c(errs, E)
+
+    # backward pass
+    delta_h_o = E * sigmoid_deriv(Z_o)
+    delta_i_h = delta_h_o %*% t(W_h_o) * sigmoid_deriv(Z_h)
+    W_h_o_ch = t(Z_h) %*% delta_h_o * LearningRate
+    W_i_h_ch = t(I) %*% delta_i_h * LearningRate
+    b_i_h_ch=delta_i_h*LearningRate
+    b_h_o_ch=delta_h_o*LearningRate
+
+    # update parameters
+    W_i_h = W_i_h + W_i_h_ch
+    W_h_o = W_h_o + W_h_o_ch
+    b_i_h = b_i_h + b_i_h_ch
+    b_h_o = b_h_o + b_h_o_ch
+  }
+  
+  # get the mean sq error for this epoch and add it to the list
+  MSE = mean(errs^2)
+  MSEs = c(MSEs, MSE)
+}
+```
+:::
+
+::: {.column width="50%"}
+- We can train for some pre-specified number of "epochs"
+  - Each epoch is a loop through the full training set (usually)
+  - Our training set has 4 inputs, so each epoch has 4 iterations
+- Or we can train until our error is below some threshold
+  - Helpful to set a maximum number of epochs in case we never reach the threshold
+
+```{r, fig.width=5, fig.height=4}
+plot(MSEs)
+```
+:::
+:::
+:::
+
+## [We can add momentum to speed up learning]{style="font-size:75%;"}
+
+```{css, echo=FALSE}
+.vscroll0 {
+  max-height: 565px;
+  overflow-y: auto;
+  overflow-x: wrap;
+}
+
+.vscroll0 code {
+  max-height: 100% !important;
+}
+```
+
+```{r}
+#| echo: false
+set.seed(1)
+
+W_i_h = matrix( # input->hidden weights
+  runif(n= 4, min = -1, max = 1),
+  nrow = 2, ncol = 2)
+
+# input->hidden bias
+b_i_h = runif(n= 2, min = -1, max = 1)
+
+W_h_o = matrix( # hidden->output weights
+  runif(n= 2, min = -1, max = 1),
+  nrow = 2, ncol = 1)
+
+# hidden->output bias
+b_h_o = runif(n= 1, min = -1, max = 1)
+
+```
+
+::: {style="font-size:50%;"}
+::: columns
+::: {.column width="50%"}
+```{r}
+#| echo: true
+#| class-source: .vscroll0
+#| code-line-numbers: "1-5,30-39"
+W_i_h_mom = 0 # initialize momentum at 0
+W_h_o_mom = 0
+b_i_h_mom = 0
+b_h_o_mom = 0
+decay = .9 # set a decay, which weights the addition of the previous change
+
+err_threshold = .001
+MSE = 1 # initially set the error to some value above the threshold
+max_epochs=10000
+MSEs=c() # make an empty vector for storing mean sq errors
+while(MSE > err_threshold){
+  errs=c() # make an empty vector for storing errors
+  for(i in 1:4){ # loop through each of our 4 input vectors
+    I = Inputs[i, , drop=F] # get the current input
+    Target = Targets[i] # get the current target
+
+    # forward pass
+    Y_h = I %*% W_i_h + b_i_h
+    Z_h = sigmoid(Y_h)
+    Y_o = Z_h %*% W_h_o + b_h_o
+    Z_o = sigmoid(Y_o)
+    E = Targets[i] - Z_o
+
+    # save the errors for the four inputs on this loop
+    errs=c(errs, E)
+
+    # backward pass
+    delta_h_o = E * sigmoid_deriv(Z_o)
+    delta_i_h = delta_h_o %*% t(W_h_o) * sigmoid_deriv(Z_h)
+    W_h_o_ch = t(Z_h) %*% delta_h_o * LearningRate + W_h_o_mom*decay
+    W_i_h_ch = t(I) %*% delta_i_h * LearningRate + W_i_h_mom*decay
+    b_i_h_ch=delta_i_h*LearningRate + b_i_h_mom*decay
+    b_h_o_ch=delta_h_o*LearningRate + b_h_o_mom*decay
+
+    # set the momentum terms to the current changes
+    W_h_o_mom = W_h_o_ch
+    W_i_h_mom = W_i_h_ch
+    b_i_h_mom = b_i_h_ch
+    b_h_o_mom = b_h_o_ch
+
+    # update parameters
+    W_i_h = W_i_h + W_i_h_ch
+    W_h_o = W_h_o + W_h_o_ch
+    b_i_h = b_i_h + b_i_h_ch
+    b_h_o = b_h_o + b_h_o_ch
+  }
+  # get the mean sq error for this epoch and add it to the list
+  MSE = mean(errs^2)
+  MSEs = c(MSEs, MSE)
+}
+```
+:::
+
+::: {.column width="50%"}
+- Momentum adds the previously-calculated weight change (scaled by a decay term) to the current one
+  - If the previous change was large, we will move further next time
+- With momentum, our training time goes from 8000 to 800 epochs!
+
+  \
+  \
+  \
+
+```{r, fig.width=5, fig.height=4}
+plot(MSEs)
+```
+:::
+:::
+:::
+
+## Let's make sure it works!
+
+:::{.columns}
+::::{.column width=70%}
+:::{style="font-size:75%;"}
+```{r}
+#| echo: true
+#| eval: false
+for(i in 1:4){ # loop through each of our 4 input vectors
+    I = Inputs[i, , drop=F] # get the current input
+    Target = Targets[i] # get the current target
+
+    # forward pass
+    Y_h = I %*% W_i_h + b_i_h
+    Z_h = sigmoid(Y_h)
+    Y_o = Z_h %*% W_h_o + b_h_o
+    Z_o = sigmoid(Y_o)
+
+    cat("Input:", I, "\n")
+    cat("Target:", Target, "\n")
+    cat("Output:", Z_o, "\n")
+    cat("\n")
+}
+```
+:::
+::::
+
+::::{.column width=30%}
+```{r}
+#| echo: false
+for(i in 1:4){ # loop through each of our 4 input vectors
+    I = Inputs[i, , drop=F] # get the current input
+    Target = Targets[i] # get the current target
+
+    # forward pass
+    Y_h = I %*% W_i_h + b_i_h
+    Z_h = sigmoid(Y_h)
+    Y_o = Z_h %*% W_h_o + b_h_o
+    Z_o = sigmoid(Y_o)
+
+    cat("Input:", I, "\n")
+    cat("Target:", Target, "\n")
+    cat("Output:", Z_o, "\n")
+    cat("\n")
+}
+```
+::::
+:::
+
+## The `tidymodels` version
+
+:::{style="font-size:70%;"}
+```{r}
+#| echo: true
+library(tidymodels)
+
+data <- data.frame(Inputs)
+colnames(data) <- c("i_1","i_2")
+data$Target <- as.factor(Targets)
+
+mlp_spec <- mlp(
+  hidden_units = 2,
+  epochs = 1000,
+  learn_rate = .01
+  ) %>%
+  set_engine("nnet", trace = TRUE, abstol = .0001) %>%
+  set_mode("classification")
+
+fit <- mlp_spec %>% fit(Target ~ ., data = data)
+
+fit %>% augment(data)
+```
+:::
+
+## The `neuralnet` version
+
+::::{style="font-size:70%;"}
+:::{.columns}
+::::{.column width=50%}
+```{r}
+#| echo: true
+library(neuralnet)
+
+nnet <- neuralnet(Target ~ .,
+                  data = data,
+                  hidden = c(2,4),
+                  stepmax = 10000,
+                  learningrate = .1,
+                  threshold = .001,
+                  algorithm = "backprop",
+                  linear.output = FALSE
+                  )
+
+predict(nnet, as.matrix(data[,1:2],ncol=2))
+```
+::::
+
+::::{.column width=50%}
+```{r}
+#| echo: true
+plot(nnet, rep="best")
+```
+::::
+:::
+::::
+
+## The `keras`/`tensorflow` version
+### Allows for advanced customization
+
+```{css, echo=FALSE}
+.vscroll1 {
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: wrap;
+}
+
+.vscroll1 code {
+  max-height: 100% !important;
+}
+
+.vscroll2 {
+  max-height: 100px;
+  overflow-y: auto;
+  overflow-x: wrap;
+}
+
+.vscroll2 code {
+  max-height: 100% !important;
+}
+```
+```{r}
+set.seed(1)
+```
+
+:::{style="font-size:55%;"}
+```{r}
+#| echo: true
+#| code-overflow: scroll
+#| class-output: .vscroll2
+#| class-source: .vscroll1
+library(tensorflow)
+library(keras)
+use_backend("tensorflow")
+
+model <- keras_model_sequential()
+
+model %>%
+  layer_dense(
+    units = 2,
+    activation = 'sigmoid',
+    input_shape = c(2),
+    kernel_initializer = initializer_random_uniform(minval = -1, maxval = 1, seed = 1234),
+    bias_initializer = initializer_random_uniform(minval = -1, maxval = 1)) %>%
+  layer_dense(
+    units = 1,
+    activation = 'sigmoid',
+    kernel_initializer = initializer_random_uniform(minval = -1, maxval = 1),
+    bias_initializer = initializer_random_uniform(minval = -1, maxval = 1))
+
+model %>% compile(
+  loss = 'mean_squared_error',
+  optimizer = keras::keras$optimizers$legacy$SGD(learning_rate = .1, momentum = .9),
+  metrics = 'accuracy'
+)
+
+callbacks = list(callback_early_stopping(monitor = "loss", min_delta = -.001, mode = "min", patience=100, restore_best_weights = TRUE,verbose=0))
+
+with(tf$device("CPU"),
+  model %>% fit(
+    Inputs,
+    Targets,
+    epochs=10000,
+    batch_size=4,
+    shuffle = FALSE,
+    verbose=2,
+    callbacks = callbacks,
+
+    view_metrics=F
+  )
+)
+```
+
+```{r}
+#| echo: true
+model %>% predict(Inputs, steps=1)
+```
+:::
+
+
+
+
+

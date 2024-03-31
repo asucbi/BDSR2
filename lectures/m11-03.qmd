@@ -1,0 +1,314 @@
+---
+title: |
+  | Intro to ANNs, Part 3
+  | `Learning:`
+  | `Backpropagation &`
+  | `Gradient Descent`
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 5
+  | Module 11
+format: 
+  revealjs:
+    css: style.css
+---
+
+## Activation Functions
+
+```{r}
+library(tidyverse)
+```
+
+```{css, echo=FALSE}
+.title {
+  font-size: 60px !important;
+}
+
+.subtitle {
+  font-size: 40px !important;
+  color: blue
+}
+```
+
+::: {style="font-size:60%;"}
+::: columns
+::: {.column width="32%"}
+-   We want a function that is:
+    -   (Usually) non-linear
+    -   Differentiable
+        -   To enable backpropagation
+    -   Avoids vanishing/exploding gradient problems
+:::
+
+::: {.column width="68%"}
+![](../imgs/activationFunctions.png)
+:::
+:::
+:::
+
+## Learning from Error
+### Single-layer Perceptron
+
+![](../imgs/2nodeperceptron2.png){.absolute top=-10 right=0 width="45%"}
+
+::: {style="font-size:65%;"}
+::: columns
+::: {.column width="40%"}
+![](../imgs/logicalAnd.png)
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: true
+df = tibble(
+  x = c(0,1,0,1), 
+  y = c(0,0,1,1),
+  targets = c(0,0,0,1))
+
+w1 = .5
+w2 = .5
+
+df %>% mutate(
+  sum = x*w1 + y*w2,
+  output = ifelse(sum >= 1, 1, 0),
+  error = targets-output)
+```
+:::
+:::
+:::
+
+## Learning from Error
+### Single-layer Perceptron
+
+![](../imgs/2nodeperceptron2.png){.absolute top=-10 right=0 width="45%"}
+
+::: {style="font-size:65%;"}
+::: columns
+::: {.column width="40%"}
+![](../imgs/logicalAnd.png)
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: true
+#| code-line-numbers: "6,7"
+df = tibble(
+  x = c(0,1,0,1), 
+  y = c(0,0,1,1),
+  targets = c(0,0,0,1))
+
+w1 = .13 #What if we started with random weights 
+w2 = .38 #and didn't know what would work?
+
+df %>% mutate(
+  sum = x*w1 + y*w2,
+  output = ifelse(sum >= 1, 1, 0),
+  error = targets-output)
+```
+:::
+:::
+:::
+
+:::{style="font-size:200%;color:red;" .absolute bottom=128 right=180}
+$\leftarrow$
+:::
+
+:::{style="font-size:50%;" .absolute bottom=65 right=220 .fragment}
+$$
+\begin{eqnarray}
+  \Delta Weights &=& LearningRate * Error * Input \\
+  &=& .3 * 1 * ⟨1,1⟩ \\
+  &=& ⟨.3,.3⟩
+\end{eqnarray}
+$$
+
+
+:::
+
+:::{style="font-size:50%;" .absolute bottom=-40 right=275 .fragment}
+$$
+\begin{eqnarray}
+  Weights_{new} &=& Weights_{old} + \Delta Weights \\
+  &=& ⟨.13, .38⟩ + ⟨.3, .3⟩ \\
+  &=& ⟨.43, .68⟩
+\end{eqnarray}
+$$
+:::
+
+## Learning from Error
+### Single-layer Perceptron
+
+![](../imgs/2nodeperceptron2.png){.absolute top=-10 right=0 width="45%"}
+
+::: {style="font-size:65%;"}
+::: columns
+::: {.column width="40%"}
+![](../imgs/logicalAnd.png)
+:::
+
+::: {.column width="60%"}
+```{r}
+#| echo: true
+#| code-line-numbers: "6,7"
+df = tibble(
+  x = c(0,1,0,1), 
+  y = c(0,0,1,1),
+  targets = c(0,0,0,1))
+
+w1 = .43 #What if we started with random weights 
+w2 = .68 #and didn't know what would work?
+
+df %>% mutate(
+  sum = x*w1 + y*w2,
+  output = ifelse(sum >= 1, 1, 0),
+  error = targets-output)
+```
+:::
+:::
+:::
+
+:::{style="font-size:200%;color:blue;" .absolute bottom=128 right=180}
+$\leftarrow$
+:::
+
+:::{style="font-size:200%;color:red;" .absolute bottom=360 right=600}
+$\rightarrow$
+:::
+
+:::{style="font-size:50%;" .absolute bottom=65 right=220}
+$$
+\begin{eqnarray}
+  \Delta Weights &=& LearningRate * Error * Input \\
+  &=& .3 * 1 * ⟨1,1⟩ \\
+  &=& ⟨.3,.3⟩
+\end{eqnarray}
+$$
+
+
+:::
+
+:::{style="font-size:50%;" .absolute bottom=-40 right=275}
+$$
+\begin{eqnarray}
+  Weights_{new} &=& Weights_{old} + \Delta Weights \\
+  &=& ⟨.13, .38⟩ + ⟨.3, .3⟩ \\
+  &=& ⟨.43, .68⟩
+\end{eqnarray}
+$$
+:::
+
+## But what if we have multiple layers?
+
+::::{style="font-size:75%;"}
+:::{.columns}
+::::{.column width=50%}
+![](../imgs/FFNs.png){.absolute top=30}
+::::
+
+::::{.column width=50%}
+:::{.absolute bottom=60}
+Now, some part of the error is due to the Input->Hidden weights, and some part due to the Hidden->Output weights
+:::
+::::
+:::
+::::
+
+## [Back-propagation for Gradient Descent]{style="font-size:90%;"}
+
+![](../imgs/backpropagation.png){width=55% .absolute left=0}
+
+![](../imgs/gradientdescent.png){width=55% .absolute right=0 .fragment}
+
+:::{.absolute left=0 bottom=0 style="font-size:45%" .fragment}
+Uses the chain rule of calculus
+$$
+\frac{d}{d x}[f(g(x))] = f'(g(x)) * g'(x)
+$$
+:::
+
+:::{.absolute right=0 bottom=0 .fragment width=40%}
+![](../imgs/chainrule.png)
+:::
+
+
+## Sigmoid Function & Derivative
+
+::: {style="font-size:100%;"}
+::: columns
+::: {.column width="50%"}
+Sigmoid/Logistic Function ![](../imgs/sigmoid.png)
+:::
+
+::: {.column width="50%"}
+First Derivative of Sigmoid ![](../imgs/sigmoidDeriv.png)
+:::
+:::
+:::
+
+## Vanishing & Exploding Gradient Problems
+
+![](../imgs/vanishingExplodingGradient.gif)
+
+## RelU Function & Derivative
+
+::: {style="font-size:100%;"}
+::: columns
+::: {.column width="50%"}
+RelU Function ![](../imgs/RelU.png)
+:::
+
+::: {.column width="50%"}
+First Derivative of RelU ![](../imgs/RelUDeriv.png)
+:::
+:::
+:::
+
+## Different Gradient Descent Algorithms
+
+::::{style="font-size:70%;"}
+:::{.columns}
+::::{.column width=50%}
+:::{.r-stack}
+![](../imgs/ANNmomentum.gif){.fragment .fade-out fragment-index=2}
+
+![](../imgs/momentum.gif){.fragment fragment-index=2 width=150%}
+:::
+::::
+
+::::{.column width=50%}
+:::{.fragment fragment-index=1}
+- "Vanilla" Gradient Descent: \
+  $\Delta W_t = - Lr * \frac{\partial C}{\partial w}$
+:::
+
+:::{.fragment fragment-index=2}
+- w/ Momentum: \
+  $\Delta W_t = - Lr * \frac{\partial C}{\partial w} + \Delta W_{t-1} * Decay$
+:::
+::::
+:::
+::::
+
+:::{.absolute bottom=0 style="font-size:40%;color:grey;"}
+Go here to play with this cool visualization tool and accompanying blog post:
+https://github.com/lilipads/gradient_descent_viz
+:::
+
+## Avoiding Overfitting
+
+::::{style="font-size:75%;"}
+:::{.columns}
+::::{.column width=50%}
+- Optimizing gradient descent is about performance on the training set:
+  - Improving overall fit
+  - Improving efficiency (time, number of samples, etc.)
+- But we still need to worry about **overfitting** the training data
+::::
+
+::::{.column width=50%}
+![](../imgs/cnnOverfitting.png)
+::::
+:::
+::::
+
+

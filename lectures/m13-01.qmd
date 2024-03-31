@@ -1,0 +1,57 @@
+---
+title: |
+  | Sequential Data &
+  | Recurrent Neural Networks
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 5
+  | Module 12
+format: 
+  revealjs:
+    css: style.css
+---
+
+## Recurrent Neural Networks
+
+:::{style="font-size:70%;"}
+- Adds feedback loops 
+  - Has "short term memory"
+  - Previous state(s) become part of the next input
+- Allows for processing sequential/temporal data, where order matters
+
+:::
+
+:::{.r-stack}
+
+::::{.fragment .fade-out fragment-index=1}
+![](../imgs/rnn-vs-fnn.png)
+::::
+
+::::{.fragment fragment-index=1}
+![](../imgs/rnn-vs-fnn2.png)
+::::
+:::
+
+## [Long Short-Term Memory (LSTM) Networks]{style="font-size:80%;"}
+### [A type of RNN]{style="font-size:80%;"}
+
+:::{style="font-size:70%;"}
+- Adds a "long-term memory" called the "cell state"
+- Adds a series of "gates" (filters) to control how current input, short term memory, and long-term memory interact
+
+:::
+
+![](../imgs/LSTM.webp)
+
+## [Long Short-Term Memory (LSTM) Networks]{style="font-size:80%;"}
+
+![](../imgs/unrolledlstm.webp)
+
+## [Long Short-Term Memory (LSTM) Networks]{style="font-size:80%;"}
+
+![](../imgs/lstm2.webp)
+
+## Transformers
+
+## Word2Vec?
+

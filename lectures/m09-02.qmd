@@ -5,7 +5,7 @@ title: |
   | (with penguins!)
 subtitle: | 
   | Behavioral Data Science in R II
-  | Unit 2
+  | Unit 4
   | Module 9
 format: 
   revealjs:

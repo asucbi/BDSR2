@@ -1,0 +1,244 @@
+---
+title: |
+  | Intro to ANNs, Part 2
+  | `Building Blocks`
+  | `& Architectures`
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 5
+  | Module 11
+format: 
+  revealjs:
+    css: style.css
+---
+
+## Basic Parts
+
+```{r}
+
+```
+
+```{css, echo=FALSE}
+.title {
+  font-size: 60px !important;
+}
+
+.subtitle {
+  font-size: 40px !important;
+  color: blue
+}
+```
+
+
+::::{style="font-size:60%;"}
+:::{.columns}
+::::{.column width=50% .incremental}
+- Layers
+  - Input
+  - Hidden
+  - Output
+- Nodes
+  - Hidden units
+    - Activation function(s)
+  - Bias Nodes
+- Weight matrices
+- Update rule(s)
+  - Cost function
+  - Gradient descent algorithm
+
+::::
+
+::::{.column width=50%}
+![](../imgs/biasNode.png)
+::::
+:::
+::::
+
+## Activation Functions
+
+::::{style="font-size:60%;"}
+:::{.columns}
+::::{.column width=32% .incremental}
+- We want a function that is:
+  - (Usually) non-linear
+  - Differentiable
+    - To enable backpropagation
+  - Avoids vanishing/exploding gradient problems
+
+::::
+
+::::{.column width=68%}
+![](../imgs/activationFunctions.png)
+
+::::
+:::
+::::
+
+## Spiking Neural Networks
+
+![](../imgs/SpikingNeuralNets.jpg)
+
+## Bias Nodes
+
+::: {style="font-size:100%;"}
+::: columns
+::: {.column width="50%"}
+![](../imgs/biasNode.png)
+:::
+
+::: {.column width="50%"}
+:::
+:::
+:::
+
+## Bias Nodes
+
+::: {style="font-size:100%;"}
+::: columns
+::: {.column width="50%"}
+![](../imgs/biasNodes1.png){width="75%"}
+
+![](../imgs/biasNodes2.png){.fragment width="75%"}
+:::
+
+::: {.column width="50%"}
+```{r, fig.width=4, fig.height=2.75}
+library(tidyverse)
+
+x = seq(-5,5,.01)
+w = c(.5,1,2)
+tmp = expand.grid(x=x,w=w)
+
+sigmoid <- function(x, w){
+  x_ = w*x
+  y = 1/(1+exp(-x_))
+}
+
+tmp$y = sigmoid(tmp$x, tmp$w)
+tmp$w = as.factor(tmp$w)
+
+ggplot(tmp, aes(x=x,y=y, color=w)) + geom_line()
+```
+
+::: fragment
+```{r, fig.width=4, fig.height=2.75}
+library(tidyverse)
+
+x = seq(-5,5,.01)
+w = c(1)
+b = c(-1,0,1)
+tmp = expand.grid(x=x,w=w,b=b)
+
+sigmoid <- function(x, w, b){
+  x_ = w*x + b
+  y = 1/(1+exp(-x_)) 
+}
+
+tmp$y = sigmoid(tmp$x, tmp$w, tmp$b)
+tmp$b = as.factor(tmp$b)
+
+ggplot(tmp, aes(x=x,y=y, color=b)) + geom_line()
+```
+:::
+:::
+:::
+:::
+
+## Weight Matrices
+
+![](../imgs/weightMatrix.png)
+
+## Types of ANNs {.scrollable}
+
+![](../imgs/neuralnetworksChart.jpg){width=200% height=200%}
+
+## Common ANN types
+### [Organized by Learning Algorithm]{style="font-size:70%;"}
+
+:::{.columns}
+::::{.column width=50%}
+:::{style="font-size:70%;"}
+- <U>Supervised</U>
+  - **Feedforward**
+  - Recurrent Neural Networks (RNNs)
+  - Convolutional Neural Networks (CNNs)
+- <U>Unsupervised</U>
+  - Autoencoders
+  - Generative Adversarial Networks (GANs)
+- <U>Reinforcement learning (Semi-supervised)</U>
+
+:::
+::::
+
+::::{.column width=50%}
+![](../imgs/FFNs.png){.absolute top=30}
+::::
+:::
+
+
+## Recurrent Neural Networks
+
+:::{style="font-size:70%;"}
+- Adds feedback loops 
+  - Has "short term memory"
+  - Previous state(s) become part of the next input
+- Allows for processing sequential/temporal data
+
+:::
+
+:::{.r-stack}
+
+::::{.fragment .fade-out fragment-index=1}
+![](../imgs/rnn-vs-fnn.png)
+::::
+
+::::{.fragment fragment-index=1}
+![](../imgs/rnn-vs-fnn2.png)
+::::
+:::
+
+## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
+
+- Spatial connectivity pattern
+- Allows for processing image data
+
+![](../imgs/cnnBasicArchitecture.png)
+
+## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
+
+::::{style="font-size:100%;"}
+:::{.columns}
+::::{.column width=50%}
+![](../imgs/convolution.gif)
+
+:::{.r-stack}
+::::{.fragment .fade-in-then-out fragment-index=2}
+![](../imgs/conv1.png){.absolute top=450 left=10 width=50%}
+::::
+
+::::{.fragment fragment-index=3}
+![](../imgs/conv2.png){.absolute top=450 left=15 width=49.5%}
+::::
+:::
+::::
+
+::::{.column width=50%}
+::::
+:::
+::::
+
+## Autoencoders
+
+- Learns to reproduce its own input
+- Develops a compressed representation of inputs
+
+![](../imgs/Autoencoder.png)
+
+## Generative Adversarial Networks (GANs)
+
+![](../imgs/GANs.jpg)
+
+## Reinforcement learning
+
+![](../imgs/DRN.png)
+

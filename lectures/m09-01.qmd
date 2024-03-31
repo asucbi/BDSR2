@@ -3,7 +3,7 @@ title: |
   | Overview of Clustering Techniques
 subtitle: | 
   | Behavioral Data Science in R II
-  | Unit 2
+  | Unit 4
   | Module 9
 format: 
   revealjs:
@@ -326,6 +326,8 @@ ggplot() + geom_point(data=preds, aes(x = Sepal.Length, y = Sepal.Width, color =
 ::::
 :::
 :::
+
+## DBSCAN implementation
 
 ```{r}
 #| echo: true

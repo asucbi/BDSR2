@@ -1,0 +1,205 @@
+---
+title: | 
+  | Intro to ANNs, Part 1
+  | A Brief History of
+  | `Artificial Neural` 
+  | `Networks`
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 5
+  | Module 11
+format: 
+  revealjs:
+    css: style.css
+---
+
+## Artificial Neural Networks
+
+```{r}
+library(tidymodels)
+library(tidyclust)
+library(tidyverse)
+```
+
+```{css, echo=FALSE}
+.title {
+  font-size: 60px !important;
+}
+
+.subtitle {
+  font-size: 40px !important;
+  color: blue
+}
+```
+
+:::{.fragment fragment-index=1}
+"A computational model inspired by the brain."
+:::
+
+::: columns
+::: {.column width="60%" .fragment fragment-index=2 }
+![](../imgs/synapse.jpg)
+:::
+
+::: {.column .fragment fragment-index=2 width="40%;"}
+:::{style="font-size:75%;"}
+- Neurons connect to each other to send signals 
+- These connections can have different strengths
+- Signals have an "all-or-none" quality
+:::
+:::
+:::
+
+## Hebbian Learning
+
+:::{.columns}
+::::{.column width=40%}
+![](../imgs/donaldhebb.jpg)
+
+:::{style="font-size:50%;"}
+"Neurons that fire together wire together." \
+Attributed to Donald Hebb, 1949
+:::
+
+::::
+
+::::{.column width=60%}
+
+
+![](../imgs/synapticPlasticity.jpg)
+::::
+:::
+
+## The McCulloch-Pitts Neuron
+
+::: columns
+::: {.column width="40%"}
+::: {style="font-size:50%;"}
+<U>"A logical calculus of the ideas immanent in nervous activity"</U>\
+McCulloch & Pitts, 1943
+
+"**Because of the "all-or-none" character of nervous activity, neural events and the relations among them can be treated by means of propositional logic. It is found that [...] for any logical expression satisfying certain conditions, one can find a net behaving in the fashion it describes.** 
+
+:::
+
+::::{style="font-size:65%;" .absolute top=470 right=350 .fragment fragment-index=1}
+
+$$
+f(x, threshold) =
+\\
+\begin{equation}
+  y =
+    \begin{cases}
+      1 \ , \  x\geq threshold
+      \\
+      0 \  , \ x<threshold
+    \end{cases}       
+\end{equation}
+$$
+::::
+
+:::
+
+::: {.column width="60%"}
+![](../imgs/mpneuron.png){.absolute top=70 width=50%}
+
+:::{.absolute top=350 left=500 .fragment fragment-index=1}
+[Step (a.k.a. staircase) function]{style="font-size:75%;"}
+```{r, fig.width=5, fig.height=3}
+x = seq(-5,5,.01)
+threshold = c(-1, 0, 1)
+tmp = expand.grid(x=x,threshold=threshold) %>% mutate(y = ifelse(x < threshold, 0, 1))
+tmp$threshold = as.factor(tmp$threshold)
+ggplot(tmp, aes(x=x,y=y, color=threshold)) + geom_line()
+```
+:::
+
+:::
+:::
+
+## Logical propositions
+
+![](../imgs/logicalOperators.png)
+
+## Logic Gates 
+### Example for `x & y`
+
+::: {style="font-size:70%;"}
+::: columns
+::: {.column width="40%"}
+![](../imgs/logicalAnd.png)
+:::
+
+::: {.column width="60%"}
+![](../imgs/2nodeperceptron2.png){.absolute top=0 right=0 width="45%"}
+
+:::{.fragment}
+```{r}
+#| echo: true
+df = tibble(
+  x = c(0,1,0,1), 
+  y = c(0,0,1,1),
+  targets = c(0,0,0,1))
+
+w1 = .5
+w2 = .5
+
+df %>% mutate(
+  sum = x*w1 + y*w2,
+  output = ifelse(sum >= 1, 1, 0),
+  error = targets-output)
+```
+:::
+
+
+::::
+:::
+::::
+
+## Rosenblatt's Perceptron (1958)
+
+![](../imgs/mkiperceptron.jpg)  
+
+Introduced the idea of learning weights by minimizing the difference between desired and actual output.
+
+## Minsky & Papert, 1969
+
+:::{.columns}
+::::{.column width=40% .incremental}
+:::{style="font-size:65%;"}
+- In their book *Perceptrons* (1969), Minsky & Papert showed that **single-layer perceptrons could not solve XOR**
+  - I.e. they are linear classifiers
+- Rosenblatt had already been working on multi-layer networks that *could* solve XOR...
+- ...but researchers misunderstood Minsky & Papert's argument, and thought neural networks were a dead end
+- Funding for ANN research dried up for over a decade (the "AI Winter")
+
+:::
+::::
+
+::::{.column width=60%}
+![](../imgs/minskypapert.jpg){.absolute top=100 left=500 width=45%}
+![](../imgs/logicalOperators.png){.absolute top=270 width=65%}
+::::
+:::
+
+## [*Parallel Distributed Processing* (1986)]{style="font-size:90%;"}
+### The (re-)discovery of <U>back-propagation</U>
+
+:::{.columns}
+::::{.column width=30%}
+![](../imgs/pdp.jpg)
+::::
+
+::::{.column width=70% .fragment}
+[Backpropagation (or "backprop") is a mathematical technique for calculating weight updates for multi-level networks]{style="font-size:60%;"}
+![](../imgs/backpropagation.png)
+::::
+:::
+
+## 2010's: The rise of Deep Neural Networks
+
+![](../imgs/deepnn.jpg)
+
+## 2010's: The rise of Deep Neural Networks
+![](../imgs/annBenchmarks.png)
+

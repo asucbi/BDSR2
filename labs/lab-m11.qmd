@@ -1,0 +1,290 @@
+---
+title: "Module 11 Lab: Peering into the Black Box"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this lab are:
+
+-   Understand how to construct simple neural networks (with 0, 1, and 2 hidden layers) from scratch
+-   Define the input data and target outputs that represent a logical proposition (XOR)
+-   Use matrix multiplication to conduct a "forward-pass", producing an output from an input
+-   Apply the back-propagation algorithm to train a neural network's weights and biases
+
+:::
+
+![](../imgs/blackbox.webp)
+
+Artificial neural networks are often described as a "black box," meaning that it can be very hard to understand *how* their structure and parameters relate to their outputs. This is especially true for modern, deep-learning models with huge numbers of parameters. Using the high-level programming interfaces for ANNs that are available today, it's possible to construct complex ANNs in just a few lines of code. But for learners, this can actually exacerbate the problem, because it puts many more layers of abstraction between us and the system we're trying to understand. That's why, in this lab, we're going to try to peer into the black box for a moment, by building a very simple ANN from scratch, with just enough parameters that you can still count them on your own two hands. 
+
+We are going to recreate an important transition in ANN history: the transition from the single-layer perceptron, which is limited to linear classification, to the multi-layer perceptron, which can do non-linear classification. We will do this using the XOR ("exclusive or") problem, which Minksy & Papert famously used to demonstrate the limitations of the single-layer perceptron. You will first build a single-layer perceptron, and show that it can solve a linear classification problem. Then, you'll show that it *fails* to solve the XOR problem. Finally, you will add a layer to your network, and show that it can now do non-linear classification. 
+
+# Exercise 1
+::: {.callout-note icon="false"}
+## Exercise 1.A
+
+Define the input and target output data for the logical proposition `!(x & y)` ("It is not the case that both x and y are true"):
+
+- Your input data should be a matrix with 2 columns and four rows, representing every possible combination of two binary variables (0's or 1's)
+- Your target output data should be a vector with 4 binary entries (or a 4x1 matrix), representing whether `!(x & y)` is true or false for each row of the input. It should be "false" (0) when x = y = 1, and "true" (1) otherwise. In other words, if at least one input is "false", the output will be "true."
+
+**NOTE:** Please put `set.seed(1)` at the top of **every** code chunk throughout this lab, which will ensure consistent results.
+
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 1.B
+
+Construct a single-layer perceptron model, which has just an input layer and an output layer. Define the following components:
+
+- a 2x1 weight matrix from inputs to output, with both weights randomly sampled from a uniform distribution between -1 and +1
+- a randomly initialized bias node for the input layer
+- a sigmoid activation function, which is $z = \sigma(y) = \frac{1}{1+e^{-y}}$
+- another function for the derivative of the sigmoid, which is $\delta = \sigma'(z) = \sigma(z) * (1 - \sigma(z))$
+- a learning rate parameter, which should be set to .1
+
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 1.C
+
+Construct a set of two nested loops to train the model. 
+  
+- The outer loop should be a `while` loop, with each iteration representing one epoch of training (one pass through each of the four inputs). Make it so that it stops when the mean-squared error goes below .001 *or* when you've hit 10,000 epochs. On each iteration through the loop, you should:
+  - Increment the current epoch by +1 (outside of both loops, you will need to define a variable for tracking the current epoch, e.g. `epoch = 0`)
+  - (Re-)initialize an empty vector for storing four errors (since there are four inputs in a single epoch)
+  - Run an inner loop representing a single epoch of training (described below)
+  - Calculate the mean-squared error for the current epoch, and append it to a vector for later plotting (you will need to define this vectore outside of both loops before you begin)
+  
+- The inner loop should iterate through the four inputs and do a forward pass (input->output->error) and backward pass (error->gradient->parameter change). On each iteration, you should: 
+  - Grab one row of the input set (make sure it remains a 1x2 matrix--not a vector) and the corresponding target
+  - Use matrix multiplication to send the input through the weights to get $y$ (the weighted/summed input to the next layer)
+  - Pass $y$ through the sigmoid activation function to get $z$ (the output)
+  - Calculate the error as $E = Target - Output$
+    - Append the current error to a vector, which will end up saving the four errors for a single epoch. You will need to define the empty vector *outside* of this loop, so that it gets re-initialized before each epoch
+  - Use back-propagation to update parameters
+    - Get $\delta$ (the gradient of the cost function) as $E * \sigma'(z)$
+    - Get the change in weights as $\delta * Input * LearningRate$
+      - Don't forget to transpose the input to make it a 2x1 matrix! Otherwise, you'll be multiplying a 1x1 matrix with a 1x2 matrix, which won't work--for matrix multiplication, the number of rows in the first matrix must match the number of columns in the second matrix
+    - Get the change in the bias node as $\delta * LearningRate$
+    - Update the weights and biases (e.g. $W_{new} = W_{current} + Change$)
+
+**NOTE:** When you're first setting this up, you may want to make the outer loop a **for-loop** (rather than while-loop) that goes for some smaller number of epochs (e.g. 100). That way, you can make sure everything is working as intended before you commit to running more iterations. But you should change it back to a while-loop once it's working.
+:::
+
+::: {.callout-note icon="false"}
+## Exercise 1.D
+
+Plot the mean-squared error of the network across epochs.
+:::
+
+```{r}
+
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 1.E
+
+Show the model's predictions for each of the four inputs. This amounts to running a single epoch with *just* the forward pass (no more training), and printing the output that you get for each input. 
+:::
+
+```{r}
+
+```
+
+# Exercise 2
+::: {.callout-note icon="false"}
+## Exercise 2.A
+
+Re-define the target output vector to correspond to the XOR ("exclusive or") problem. Now, the output should be "true" (1) when the two inputs have *different* values (x = 1 and y = 0, or vice versa), but "false" (0) when the inputs are both 1's or both 0's.
+
+Then, re-initialize and re-run the single-layer perceptron you built above, plot the MSE, and display the model's predictions.
+:::
+
+```{r}
+
+```
+
+# Exercise 3
+::: {.callout-note icon="false"}
+## Exercise 3.A
+
+Now let's build a multi-layer perceptron, by adding a single hidden layer with two hidden units and bias node. This time, your weight matrix from the input->hidden layer should be a 2x2 matrix (four weights) and your input->hidden bias should be a vector of 2 values. Your hidden->output weights and biases will have the same dimensions as what you used in the previous models.
+
+You will need to adjust your backpropagation steps to propagate the error back another layer:
+
+- First, get $\delta$ for the output layer as we did before: $\delta^{h->o}$ = $E * \sigma'(z)$
+- Then, compute $\delta^{i->h}$ for the hidden layer by sending $\delta^{h->o}$ through the weights from hidden to the output layer (transposed, so we move in reverse), and multiplying by the derivative of the hidden layer activations
+
+As before, plot your MSE across training iterations and print the model's predictions at the end.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 3.B
+
+Add momentum to your model. Momentum simply adds the weight change from the *previous* step to the weight change for the *current* step, with the influence of the previous step scaled down by a decay factor. This functions to build up speed as you move down the gradient of the cost function--if you made a large adjustment on the last step, it will make the current change larger as well.
+
+Outside of both loops, you will need to define a variable representing the momentum for each weight matrix, and each bias node/vector (so there should be four momentum variables). These should be set to 0 to start. You will also need to define a decay term (set it to .9). 
+
+Then, when you are changing weights, simply **add** $momentum*decay$. At the end of each training iteration (so at the bottom of the inner for-loop), set the momentum variables to be equal to the weight change on the current step.
+
+Again, plot your MSE over epochs and print the model's predictions.
+:::
+
+```{r}
+
+```
+
+# Exercise 4
+::: {.callout-note icon="false"}
+## Exercise 4.A
+
+Below, I have defined the inputs and targets for a different non-linear classification problem. Now, each input has *four* units rather than two, and each output has *two* units rather than four. Let's see if we can get a neural network to categorize whether there are two 1's or 0's in a row. For the first two inputs, this is *not* the case, and we'll ask the network to output a [0, 1]. For the second two inputs, it *is* the case, and we'll ask the network to output a [1, 0].
+
+Adjust your network to have *four* nodes in the hidden layer. You will need to change all of your weight matrices and bias nodes accordingly. The weight matrix should be an $m x n$ matrix, where $m$ is the number of nodes in the earlier layer, and $n$ is the number of nodes in the next layer. The bias nodes should be represented by a vector of $n$ values (a bias term for every node in the next layer).
+
+Also, note that when you calculate your error on each training iteration, it will now be a vector of two values. When you save the error, we want to turn it into a single value, so you should *sum the absolute values of the error vector* (This is called the L1 norm of the vector--a measure of the magnitude of a vector), and store that result as your error for the current iteration. <U>However, make sure you don't save over your original error vector when you do this, because you still need it in vector form for the backpropagation steps.</U>
+
+:::
+
+```{r}
+Inputs <- matrix(c(1, 0, 1, 0,
+                   0, 1, 0, 1,
+                   1, 1, 0, 0,
+                   0, 0, 1, 1), ncol = 4, byrow = TRUE)
+
+Targets <- matrix(c(1, 0,
+                    1, 0,
+                    0, 1,
+                    0, 1), ncol = 2, byrow = TRUE)
+```
+
+# Exercise 5
+
+For the final boss, let's see if we can take on some real data! We'll use the 'Human Activity Recognition' dataset that we've encountered a couple times before in this course. The predictors are measurements from cell phone sensors taken while participants were engaging in one of 6 activities. We'll try to predict the activity being performed from the sensor data.
+
+The original dataset had 112 predictor variables and several thousand observations, but to make things a bit more manageable, I've trimmed it down to 20 predictors and 300 observations. I have also normalized all of the predictors in advance, so no further pre-processing steps are needed.
+
+```{r, eval=F}
+
+load("HumanActivityRecognition_forANN.Rdata")
+
+ggplot(df, aes(x = Activity, fill = Activity))+geom_bar()
+
+ggplot(df, aes(x = ACCELEROMETER_X_mean, y = ACCELEROMETER_Y_mean, color = as.factor(Activity))) + geom_point()
+```
+
+Note that our outcome variable, `Activity`, is a factor variable. When you look at that column of your dataset, you will see it represented as a character string (e.g. "Laying"). Obviously, our neural network can't directly process a character string, so in order to use the `Activity` column as our target output, we will need to somehow convert it to a vector of 0's and 1's, with a distinct pattern for each level of `Activity`.
+
+Fortunately, it turns out that factor variables are *already* encoded this way behind the scenes. You can extract the "contrast-coding" matrix for any factor variable like this:
+
+```{r, eval=F}
+ActivityCoding <- contrasts(df$Activity)
+ActivityCoding
+```
+Then, to get the contrast-coding for a **single** observation (e.g. for row 127, which is "Standing"), we can convert the factor to a number using `as.numeric()`, which will tell us which row of the above matrix represents that factor level. This will allow us to represent our outcome variable as a matrix, which we can then use as the target output pattern for our model:
+
+```{r, eval=F}
+ActivityCoding[as.numeric(df$Activity[127]),]
+```
+
+::: {.callout-note icon="false"}
+## Exercise 5.A
+
+To accurately predict which `Activity` was being performed, we will need to make a slightly more complex network. Below, initialize the weight matrices and bias parameters for a neural network with:
+
+- **20 input nodes** (corresponding the 20 predictor variables in our dataframe)
+- **FIVE output nodes** in the (corresponding the the 5-column contrast-coding for `Activity`, shown above)
+- **TWO hidden layers**, with **12 nodes** in each 
+- **THREE bias vectors** (one for each of the two hidden layers, and one for the output layer)
+
+You will need to think through the correct dimensions for each of your weight matrices and bias vectors. 
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 5.B
+
+Next, modify your code for the training loop appropriately. You will need to:
+
+- Add a two additional momentum variables, for the weights and biases of the new layer
+- Modify how you get the input and target on each iteration.
+  - Each input should be a 1x20 matrix, drawn from columns 1:20 for a single row of the dataframe
+  - Each target should be the contrast-coding for the outcome variable in the same row as the current input (see my code above for how to get that)
+- Add an additional step to your forward pass, your backwards pass, and the updating of weights/biases/momentums to account for your additional layer. 
+- **IMPORTANT**: Set the maximum number of epochs to 1000 (previously, it was 10,000), since this more complex model will take longer to train
+  - While testing your model, it can be helpful to print the current epoch to the console (e.g. `print(cur_epoch)` command), so you can see how quickly it's running. It should not take more than a minute or two to run. But make sure to remove the print command before you render your assignment, so as not to clutter up the output.
+
+At the end of training, plot the MSEs over epochs.
+:::
+
+```{r}
+
+```
+
+::: {.callout-note icon="false"}
+## Exercise 5.C
+
+Finally, get the trained model's predictions. As before, you can run a single epoch (one loop through the full dataset), doing **just the forward pass** (no more training). For each row of the data, use this code below to turn the network's output layer into a prediction (changing `YOUR_FINAL_OUTPUT_LAYER` to whatever you've named it):
+
+`pred = levels(df$Activity)[which.min(rowSums(abs(sweep(ActivityCoding, 2, YOUR_FINAL_OUTPUT_LAYER))))]`
+
+Save all of those predictions in a vector called `preds`. Then, use these next two lines to compute your model's accuracy and show the result:
+
+`Accuracy = mean(df$Activity==preds)`
+`Accuracy`
+
+(Note that we're just getting accuracy on the training set here. In real scenarios, we always want to make a test-train split, but we're not going to worry )
+:::
+
+```{r}
+
+```
+
+## You're done!
+
+But just for fun, you can run the code below to see how your ANN's accuracy compares to what you get from a Naive Bayes model.
+
+```{r, eval=F}
+library(tidymodels)
+library(discrim)
+
+rec <- recipe(Activity ~ ., df)
+
+nb_spec <- 
+  naive_Bayes() %>%
+  set_mode("classification") %>%
+  set_engine("naivebayes")
+
+nb_fit <- workflow() %>% 
+  add_recipe(rec) %>% 
+  add_model(nb_spec) %>% 
+  fit(data = df)
+
+nb_fit %>% 
+  augment(df) %>% 
+  metrics(truth=Activity, estimate = .pred_class)
+```
+
+
+

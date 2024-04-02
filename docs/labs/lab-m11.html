@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Ben Falandays">
+
+<title>Module 11 Lab: Peering into the Black Box</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="lab-m11_files/libs/clipboard/clipboard.min.js"></script>
+<script src="lab-m11_files/libs/quarto-html/quarto.js"></script>
+<script src="lab-m11_files/libs/quarto-html/popper.min.js"></script>
+<script src="lab-m11_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="lab-m11_files/libs/quarto-html/anchor.min.js"></script>
+<link href="lab-m11_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="lab-m11_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="lab-m11_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="lab-m11_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="lab-m11_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body>
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active" data-toc-expanded="2">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#exercise-1" id="toc-exercise-1" class="nav-link active" data-scroll-target="#exercise-1">Exercise 1</a></li>
+  <li><a href="#exercise-2" id="toc-exercise-2" class="nav-link" data-scroll-target="#exercise-2">Exercise 2</a></li>
+  <li><a href="#exercise-3" id="toc-exercise-3" class="nav-link" data-scroll-target="#exercise-3">Exercise 3</a></li>
+  <li><a href="#exercise-4" id="toc-exercise-4" class="nav-link" data-scroll-target="#exercise-4">Exercise 4</a></li>
+  <li><a href="#exercise-5" id="toc-exercise-5" class="nav-link" data-scroll-target="#exercise-5">Exercise 5</a>
+  <ul class="collapse">
+  <li><a href="#youre-done" id="toc-youre-done" class="nav-link" data-scroll-target="#youre-done">You’re done!</a></li>
+  </ul></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Module 11 Lab: Peering into the Black Box</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    <div>
+    <div class="quarto-title-meta-heading">Author</div>
+    <div class="quarto-title-meta-contents">
+             <p>Ben Falandays </p>
+          </div>
+  </div>
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<div class="callout callout-style-default callout-caution no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Learning Objectives
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Our learning objectives for this lab are:</p>
+<ul>
+<li>Understand how to construct simple neural networks (with 0, 1, and 2 hidden layers) from scratch</li>
+<li>Define the input data and target outputs that represent a logical proposition (XOR)</li>
+<li>Use matrix multiplication to conduct a “forward-pass”, producing an output from an input</li>
+<li>Apply the back-propagation algorithm to train a neural network’s weights and biases</li>
+</ul>
+</div>
+</div>
+<p><img src="../imgs/blackbox.webp" class="img-fluid"></p>
+<p>Artificial neural networks are often described as a “black box,” meaning that it can be very hard to understand <em>how</em> their structure and parameters relate to their outputs. This is especially true for modern, deep-learning models with huge numbers of parameters. Using the high-level programming interfaces for ANNs that are available today, it’s possible to construct complex ANNs in just a few lines of code. But for learners, this can actually exacerbate the problem, because it puts many more layers of abstraction between us and the system we’re trying to understand. That’s why, in this lab, we’re going to try to peer into the black box for a moment, by building a very simple ANN from scratch, with just enough parameters that you can still count them on your own two hands.</p>
+<p>We are going to recreate an important transition in ANN history: the transition from the single-layer perceptron, which is limited to linear classification, to the multi-layer perceptron, which can do non-linear classification. We will do this using the XOR (“exclusive or”) problem, which Minksy &amp; Papert famously used to demonstrate the limitations of the single-layer perceptron. You will first build a single-layer perceptron, and show that it can solve a linear classification problem. Then, you’ll show that it <em>fails</em> to solve the XOR problem. Finally, you will add a layer to your network, and show that it can now do non-linear classification.</p>
+<section id="exercise-1" class="level1">
+<h1>Exercise 1</h1>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 1.A
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Define the input and target output data for the logical proposition <code>!(x &amp; y)</code> (“It is not the case that both x and y are true”):</p>
+<ul>
+<li>Your input data should be a matrix with 2 columns and four rows, representing every possible combination of two binary variables (0’s or 1’s)</li>
+<li>Your target output data should be a vector with 4 binary entries (or a 4x1 matrix), representing whether <code>!(x &amp; y)</code> is true or false for each row of the input. It should be “false” (0) when x = y = 1, and “true” (1) otherwise. In other words, if at least one input is “false”, the output will be “true.”</li>
+</ul>
+<p><strong>NOTE:</strong> Please put <code>set.seed(1)</code> at the top of <strong>every</strong> code chunk throughout this lab, which will ensure consistent results.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 1.B
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Construct a single-layer perceptron model, which has just an input layer and an output layer. Define the following components:</p>
+<ul>
+<li>a 2x1 weight matrix from inputs to output, with both weights randomly sampled from a uniform distribution between -1 and +1</li>
+<li>a randomly initialized bias node for the input layer</li>
+<li>a sigmoid activation function, which is <span class="math inline">\(z = \sigma(y) = \frac{1}{1+e^{-y}}\)</span></li>
+<li>another function for the derivative of the sigmoid, which is <span class="math inline">\(\delta = \sigma'(z) = \sigma(z) * (1 - \sigma(z))\)</span></li>
+<li>a learning rate parameter, which should be set to .1</li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 1.C
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Construct a set of two nested loops to train the model.</p>
+<ul>
+<li>The outer loop should be a <code>while</code> loop, with each iteration representing one epoch of training (one pass through each of the four inputs). Make it so that it stops when the mean-squared error goes below .001 <em>or</em> when you’ve hit 10,000 epochs. On each iteration through the loop, you should:
+<ul>
+<li>Increment the current epoch by +1 (outside of both loops, you will need to define a variable for tracking the current epoch, e.g.&nbsp;<code>epoch = 0</code>)</li>
+<li>(Re-)initialize an empty vector for storing four errors (since there are four inputs in a single epoch)</li>
+<li>Run an inner loop representing a single epoch of training (described below)</li>
+<li>Calculate the mean-squared error for the current epoch, and append it to a vector for later plotting (you will need to define this vectore outside of both loops before you begin)</li>
+</ul></li>
+<li>The inner loop should iterate through the four inputs and do a forward pass (input-&gt;output-&gt;error) and backward pass (error-&gt;gradient-&gt;parameter change). On each iteration, you should:
+<ul>
+<li>Grab one row of the input set (make sure it remains a 1x2 matrix–not a vector) and the corresponding target</li>
+<li>Use matrix multiplication to send the input through the weights to get <span class="math inline">\(y\)</span> (the weighted/summed input to the next layer)</li>
+<li>Pass <span class="math inline">\(y\)</span> through the sigmoid activation function to get <span class="math inline">\(z\)</span> (the output)</li>
+<li>Calculate the error as <span class="math inline">\(E = Target - Output\)</span>
+<ul>
+<li>Append the current error to a vector, which will end up saving the four errors for a single epoch. You will need to define the empty vector <em>outside</em> of this loop, so that it gets re-initialized before each epoch</li>
+</ul></li>
+<li>Use back-propagation to update parameters
+<ul>
+<li>Get <span class="math inline">\(\delta\)</span> (the gradient of the cost function) as <span class="math inline">\(E * \sigma'(z)\)</span></li>
+<li>Get the change in weights as <span class="math inline">\(\delta * Input * LearningRate\)</span>
+<ul>
+<li>Don’t forget to transpose the input to make it a 2x1 matrix! Otherwise, you’ll be multiplying a 1x1 matrix with a 1x2 matrix, which won’t work–for matrix multiplication, the number of rows in the first matrix must match the number of columns in the second matrix</li>
+</ul></li>
+<li>Get the change in the bias node as <span class="math inline">\(\delta * LearningRate\)</span></li>
+<li>Update the weights and biases (e.g.&nbsp;<span class="math inline">\(W_{new} = W_{current} + Change\)</span>)</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><strong>NOTE:</strong> When you’re first setting this up, you may want to make the outer loop a <strong>for-loop</strong> (rather than while-loop) that goes for some smaller number of epochs (e.g.&nbsp;100). That way, you can make sure everything is working as intended before you commit to running more iterations. But you should change it back to a while-loop once it’s working.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 1.D
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Plot the mean-squared error of the network across epochs.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 1.E
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Show the model’s predictions for each of the four inputs. This amounts to running a single epoch with <em>just</em> the forward pass (no more training), and printing the output that you get for each input.</p>
+</div>
+</div>
+</section>
+<section id="exercise-2" class="level1">
+<h1>Exercise 2</h1>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 2.A
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Re-define the target output vector to correspond to the XOR (“exclusive or”) problem. Now, the output should be “true” (1) when the two inputs have <em>different</em> values (x = 1 and y = 0, or vice versa), but “false” (0) when the inputs are both 1’s or both 0’s.</p>
+<p>Then, re-initialize and re-run the single-layer perceptron you built above, plot the MSE, and display the model’s predictions.</p>
+</div>
+</div>
+</section>
+<section id="exercise-3" class="level1">
+<h1>Exercise 3</h1>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 3.A
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Now let’s build a multi-layer perceptron, by adding a single hidden layer with two hidden units and bias node. This time, your weight matrix from the input-&gt;hidden layer should be a 2x2 matrix (four weights) and your input-&gt;hidden bias should be a vector of 2 values. Your hidden-&gt;output weights and biases will have the same dimensions as what you used in the previous models.</p>
+<p>You will need to adjust your backpropagation steps to propagate the error back another layer:</p>
+<ul>
+<li>First, get <span class="math inline">\(\delta\)</span> for the output layer as we did before: <span class="math inline">\(\delta^{h-&gt;o}\)</span> = <span class="math inline">\(E * \sigma'(z)\)</span></li>
+<li>Then, compute <span class="math inline">\(\delta^{i-&gt;h}\)</span> for the hidden layer by sending <span class="math inline">\(\delta^{h-&gt;o}\)</span> through the weights from hidden to the output layer (transposed, so we move in reverse), and multiplying by the derivative of the hidden layer activations</li>
+</ul>
+<p>As before, plot your MSE across training iterations and print the model’s predictions at the end.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 3.B
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Add momentum to your model. Momentum simply adds the weight change from the <em>previous</em> step to the weight change for the <em>current</em> step, with the influence of the previous step scaled down by a decay factor. This functions to build up speed as you move down the gradient of the cost function–if you made a large adjustment on the last step, it will make the current change larger as well.</p>
+<p>Outside of both loops, you will need to define a variable representing the momentum for each weight matrix, and each bias node/vector (so there should be four momentum variables). These should be set to 0 to start. You will also need to define a decay term (set it to .9).</p>
+<p>Then, when you are changing weights, simply <strong>add</strong> <span class="math inline">\(momentum*decay\)</span>. At the end of each training iteration (so at the bottom of the inner for-loop), set the momentum variables to be equal to the weight change on the current step.</p>
+<p>Again, plot your MSE over epochs and print the model’s predictions.</p>
+</div>
+</div>
+</section>
+<section id="exercise-4" class="level1">
+<h1>Exercise 4</h1>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 4.A
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Below, I have defined the inputs and targets for a different non-linear classification problem. Now, each input has <em>four</em> units rather than two, and each output has <em>two</em> units rather than four. Let’s see if we can get a neural network to categorize whether there are two 1’s or 0’s in a row. For the first two inputs, this is <em>not</em> the case, and we’ll ask the network to output a [0, 1]. For the second two inputs, it <em>is</em> the case, and we’ll ask the network to output a [1, 0].</p>
+<p>Adjust your network to have <em>four</em> nodes in the hidden layer. You will need to change all of your weight matrices and bias nodes accordingly. The weight matrix should be an <span class="math inline">\(m x n\)</span> matrix, where <span class="math inline">\(m\)</span> is the number of nodes in the earlier layer, and <span class="math inline">\(n\)</span> is the number of nodes in the next layer. The bias nodes should be represented by a vector of <span class="math inline">\(n\)</span> values (a bias term for every node in the next layer).</p>
+<p>Also, note that when you calculate your error on each training iteration, it will now be a vector of two values. When you save the error, we want to turn it into a single value, so you should <em>sum the absolute values of the error vector</em> (This is called the L1 norm of the vector–a measure of the magnitude of a vector), and store that result as your error for the current iteration. <u>However, make sure you don’t save over your original error vector when you do this, because you still need it in vector form for the backpropagation steps.</u></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>Inputs <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                   <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">1</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                   <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">0</span>, <span class="dv">0</span>,</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>                   <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">1</span>), <span class="at">ncol =</span> <span class="dv">4</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>Targets <span class="ot">&lt;-</span> <span class="fu">matrix</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">0</span>,</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>                    <span class="dv">1</span>, <span class="dv">0</span>,</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>                    <span class="dv">0</span>, <span class="dv">1</span>,</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>                    <span class="dv">0</span>, <span class="dv">1</span>), <span class="at">ncol =</span> <span class="dv">2</span>, <span class="at">byrow =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="exercise-5" class="level1">
+<h1>Exercise 5</h1>
+<p>For the final boss, let’s see if we can take on some real data! We’ll use the ‘Human Activity Recognition’ dataset that we’ve encountered a couple times before in this course. The predictors are measurements from cell phone sensors taken while participants were engaging in one of 6 activities. We’ll try to predict the activity being performed from the sensor data.</p>
+<p>The original dataset had 112 predictor variables and several thousand observations, but to make things a bit more manageable, I’ve trimmed it down to 20 predictors and 300 observations. I have also normalized all of the predictors in advance, so no further pre-processing steps are needed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"HumanActivityRecognition_forANN.Rdata"</span>)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> Activity, <span class="at">fill =</span> Activity))<span class="sc">+</span><span class="fu">geom_bar</span>()</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(df, <span class="fu">aes</span>(<span class="at">x =</span> ACCELEROMETER_X_mean, <span class="at">y =</span> ACCELEROMETER_Y_mean, <span class="at">color =</span> <span class="fu">as.factor</span>(Activity))) <span class="sc">+</span> <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that our outcome variable, <code>Activity</code>, is a factor variable. When you look at that column of your dataset, you will see it represented as a character string (e.g.&nbsp;“Laying”). Obviously, our neural network can’t directly process a character string, so in order to use the <code>Activity</code> column as our target output, we will need to somehow convert it to a vector of 0’s and 1’s, with a distinct pattern for each level of <code>Activity</code>.</p>
+<p>Fortunately, it turns out that factor variables are <em>already</em> encoded this way behind the scenes. You can extract the “contrast-coding” matrix for any factor variable like this:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>ActivityCoding <span class="ot">&lt;-</span> <span class="fu">contrasts</span>(df<span class="sc">$</span>Activity)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ActivityCoding</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Then, to get the contrast-coding for a <strong>single</strong> observation (e.g.&nbsp;for row 127, which is “Standing”), we can convert the factor to a number using <code>as.numeric()</code>, which will tell us which row of the above matrix represents that factor level. This will allow us to represent our outcome variable as a matrix, which we can then use as the target output pattern for our model:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>ActivityCoding[<span class="fu">as.numeric</span>(df<span class="sc">$</span>Activity[<span class="dv">127</span>]),]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 5.A
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>To accurately predict which <code>Activity</code> was being performed, we will need to make a slightly more complex network. Below, initialize the weight matrices and bias parameters for a neural network with:</p>
+<ul>
+<li><strong>20 input nodes</strong> (corresponding the 20 predictor variables in our dataframe)</li>
+<li><strong>FIVE output nodes</strong> in the (corresponding the the 5-column contrast-coding for <code>Activity</code>, shown above)</li>
+<li><strong>TWO hidden layers</strong>, with <strong>12 nodes</strong> in each</li>
+<li><strong>THREE bias vectors</strong> (one for each of the two hidden layers, and one for the output layer)</li>
+</ul>
+<p>You will need to think through the correct dimensions for each of your weight matrices and bias vectors.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 5.B
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Next, modify your code for the training loop appropriately. You will need to:</p>
+<ul>
+<li>Add a two additional momentum variables, for the weights and biases of the new layer</li>
+<li>Modify how you get the input and target on each iteration.
+<ul>
+<li>Each input should be a 1x20 matrix, drawn from columns 1:20 for a single row of the dataframe</li>
+<li>Each target should be the contrast-coding for the outcome variable in the same row as the current input (see my code above for how to get that)</li>
+</ul></li>
+<li>Add an additional step to your forward pass, your backwards pass, and the updating of weights/biases/momentums to account for your additional layer.</li>
+<li><strong>IMPORTANT</strong>: Set the maximum number of epochs to 1000 (previously, it was 10,000), since this more complex model will take longer to train
+<ul>
+<li>While testing your model, it can be helpful to print the current epoch to the console (e.g.&nbsp;<code>print(cur_epoch)</code> command), so you can see how quickly it’s running. It should not take more than a minute or two to run. But make sure to remove the print command before you render your assignment, so as not to clutter up the output.</li>
+</ul></li>
+</ul>
+<p>At the end of training, plot the MSEs over epochs.</p>
+</div>
+</div>
+<div class="callout callout-style-default callout-note no-icon callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon no-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Exercise 5.C
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Finally, get the trained model’s predictions. As before, you can run a single epoch (one loop through the full dataset), doing <strong>just the forward pass</strong> (no more training). For each row of the data, use this code below to turn the network’s output layer into a prediction (changing <code>YOUR_FINAL_OUTPUT_LAYER</code> to whatever you’ve named it):</p>
+<p><code>pred = levels(df$Activity)[which.min(rowSums(abs(sweep(ActivityCoding, 2, YOUR_FINAL_OUTPUT_LAYER))))]</code></p>
+<p>Save all of those predictions in a vector called <code>preds</code>. Then, use these next two lines to compute your model’s accuracy and show the result:</p>
+<p><code>Accuracy = mean(df$Activity==preds)</code> <code>Accuracy</code></p>
+<p>(Note that we’re just getting accuracy on the training set here. In real scenarios, we always want to make a test-train split, but we’re not going to worry )</p>
+</div>
+</div>
+<section id="youre-done" class="level2">
+<h2 class="anchored" data-anchor-id="youre-done">You’re done!</h2>
+<p>But just for fun, you can run the code below to see how your ANN’s accuracy compares to what you get from a Naive Bayes model.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidymodels)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(discrim)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>rec <span class="ot">&lt;-</span> <span class="fu">recipe</span>(Activity <span class="sc">~</span> ., df)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>nb_spec <span class="ot">&lt;-</span> </span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">naive_Bayes</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_mode</span>(<span class="st">"classification"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_engine</span>(<span class="st">"naivebayes"</span>)</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>nb_fit <span class="ot">&lt;-</span> <span class="fu">workflow</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_recipe</span>(rec) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">add_model</span>(nb_spec) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">fit</span>(<span class="at">data =</span> df)</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>nb_fit <span class="sc">%&gt;%</span> </span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">augment</span>(df) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metrics</span>(<span class="at">truth=</span>Activity, <span class="at">estimate =</span> .pred_class)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

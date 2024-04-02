@@ -418,8 +418,10 @@ err_threshold = .001
 MSE = 1 # initially set the error to some value above the threshold
 max_epochs=10000
 
+epoch=0
 MSEs=c() # make an empty vector for storing mean sq errors
-while(MSE > err_threshold){
+while(MSE > err_threshold & epoch <= max_epochs){
+  epoch = epoch+1
 
   errs=c() # make an empty vector for storing errors
   for(i in 1:4){ # loop through each of our 4 input vectors
@@ -521,9 +523,12 @@ decay = .9 # set a decay, which weights the addition of the previous change
 
 err_threshold = .001
 MSE = 1 # initially set the error to some value above the threshold
+
 max_epochs=10000
+epoch=0
 MSEs=c() # make an empty vector for storing mean sq errors
-while(MSE > err_threshold){
+while(MSE > err_threshold & epoch <= max_epochs){
+  epoch = epoch+1
   errs=c() # make an empty vector for storing errors
   for(i in 1:4){ # loop through each of our 4 input vectors
     I = Inputs[i, , drop=F] # get the current input
@@ -712,6 +717,7 @@ plot(nnet, rep="best")
   max-height: 100% !important;
 }
 ```
+
 ```{r}
 set.seed(1)
 ```

@@ -130,6 +130,8 @@ You will need to adjust your backpropagation steps to propagate the error back a
 - Then, compute $\delta^{i->h}$ for the hidden layer by sending $\delta^{h->o}$ through the weights from hidden to the output layer (transposed, so we move in reverse), and multiplying by the derivative of the hidden layer activations
 
 As before, plot your MSE across training iterations and print the model's predictions at the end.
+
+**NOTE:** If your model does not look like it solves the XOR problem (i.e. if the final MSE is still > .01), try changing the random seed. Sometimes, this simplest-possible multi-layer perceptron can get stuck in a local minimum, depending upon the initial weights/biases. Alternatively, adding at least 1 more node to your hidden layer should fix it.
 :::
 
 ```{r}

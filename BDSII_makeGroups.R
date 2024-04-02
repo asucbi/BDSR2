@@ -9,7 +9,7 @@ students = c('Ayah',
              'Yasaman',
              'Alex',
              'Natalie',
-             'Emma',
+             'NA',
              'Gabby'
              )
 groups = list()

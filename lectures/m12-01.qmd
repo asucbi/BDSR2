@@ -1,18 +1,217 @@
 ---
 title: |
-  | Computer Vision &
-  | Convolutional Neural Networks
+  | Intro to
+  | `Computer Vision` &
+  | `Convolutional Neural Networks`
 subtitle: | 
   | Behavioral Data Science in R II
   | Unit 5
   | Module 12
 format: 
   revealjs:
+    width: 1200
     css: style.css
 ---
 
+## Computer vision
+
+```{r}
+library(tidyverse)
+```
+
+```{css, echo=FALSE}
+.title {
+  font-size: 60px !important;
+}
+
+.subtitle {
+  font-size: 40px !important;
+  color: blue
+}
+```
+
+![](../imgs/computervision.jpg)
+
+## Brief History of Computer Vision
+
+![](../imgs/annBenchmarks.png)
+
+## Brief History of Computer Vision
+### Neocognitron (1980)
+
+::::{style="font-size:100%;"}
+:::{.columns}
+::::{.column width=50%}
+![](../imgs/neocognitron.webp)
+::::
+
+::::{.column width=50% style="font-size:75%;"}
+- Introduced the basic idea of breaking the task of computer vision into:
+  - Feature extraction
+  - Pattern recognition
+- Introduced convolutions for position-invariant feature detection
+
+::::
+:::
+::::
+
+## Brief History of Computer Vision
+### MNIST database and LeNet (1989–1998)
+
+::::{style="font-size:100%;"}
+:::{.columns}
+::::{.column width=30%}
+![](../imgs/MNIST.jpg)
+::::
+
+::::{.column width=70%}
+![](../imgs/LeNet.webp)
+
+::::
+:::
+::::
+
+
+## Brief History of Computer Vision
+### ImageNet database and competition
+
+::::{style="font-size:75%;"}
+:::{.columns}
+::::{.column width=30%}
+![](../imgs/wordnet.png)
+WordNet semantic database
+::::
+
+::::{.column width=70% .fragment}
+![](../imgs/imagenet.png)
+::::
+:::
+::::
+
+## Brief History of Computer Vision
+### ImageNet database and competition
+
+::::{style="font-size:60%;"}
+:::{.columns}
+::::{.column width=60%}
+![](../imgs/imagenet_winners.webp)
+
+::::
+
+::::{.column width=40% .incremental}
+- AlexNet (2012) kicked off the computer vision revolution with CNNs
+- Subsequent years saw trend of increasing depth
+  - Remember the "vanishing gradient" problem
+
+::::
+:::
+::::
+
+## Brief History of Computer Vision
+### ImageNet database and competition
+
+::::{style="font-size:60%;"}
+:::{.columns}
+::::{.column width=60%}
+![](../imgs/imagenet_winners.webp)
+
+::::
+
+::::{.column width=40%}
+- AlexNet (2012) kicked off the computer vision revolution with CNNs
+- Subsequent years saw trend of increasing depth
+  - Remember the "vanishing gradient" problem
+- ResNet (2015) introduced connections that skip layers, allowing for even deeper networks
+
+::::
+:::
+::::
+
+![](../imgs/resnet.webp){.absolute bottom=-20 right=0 width=40%}
+
+## Tasks of computer vision
+
+:::{.incremental}
+- Object or Event Detection
+- Image Classification
+- Scene Understanding/Summary/Captioning
+- Image Search
+- Image Segmentation
+- 3D Scene reconstruction
+- Image restoration
+
+:::
+
+## [How can social & behavioral scientists use computer vision?]{style="font-size:70%;"}
+
+## [How can social & behavioral scientists use computer vision?]{style="font-size:70%;"}
+#### Automated coding of images/videos, e.g. emotion recognition
+
+![](../imgs/emotionRecognition.png)
+
+## [How can social & behavioral scientists use computer vision?]{style="font-size:70%;"}
+#### Visual sentiment analysis for stimulus construction
+
+![](../imgs/visualSentimentAnalysis.png)
+
+## [How can social & behavioral scientists use computer vision?]{style="font-size:70%;"}
+#### Motion capture data
+
+![](../imgs/markerlessmocap.webp)
+
+## [How can social & behavioral scientists use computer vision?]{style="font-size:70%;"}
+#### Motion capture data
+
+![](../imgs/crowdTracking.mov){width=950}
+
+## [How can social & behavioral scientists use computer vision?]{style="font-size:70%;"}
+#### Social media images as big data
+
+[<U>Crowdsourcing data through social media</U>]{.fragment fragment-index=1 .absolute left=100 top=170 style="color:red;font-size:70%;"}
+![](../imgs/socialmedia_bigdata2.png){.fragment fragment-index=1 .absolute left=0 top=200}
+![](../imgs/socialmedia_bigdata3.png){.fragment fragment-index=1 .absolute left=100 top=300 width="40%"}
+[Song, et al., 2022]{.fragment fragment-index=1 .absolute left=270 bottom=40 style="color:grey;font-size:40%;"}
+
+![](../imgs/socialmedia_bigdata4.png){.fragment fragment-index=2 .absolute right=0 top=250 width="50%"}
+![](../imgs/socialmedia_bigdata5.png){.fragment fragment-index=2 .absolute right=50 top=350 width="40%"}
+
+[<U>Studying social media itself</U>]{.fragment fragment-index=2 .absolute right=120 top=170 style="color:red;font-size:70%;"}
+[Bakhshi, Shamma & Gilbert, 2014]{.fragment fragment-index=2 .absolute right=150 bottom=125 style="color:grey;font-size:40%;"}
+
+
+## [How can social & behavioral scientists use computer vision?]{style="font-size:70%;"}
+#### Evaluating hypotheses about human cognition
+
+
+:::{.columns}
+::::{.column width=40%}
+ \ 
+ 
+ \ 
+
+:::{style="font-size:90%;"}
+If we build an ANN that behaves like humans, maybe we can treat it as a *model* of the human brain?
+:::
+::::
+
+::::{.column width=60%}
+![](../imgs/cnn_attention2.png)
+::::
+:::
+
+[Ebhrahimpor, Falandays, Spevack, & Noelle, 2019]{.absolute bottom=50 right=150 style="font-size:50%;color:grey;text-align:center;"}
+
+## Basic steps of computer vision
+
+:::{.incremental}
+- Image acquisition
+- Image processing
+- Feature extraction
+- Pattern recognition
+
+:::
+
 ## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
-### For processing images
 
 :::{.fragment fragment-index=1}
 Inspired by the brain's visual pathway
@@ -21,6 +220,9 @@ Inspired by the brain's visual pathway
 ::::{style="font-size:100%;"}
 :::{.columns}
 ::::{.column width=50% .fragment fragment-index=1}
+ \ 
+ \ 
+ 
 ![](../imgs/visualpathway.png)
 ::::
 
@@ -31,47 +233,167 @@ Inspired by the brain's visual pathway
 ::::
 
 ## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
+
+:::{}
+Inspired by the brain's visual pathway
+:::
+
+::::{style="font-size:100%;"}
+:::{.columns}
+::::{.column width=50%}
+![](../imgs/visualcortex.jpg)
+::::
+
+::::{.column width=50%}
+![](../imgs/v1-v6.png){height=500}
+::::
+:::
+::::
+
+## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
 ### Basic architecture
 
-![](../imgs/cnnBasicArchitecture.png)
+![](../imgs/cnnBasicArchitecture.webp)
 
 ## Image Encoding
 
 ![](../imgs/imageEncoding.png)
 
-## Convolutional Filters
+## Image Encoding
 
-::::{style="font-size:100%;"}
-:::{.columns}
-::::{.column width=50%}
-![](../imgs/convolution.gif)
+![](../imgs/image_3Ddata.png)
+
+## Convolutional Filters
+#### Construct "feature maps"
+
+![](../imgs/convolution.gif){.absolute top=150 left=0 width="40%"}
 
 :::{.r-stack}
-::::{.fragment .fade-in-then-out fragment-index=2}
-![](../imgs/conv1.png){.absolute top=450 left=10 width=50%}
+::::{.fragment .fade-in-then-out fragment-index=1}
+![](../imgs/conv1.png){.absolute top=450 left=10 width=40%}
+[CNNs use "weight sharing"]{.absolute bottom=-30 left=100 style="font-size:75%;"}
 ::::
 
-::::{.fragment fragment-index=3}
-![](../imgs/conv2.png){.absolute top=450 left=15 width=49.5%}
+::::{.fragment fragment-index=2}
+![](../imgs/conv2.png){.absolute top=450 left=15 width=39.5%}
+[CNNs use "weight sharing"]{.absolute bottom=-30 left=100 style="font-size:75%;"}
 ::::
 :::
 ::::
 
-::::{.column width=50%}
-::::{.fragment fragment-index=1}
-![](../imgs/cnnKernels.webp)
-::::
+![](../imgs/cnnKernels.webp){.absolute top=150 right=-50 width="60%" .fragment fragment-index=3}
+[Note: Kernels in CNNs are <U>learned</U> weights]{.fragment fragment-index=3 .absolute bottom=0 right=20 style="font-size:75%;"}
 
-::::{.fragment fragment-index=4}
-![](../imgs/CNNfilters.webp){.absolute top=420 left=550 width=49.5%}
-::::
-::::
-:::
-::::
+## Convolutional Filters (1-D Example)
+
+![](../imgs/convexample/conv_example1.png)
+
+## Convolutional Filters (1-D Example)
+
+![](../imgs/convexample/conv_example2.png)
+
+## Convolutional Filters (1-D Example)
+
+![](../imgs/convexample/conv_example3.png)
+
+## Convolutional Filters (1-D Example)
+
+![](../imgs/convexample/conv_example4.png)
+
+## Convolutional Filters
+
+![](../imgs/CNNfilters.webp)
 
 ## Pooling 
+
 ![](../imgs/pooling.gif)
 
 ## [Convolutional Neural Networks (CNNs)]{style="font-size:90%;"}
+### Basic architecture
 
-![](../imgs/cnnarchitecture2.png)
+![](../imgs/cnnBasicArchitecture.webp)
+
+## Getting the output
+
+![](../imgs/softmax.jpg)
+
+## CNNs are prone to overfitting
+
+::::{style="font-size:100%;"}
+:::{.columns}
+::::{.column width=45%}
+![](../imgs/cnnOverfitting.png)
+::::
+
+::::{.column width=55% style="font-size:75%;" .incremental}
+ \ 
+ \ 
+ \ 
+ \ 
+ 
+- One way to prevent overfitting is by build ensembles of networks with different architectures (like our usual k-fold cross-validation approach)
+  - But this is very computationally expensive
+- Other strategies can be used to optimize the bias-variance tradeoff while training only a single network
+
+::::
+:::
+::::
+
+
+## Dropout layers
+
+[- Layers that randomly drop a proportion of nodes during training]{style="font-size:75%;"}
+
+![](../imgs/dropoutlayers.webp)
+
+## Batch Normalization
+
+:::{style="font-size:75%;"}
+- Run a few inputs through (a "mini batch") and get mean/SD for each node
+- Normalize output of layer before feeding forward
+:::
+
+![](../imgs/batchNorm2.png)
+
+## Data Augmentation
+
+![](../imgs/dataAugmentation.png)
+
+## Feature Visualization
+
+## Feature Visualization
+#### Plotting Feature Maps
+
+![](../imgs/prewittfilter2.png)
+
+## Feature Visualization
+#### Activation Maximization
+
+[Finding/Generating image that maximizes activation of a node]{style="font-size:75%;"}
+
+![](../imgs/activationMax.png)
+
+## Feature Visualization
+#### Saliency Maps
+
+[Highlight regions of input that were most important for the classification]{style="font-size:75%;"}
+
+![](../imgs/saliencyMaps.jpg)
+
+## Feature Visualization
+#### Adversarial Examples
+
+[Maximize activation of an *incorrect* class]{style="font-size:75%;"}
+
+[Classified Correctly]{.absolute top=170 left=570 style="font-size:40%;"}
+[Added noise]{.absolute top=170 left=745 style="font-size:40%;"}
+[Classified "Ostrich"]{.absolute top=170 left=880 style="font-size:40%;"}
+
+![](../imgs/adversarialExamples.png){.absolute bottom=0 left=550 width=40%}
+
+[From Szegedy et al, 2013]{.absolute bottom=-20 left=700 style="font-size:40%;"}
+
+## A cool visualization tool
+#### https://adamharley.com/nn_vis/cnn/3d.html
+
+![](../imgs/adamharley.png)

@@ -1,0 +1,402 @@
+---
+title: |
+  | Implementing CNNs with
+  | `keras`/`tensorflow`
+  | in R
+subtitle: | 
+  | Behavioral Data Science in R II
+  | Unit 5
+  | Module 12
+format: 
+  revealjs:
+    width: 1200
+    css: style.css
+---
+
+## `tensorflow` and `keras`
+
+```{r}
+
+```
+
+```{css, echo=FALSE}
+.title {
+  font-size: 60px !important;
+}
+
+.subtitle {
+  font-size: 40px !important;
+  color: blue
+}
+```
+
+-   `tensorflow` is an open-source machine-learning library
+-   `keras` is a high-level application programming interface (API)
+    -   Can run on top of `tensorflow` (or other ML libraries, e.g. Theano)
+    -   Makes coding with `tensorflow` more user friendly
+
+## Classifying the MNIST data
+
+![](../imgs/MNIST.jpg)
+
+## MNIST is included with `keras`
+
+::: {style="font-size:70%;"}
+::: columns
+::: {.column width="40%"}
+```{r}
+#| echo: true
+library(tidymodels)
+library(tidyverse)
+
+# load tensorflow and keras
+library(tensorflow)
+library(keras)
+
+mnist <- dataset_mnist()
+
+# Load the mnist train/test sets
+mnist <- dataset_mnist()
+
+train_images <- mnist$train$x
+train_labels <- mnist$train$y
+
+test_images <- mnist$test$x
+test_labels <- mnist$test$y
+
+dim(train_images)
+```
+:::
+
+::: {.column width="60%"}
+```{r}
+# plot a random image in the dataset
+index_image = 17 ## change this index to see different image.
+image <- as.data.frame(train_images[index_image, , ])
+colnames(image) <- seq_len(ncol(image))
+image$y <- seq_len(nrow(image))
+image <- gather(image, "x", "value", -y)
+image$x <- as.integer(image$x)
+
+ggplot(image, aes(x = x, y = y, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) +
+  scale_y_reverse() +
+  theme_minimal() +
+  theme(panel.grid = element_blank())   +
+  theme(aspect.ratio = 1) +
+  xlab(paste('Image for digit of: ', train_labels[index_image])) +
+  ylab("")
+```
+:::
+:::
+:::
+
+## Pre-processing
+
+::: {style="\"font-size:80%;"}
+```{r}
+#| echo: true
+
+## (convert 0:255 pixel values to 0:1)
+train_images <- train_images / 255
+test_images <- test_images / 255
+
+# Convert class vectors to binary class matrices
+num_classes = 10 
+train_labels <- to_categorical(train_labels, num_classes)
+test_labels <- to_categorical(test_labels, num_classes)
+```
+
+If your images are not all the same size, pre-processing will also involve resizing
+:::
+
+## Constructing a CNN
+
+::: {style="\"font-size:70%;"}
+```{r}
+#| echo: true
+# Define a few parameters to be used in the CNN model
+batch_size <- 128
+epochs <- 10
+input_shape <- c(28,28,1)
+```
+
+ 
+
+```{r}
+#| echo: true
+# define the model structure
+cnn_model <- keras_model_sequential() %>%
+  layer_conv_2d(filters = 32, kernel_size = c(3,3), activation = 'relu', input_shape = input_shape) %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  layer_conv_2d(filters = 64, kernel_size = c(3,3), activation = 'relu') %>% 
+  layer_max_pooling_2d(pool_size = c(2, 2)) %>% 
+  layer_dropout(rate = 0.25) %>% 
+  layer_flatten() %>% 
+  layer_dense(units = 128, activation = 'relu') %>% 
+  layer_dropout(rate = 0.5) %>% 
+  layer_dense(units = num_classes, activation = 'softmax') 
+```
+:::
+
+## Compile the model
+
+```{r}
+#| echo: true
+# compile the model
+cnn_model %>% compile(
+  loss = loss_categorical_crossentropy,
+  optimizer = optimizer_adam(),
+  metrics = c('accuracy')
+)
+```
+
+## Fit the model
+
+::: {style="\"font-size:70%;"}
+```{r}
+#| echo: true
+cnn_history <- cnn_model %>% fit(
+  train_images, train_labels,
+  batch_size = batch_size,
+  epochs = epochs,
+  validation_split = 0.2
+)
+```
+:::
+
+## Evaluate the model
+
+::: {style="font-size:60%;"}
+::: columns
+::: {.column width="50%"}
+```{r}
+#| echo: true
+cnn_model %>% evaluate(test_images, test_labels)
+```
+
+```{r}
+#| echo: true
+# get model predictions
+cnn_preds <- cnn_model %>% 
+  predict(test_images) %>% 
+  k_argmax() %>% 
+  as.integer()
+
+head(cnn_preds)
+```
+
+```{r}
+#| echo: true
+test_labels <- test_labels %>% 
+  k_argmax() %>% 
+  as.integer()
+
+# find the number of mis-classcified images
+sum(cnn_preds != test_labels)
+
+# for plotting, find all the misclassified images, 
+# their actual labels, and the model predictions 
+missed_images = test_images[cnn_preds != test_labels,,]
+missed_digits = test_labels[cnn_preds != test_labels]
+missed_preds = cnn_preds[cnn_preds != test_labels]
+```
+:::
+
+::: {.column width="50%"}
+```{r, fig.width=4, fig.height=4}
+#| echo: true
+# plot a misclassified image
+index_image = 1 ## change this index to see different image.
+image <- as.data.frame(missed_images[index_image,,])
+colnames(image) <- seq_len(ncol(image))
+image$y <- seq_len(nrow(image))
+image <- gather(image, "x", "value", -y)
+image$x <- as.integer(image$x)
+
+ggplot(image, aes(x = x, y = y, fill = value)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "black", na.value = NA) +
+  scale_y_reverse() +
+  theme_minimal() +
+  theme(panel.grid = element_blank())   +
+  theme(aspect.ratio = 1) +
+  xlab(paste('Image for digit ', 
+                 missed_digits[index_image], 
+                 ', wrongly predicted as ', 
+                 missed_preds[index_image])) +
+  ylab("")
+```
+:::
+:::
+:::
+
+## Using a pre-trained model
+
+### Transfer-learning & Fine-tuning
+
+::: {style="font-size:70%;"}
+-   "Transfer-learning" refers to taking a model trained on one dataset/problem, and applying it to a similar dataset/problem
+
+-   "Fine-tuning" refers to re-training the existing model on some new data, with a very low learning rate
+:::
+
+::: {.fragment style="font-size:75%;"}
+-   The typical transfer-learning workflow:
+    1.  Instantiate a base model and load pre-trained weights into it.
+    2.  Freeze all layers in the base model by setting `trainable = FALSE`.
+    3.  Create a new model on top of the output of one (or several) layers from the base model.
+    4.  Train your new model on your new dataset.
+    5.  Once the new model has converged, unfreeze the base model and fine-tune the whole thing
+:::
+
+## Using a pre-trained model
+
+### Load & pre-process new data
+
+::: {style="font-size:70%;"}
+::: columns
+::: {.column width="50%"}
+Load the CIFAR-10 image set
+
+```{r}
+#| echo: true
+cifar10 <- dataset_cifar10()
+
+train_images <- cifar10$train$x[1:10000,,,]
+train_labels <-cifar10$train$y
+
+dim(train_images)
+```
+
+Pre-process the new data
+
+```{r}
+#| echo: true
+
+# (convert 0:255 pixel values to 0:1)
+train_images <- train_images / 255
+test_images <- test_images / 255
+
+# Convert class vectors to binary class matrices
+num_classes = 10 
+train_labels <- to_categorical(train_labels, num_classes)
+test_labels <- to_categorical(test_labels, num_classes)
+```
+:::
+
+::: {.column width="50%"}
+![](../imgs/cifar10.png)
+:::
+:::
+:::
+
+## Using a pre-trained model
+
+### Instantiate a model with pre-trained weights
+
+::: {style="font-size:60%;"}
+::: columns
+::: {.column width="50%"}
+Instantiate the base model
+
+```{r}
+#| echo: true
+base_model <- application_mobilenet_v2(
+  include_top = FALSE,
+  weights = "imagenet",
+  input_shape = c(128,128,3)
+)
+```
+
+Freeze the base model
+
+```{r}
+#| echo: true
+base_model$trainable <- FALSE
+```
+:::
+
+::: {.column width="50%"}
+Create a new model on top
+
+```{r}
+#| echo: true
+inputs <- layer_input(c(32, 32, 3))
+
+outputs <-  inputs %>%
+  
+  # cifar10 images are 32x32x3, 
+  # so we can include this to resize them to 128x128x3
+  layer_resizing(
+    height=128,
+    width=128,
+    crop_to_aspect_ratio = T
+  ) %>% 
+  
+  # We make sure that the base_model is running in inference mode here,
+  # by passing `training=FALSE`. This is important for fine-tuning
+  base_model(training=FALSE) %>%
+
+  # Convert features of shape `base_model$output_shape[-1]` to vectors
+  layer_global_average_pooling_2d() %>%
+
+  # A Dense classifier with a 10 output units, because CIFAR10 has 10 classes
+  layer_dense(units = 10, activation = 'softmax') 
+
+model <- keras_model(inputs, outputs)
+```
+:::
+:::
+:::
+
+## Using a pre-trained model
+
+### Train the model on new data
+
+::: {style="font-size:60%;"}
+```{r}
+#| echo: true
+model %>%
+  compile(
+    loss = loss_categorical_crossentropy,
+    optimizer = optimizer_adam(),
+    metrics = c('accuracy'))
+
+model %>% 
+  fit(
+    as_tensor(train_images), train_labels,
+    batch_size = 128,
+    epochs = 10,
+    validation_split = 0.2)
+```
+:::
+
+## Using a pre-trained model
+
+### Fine-tuning
+
+::: {style="font-size:60%;"}
+```{r, eval=F}
+#| echo: true
+# Unfreeze the base model
+base_model$trainable <- TRUE
+
+# It's important to recompile your model after you make any changes
+# to the `trainable` attribute of any inner layer, so that your changes
+# are taken into account
+model %>%
+  compile(
+    loss = loss_categorical_crossentropy,
+    optimizer = optimizer_adam(1e-5),
+    metrics = c('accuracy'))
+
+# Train end-to-end. Be careful to stop before you overfit!
+model %>% 
+  fit(
+    as_tensor(train_images), train_labels,
+    epochs = 1,
+    validation_split = 0.2)
+```
+:::

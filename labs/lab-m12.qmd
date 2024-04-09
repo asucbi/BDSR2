@@ -1,0 +1,159 @@
+---
+title: "Module 12 Lab: CNNs for Emotion Classification"
+author: "Ben Falandays"
+bibliography: ../references.bib
+editor: source
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this module are:
+
+-   Learn to use `tensorflow`/`keras` to build a Convolutional Neural Network (CNN)
+-   Understand the purposes of common layers used in CNNs, including:
+  -   Convolutional layers
+  -   Pooling layers
+  -   Dense layers
+  -   Dropout layers
+  -   Noise layers
+  -   Image augmentation layers
+-   Fit a CNN to an image dataset and evaluate performance
+
+:::
+
+![](../imgs/fer2013.png)
+
+## Library and data loading
+
+```{r}
+#| message = FALSE
+library(tidymodels)
+library(tidyverse)
+library(tensorflow)
+library(tfdatasets)
+library(keras)
+library(ggplot2)
+```
+
+```{r}
+train <- image_dataset_from_directory( 
+  "./train", 
+  labels = "inferred", 
+  label_mode = "int", 
+  color_mode = "grayscale", 
+  image_size = c(48, 48),
+  batch_size = 128,
+  validation_split=0.2,
+  seed=123,
+  subset="training"
+) 
+
+val <- image_dataset_from_directory( 
+  "./train", 
+  labels = "inferred", 
+  label_mode = "int", 
+  color_mode = "grayscale", 
+  image_size = c(48, 48),
+  batch_size = 128,
+  validation_split=0.2,
+  seed=123,
+  subset="validation"
+) 
+
+test <- image_dataset_from_directory( 
+  "./test", 
+  labels = "inferred", 
+  label_mode = "int", 
+  color_mode = "grayscale", 
+  image_size = c(48, 48),
+  batch_size = 128
+) 
+```
+## Plot one image from each class
+
+```{r}
+c(images, labels) %<-% as_iterator(train)$get_next()
+
+class_names = train$class_names
+
+par(mfrow = c(3, 3))
+
+p <- list()
+j=0
+for(i in 1:128){
+  image <- images[i,,,]$numpy()
+  label <- class_names[labels[i]$numpy() + 1]
+  
+  if(label %in% class_names){
+    j=j+1
+    class_names = class_names[class_names != label]
+    
+    image <- as.data.frame(image)
+    colnames(image) <- seq_len(ncol(image))
+    image$y <- seq_len(nrow(image))
+    image <- gather(image, "x", "value", -y)
+    image$x <- as.integer(image$x)
+    
+    p_ <- ggplot(image, aes(x = x, y = y, fill = value)) +
+      geom_tile() +
+      scale_fill_gradient(low = "black", high = "white", na.value = NA) +
+      scale_y_reverse() +
+      theme_minimal() +
+      theme(panel.grid = element_blank())   +
+      theme(aspect.ratio = 1) +
+      xlab(paste('Image for : ', label)) +
+      ylab("")+
+      guides(fill = FALSE)
+    
+    p[[j]]<-p_
+  }
+  
+  
+}
+
+library(gridExtra)
+
+grid.arrange(
+  grobs = p
+)
+```
+
+## Exercise 1
+::: {.callout-note icon="false"}
+## Exercise 1
+
+Below, construct a CNN that takes the images as input, and predicts the emotion class. Your goal is to maximize the performance on the test set. I have included a rescaling layer to normalize the pixel values from their original range of 0-255, to 0-1. After that, you must include at least one layer of each of the following types: `layer_conv_2d` (with relU activation function), `layer_max_pooling_2d`, `layer_flatten`, and `layer_dense` (with `units = 7, activation = 'softmax'`--this is your output layer).
+
+However, you should explore the `keras` documentation (https://tensorflow.rstudio.com/reference/keras/) and consider adding dropout layers, noise layers, and/or data-augmentation layers to avoid overfitting. 
+
+The group with the highest performance on the test set, with 10 epochs of training, will win bonus points!
+:::
+
+```{r}
+model <- keras_model_sequential() %>% 
+  layer_rescaling(scale = 1/255) %>% 
+  ...
+```
+
+## Compile and fit the model
+
+```{r}
+model %>% compile(
+  optimizer = 'adam',
+  loss = loss_sparse_categorical_crossentropy, 
+  metrics = 'accuracy'
+)
+
+model %>% fit(train, 
+              epochs = 10, 
+              validation_data = val)
+```
+
+## Evaluate on the test set
+
+```{r}
+model %>% evaluate(test)
+```
+
+

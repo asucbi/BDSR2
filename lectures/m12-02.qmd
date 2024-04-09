@@ -205,7 +205,7 @@ missed_preds = cnn_preds[cnn_preds != test_labels]
 :::
 
 ::: {.column width="50%"}
-```{r, fig.width=4, fig.height=4}
+```{r, fig.width=3, fig.height=3}
 #| echo: true
 # plot a misclassified image
 index_image = 1 ## change this index to see different image.
@@ -222,10 +222,7 @@ ggplot(image, aes(x = x, y = y, fill = value)) +
   theme_minimal() +
   theme(panel.grid = element_blank())   +
   theme(aspect.ratio = 1) +
-  xlab(paste('Image for digit ', 
-                 missed_digits[index_image], 
-                 ', wrongly predicted as ', 
-                 missed_preds[index_image])) +
+  xlab(paste('Image for digit ', missed_digits[index_image], ', wrongly predicted as ', missed_preds[index_image])) +
   ylab("")
 ```
 :::

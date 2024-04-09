@@ -12,12 +12,12 @@ Our learning objectives for this module are:
 
 -   Learn to use `tensorflow`/`keras` to build a Convolutional Neural Network (CNN)
 -   Understand the purposes of common layers used in CNNs, including:
-  -   Convolutional layers
-  -   Pooling layers
-  -   Dense layers
-  -   Dropout layers
-  -   Noise layers
-  -   Image augmentation layers
+    -   Convolutional layers
+    -   Pooling layers
+    -   Dense layers
+    -   Dropout layers
+    -   Noise layers
+    -   Image augmentation layers
 -   Fit a CNN to an image dataset and evaluate performance
 
 :::

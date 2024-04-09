@@ -375,7 +375,7 @@ model %>%
 ### Fine-tuning
 
 ::: {style="font-size:60%;"}
-```{r, eval=F}
+```{r}
 #| echo: true
 # Unfreeze the base model
 base_model$trainable <- TRUE

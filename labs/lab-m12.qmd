@@ -36,7 +36,7 @@ library(keras)
 library(ggplot2)
 ```
 
-```{r}
+```{r, eval=F}
 train <- image_dataset_from_directory( 
   "./train", 
   labels = "inferred", 
@@ -72,7 +72,7 @@ test <- image_dataset_from_directory(
 ```
 ## Plot one image from each class
 
-```{r}
+```{r, eval=F}
 c(images, labels) %<-% as_iterator(train)$get_next()
 
 class_names = train$class_names
@@ -130,7 +130,7 @@ However, you should explore the `keras` documentation (https://tensorflow.rstudi
 The group with the highest performance on the test set, with 10 epochs of training, will win bonus points!
 :::
 
-```{r}
+```{r, eval=F}
 model <- keras_model_sequential() %>% 
   layer_rescaling(scale = 1/255) %>% 
   ...
@@ -138,7 +138,7 @@ model <- keras_model_sequential() %>%
 
 ## Compile and fit the model
 
-```{r}
+```{r, eval=F}
 model %>% compile(
   optimizer = 'adam',
   loss = loss_sparse_categorical_crossentropy, 
@@ -152,7 +152,7 @@ model %>% fit(train,
 
 ## Evaluate on the test set
 
-```{r}
+```{r, eval=F}
 model %>% evaluate(test)
 ```
 

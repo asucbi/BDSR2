@@ -68,7 +68,8 @@ nij <- read_csv("data/NIJ_s_Recidivism_Challenge_Full_Dataset_20240112.csv") %>%
   mutate_at(vars(matches("_Arrest_|_Conviction_|Program_Attendances")), to_numeric) %>%
   mutate_if(is.character, factor) %>% 
   select(-contains("Recidivism"), -Gang_Affiliated, -Training_Sample, -Supervision_Level_First, - Residence_PUMA) %>% 
-  mutate_if(is.logical, factor)
+  mutate_if(is.logical, factor) %>% 
+  drop_na(where(is.numeric))
 
 ```
 
@@ -81,6 +82,8 @@ We want to predict which parolees will recidivate within 3 years of release. Fir
 ## Exercise 1
 
 First, load the data using the code show nabove. Then, examine the balance of the classes (1 = recidivated, 0 = no recidivation) coded by the `recidivated` variable. Calculate the proportion who recidivated.
+
+✅ **Answer Check**: Report the proportion who recidivated.
 :::
 
 ## Exercise 2
@@ -100,6 +103,8 @@ Let's begin our machine-learning workflow!
 ::: {.callout-note icon="false"}
 ## Exercise 3
 Split the data into training (80%) and testing (20%) splits. Since we won't use it for prediction, drop the `ID` column before making these splits. Make sure to stratify the train/test splits by our outcome to ensure a representative class balance for our predictions. Call your training and testing splits `train` and `test`
+
+✅ **Answer Check**: How many rows are in your training set?
 :::
 
 ## Exercise 4
@@ -110,6 +115,8 @@ We'll begin with a simple model using a single predictor: The initial supervisio
 ## Exercise 4
 
 Create a workflow and fit a model predicting `recidivated` from `Supervision_Risk_Score_First`. You can add the formula directly to the workflow.
+
+✅ **Answer Check**: Write the formula you used.
 
 :::
 
@@ -125,6 +132,8 @@ Let's examine this model in a few ways.
 2. Calculate the probability of recidivating for parolees with a score of 2 versus 9:  
     - using `augment()` or `predict()`
     - manually using `plogis()`
+    
+✅ **Answer Check**: Report the value you calculated using `plogis()`.
 :::
 
 
@@ -150,6 +159,8 @@ Balanced accuracy is the average of the model's true positive rate (TPR) and its
 Calculate the performance of the model on the test data. Since the classes are not perfectly balanced, calculate both accuracy and balanced accuracy. In addition, calculate the `sensitivity` (TPR) and `specificity` (TNR) of the model, making sure to use the `event_level = "second"` flag. 
 
 Briefly consider how the TPR and TNR might influence the use of such a model.
+
+✅ **Answer Check**: Report the TPR and TNR. Briefly describe your thoughts about the question above.
 :::
 
 
@@ -159,169 +170,50 @@ The `metric_set()` function can help you do this without coding things up manual
 :::
 
 
-
-
 ## Exercise 8
 
-Can we do better with machine learning? 
+Can we do better with machine learning than the existing risk score? 
 
-Let's build a model that brings to bear all of the data we have available from this challenge dataset. Unfortunately, some of the data is missing, so the first thing we will need to do is build a pre-processing recipe to handle these cases.
-
-There are many missing data approaches we might take, but we'll take a relatively simple approach here.
-
-- Where factor variables are missing we will replace them with a new "unknown" factor level
-- Where numeric variables are missing we will 1) create a new binary variable to indicate the case's variable is missing and 2) replace the `NA` with zero.
-
-
-::: callout-tip
-The `Recipes` package includes two helpful functions for previewing the results of a recipe. `prep()` and `bake()` can help you see what your recipe steps will accomplish, without having to train and fit a model. First you `prep()` the recipe, then you `bake()` the data using the prepped recipe.
-
-The schema is:
-
-```r
-the_recipe %>% 
-  prep() %>% 
-  bake(the_data)
-```
-:::
-
+Let's build a model that brings to bear all of the other data we have available from this challenge dataset.
 
 ::: {.callout-note icon="false"}
 ## Exercise 8
 
-Build a recipe to complete the following steps. Use `?` to read the help for each of these new functions to see how they should be used.
+Build a recipe to do a few things:
 
-1. Add an "unknown" level to any factor variables that are missing data (`step_unknown()`)
-2. Create new columns to indicate where continuous predictors are missing data (`step_indicate_na()`)
-3. Replace `NA` values for continuous predictors with zeroes
-4. Remove the `Supervision_Risk_Score_First` variable (`step_rm()`) -- we just want to ignore this for our machine learning model for comparison purposes.
-
-Then, use `prep()` and `bake()` to see what this does to the training data.
+1. Remove `Supervision_Risk_Score_First` variable (`step_rm()`) from the data. We want to ignore this for our machine learning model, since this is what we are going to compare against.
+2. Replace any missing values for categorical variables with a new "unknown" factor level.
 :::
-
-
-::: {.hidden}
-THIS NEEDS WORK
-::: {.callout-note icon="false" collapse="true"}
-## Deeper dive
-
-Why add a variable indicating the missingness?
-
-If we don't add this variable, imputing the missing values with zero will bias our models' parameters and could reduce its predictive performance.
-
-```{r}
-#| echo: false
-set.seed(123433)
-tibble(
-  x = rnorm(20),
-  y = .7*x + rnorm(20),
-  miss = rbernoulli(20, .2)
-) %>% 
-  mutate(miss = if_else(x < -1.5, "missing", "obs")) %>%
-  ggplot(aes(x=x, y=y)) +
-  geom_point(aes(color = miss)) +
-  geom_smooth(method="lm")
-
-set.seed(123433)
-tibble(
-  x = rnorm(20),
-  y = .7*x + rnorm(20),
-  miss = rbernoulli(20, .2)
-) %>% 
-  mutate(miss = if_else(x < -1.5, "missing", "obs")) %>%
-  mutate(x = if_else(miss=="missing", 0, x)) %>% 
-  ggplot(aes(x=x, y=y)) +
-  geom_point(aes(color = miss)) +
-  geom_smooth(method="lm")
-```
-
-:::
-
-
 
 
 ## Exercise 9
 
-If you fit a model using the recipe you have created so far, you will receive at some point a warning that you have a "rank-deficient" model. What does this mean?
-
-The term comes from linear algebra, where the **rank** of a matrix is (informally) the number of columns that provide distinct information, i.e. that are not linear combinations of any of the other columns. 
-
-With regression and logistic regression, we can end up with a rank-deficient model whenever:
-
-- any number of predictors have zero variance (i.e. are all the same value)
-- any predictor variables are **exactly** identical to some linear combination of other predictor variables
-
-The two hypothetical datasets below show rank-deficient predictors (`x`): in the first, there is zero variance and in the second, `x3` is exactly equal to two times `x1` plus `x2`.
-
-
-:::: {.columns}
-::: {.column width="40%"}
-
-```{r}
-#| echo: false
-
-tibble(
-  x1 = c(1,1,1,1,1),
-  y = rnorm(5)
-) %>% 
-  mutate(y = round(y, 2)) %>% 
-  knitr::kable()
-  
-```
-:::
-
-::: {.column width="10%"}
-
-:::
-
-::: {.column width="40%"}
-
-```{r}
-#| echo: false
-tibble(
-  x1 = c(1,1.5,3,2,-1),
-  x2 = c(1,1.5,-2,3,5),
-  x3 = 2*x1 + x2,
-  y = rnorm(5)
-) %>% 
-  mutate(y = round(y, 2)) %>% 
-  knitr::kable()
-``` 
-:::
-::::
-
 ::: {.callout-note icon="false"}
 ## Exercise 9
-Expand the recipe to prevent producing a rank-deficient model, i.e. remove all zero variance predictors and any variables that are linear combinations of one another. I won't tell you exactly how, so look up the help or Google to find the right functions for this purpose.
-
-One set of variables that would cause issues are the `na_ind_...` variables created for the missing drug test values. The reason is structural---if a parolee is missing drug test data for any particular drug it is because they are missing this data for all drugs. Would this produce a rank-deficient model due to zero variance predictors or predictors that are linear combinations of one another?
-:::
-
-## Exercise 10
-
-::: {.callout-note icon="false"}
-## Exercise 10
 Fit and calculate the performance on the test data for a model using this recipe. Compare this to the model using just the traditional supervision risk score assessment in terms of accuracy, balanced accuracy, and TPR/TNR.
+
+✅ **Answer Check**: Which is better in terms of balanced accuracy?
 :::
 
 
-
-## Exercise 11
+## Exercise 10
 
 Let's dive in to interpreting the model a bit, by considering two potentially important variables that might be somewhat under a parolee or the parole system and programming control: employment and program attendance. 
 
 We'll examine the relative importance of these two predictors.
 
 ::: {.callout-note icon="false"}
-## Exercise 11
+## Exercise 10
 
 - `tidy()` the model and filter the result to display just the coefficients for these two predictors. Look at the codebook to ensure you are interpeting them correctly in terms of their original predictors. Can you tell which is more important?
 - Interpeting the relative importance of coefficients is easier with standardized predictors. Re-fit the model adding a `step_normalize()` to the recipe and then compare thes coefficients again.
-- Make two line plots to explore the proportion of recidivists across `Program_Attendances` and a binned version of `Percent_Days_Employed` (use 10 bins). Put proportion of recidivists on the y-axis and the predictor on the x-axis. Compare the plots to the relative importance you determined based on the model coefficients---do these two ways of exploring this correspond well?
+- Make two line plots to explore the proportion of recidivists across `Program_Attendances` and a binned version of `Percent_Days_Employed` (use 10 bins). Put proportion of recidivists on the y-axis and the predictor on the x-axis. 
+
+✅ **Answer Check**:  Compare the plots to the relative importance you determined based on the model coefficients. Do these two ways of exploring this correspond well? do these two ways of exploring this correspond well? and briefly share your thoughts.
 
 :::
 
-## Exercise 12
+## Exercise 11
 
 What does it all mean?
 
@@ -330,8 +222,8 @@ Do employement and/or program attendance reduce the risk of recidivism? Or do ot
 More generally, how do you think should parole decisions should incorporate these kinds of predictive models to support both community safety but also justice and fairness? What does this level of accuracy support? What if you imagine we could make these predictions more accurately (e.g. 95% or 99%)?
 
 ::: {.callout-note icon="false"}
-## Exercise 12
-Reflect on the questions above and write 1-2 paragraphs discussing your thoughts.
+## Exercise 11
+✅ **Answer Check**: Reflect on the questions above and write 1-2 paragraphs discussing your thoughts.
 :::
 
 

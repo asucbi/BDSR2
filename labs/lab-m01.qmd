@@ -160,6 +160,16 @@ Then, fit this new model and call it `lin_fit2`.
 ### What is a recipe?
 
 A `tidymodels` **recipe** is a set of data manipulation and/or preprocessing steps carried out prior to fitting a model. A recipe can be combined with a model inside a **workflow** to take a set of data, preprocess it, and then pipe that through a model. Unlike calling `mutate()` on a dataframe, adding a call of `step_mutate()` in a recipe doesn't modify the data right away. Instead, it just marks this as a step to complete when the recipe is called inside an appropriate workflow or function. In other frameworks the concept of a workflow is often called a "pipeline." For more, see Lecture 4 of Module 1.
+
+The `Recipes` package includes two helpful functions for previewing the results of a recipe. `prep()` and `bake()` can help you see what your recipe steps will accomplish, without having to train and fit a model. First you `prep()` the recipe, then you `bake()` the data using the prepped recipe.
+
+The schema is:
+
+```r
+the_recipe %>% 
+  prep() %>% 
+  bake(the_data)
+```
 :::
 
 ## Exercise 8

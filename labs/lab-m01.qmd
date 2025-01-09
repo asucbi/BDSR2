@@ -54,8 +54,13 @@ First, do some further data munging of the sort we learned last semester.
 1.  Filter `df` to include only the rows for Democrat and Republican candidates
 2.  Pivot the data to a wide format, so that for each Congressional district we have variables representing the proportion of democratic votes in 2014, 2016, 2018, and 2020, and whether or not there was a democrat incumbent going into the 2018 election. If there is more than one D or R candidate, use the proportion value for the candidate with the most votes.
 3.  Replace `NA` values for vote proportion and incumbency with zero---if there's not value it's because no one ran and therefore they got zero votes.
+
+✅ **Answer Check**: Report the number of rows in your resulting dataset (`nrow(df)`).
 :::
 
+When you are done, a call of `head()` on your data should look something like this:
+
+![exercise 1 output](../imgs/m01-lab01-ex01.png)
 
 ::: callout-warning
 Make sure your `df` is not grouped to avoid unexpected behavior later as you split and add recipes.
@@ -75,8 +80,9 @@ set.seed(1234)
 ## Exercise 2
 
 Using `tidymodels`, split the data into training and testing splits called `train` and `test`.
-:::
 
+✅ **Answer Check**: Show the code you used.
+:::
 
 
 ## Exercise 3
@@ -108,6 +114,8 @@ Check the fit of the model on the training data. We will focus on two ways of ex
 ## Exercise 5
 
 Compute predictive metrics for the model on our training data using `metrics()`. Then, plot the predicted values against the actual observed values.
+
+✅ **Answer Check**: report the RMSE value from the model.
 :::
 
 ## Exercise 6
@@ -118,6 +126,8 @@ By looking at the predictions against the actual election results, we can see ou
 ## Exercise 6
 
 Let's inspect the model's coefficients and see if they offer any clues. Use the `tidy()` function from the `broom` package. What does the intercept represent? Can you see that reflected on the plot above anywhere? Think about this a bit before moving on to the next exercise to see if you can come up with a theory for what is happening. When you've thought it through, you can expand the explanation below.
+
+✅ **Answer Check**: Briefly describe what the intercept represents.
 
 ::: {.callout-warning icon="false" collapse="true"}
 ## Explanation
@@ -139,7 +149,17 @@ Let's create a recipe and add that to the workflow.
 
 Create a recipe `rec2` that uses a `step_mutate()` to add a recipe step creating a new variable called `prior_uncontested` that is `1` if the democratic vote share was 0 in 2016 and `0` otherwise. Remember, now the formula goes in the recipe rather than directly into the workflow. 
 
+To observe how the recipe you've created modifies the training data, you can use `rec %>% prep() %>% bake(train)` to prep and then "bake" the recipe, applying it to the training data (`train`).
+
 Then, fit this new model and call it `lin_fit2`.
+
+✅ **Answer Check**: Using the results of `bake()`, report the mean of `prior_uncontested` for the training data.
+:::
+
+::: callout-tip
+### What is a recipe?
+
+A `tidymodels` **recipe** is a set of data manipulation and/or preprocessing steps carried out prior to fitting a model. A recipe can be combined with a model inside a **workflow** to take a set of data, preprocess it, and then pipe that through a model. Unlike calling `mutate()` on a dataframe, adding a call of `step_mutate()` in a recipe doesn't modify the data right away. Instead, it just marks this as a step to complete when the recipe is called inside an appropriate workflow or function. In other frameworks the concept of a workflow is often called a "pipeline." For more, see Lecture 4 of Module 1.
 :::
 
 ## Exercise 8
@@ -152,6 +172,8 @@ Now let's examine the fit of our new model and compare it to the previous one.
 Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot the predicted values against the actual observed values.
 
 Have the metrics improved? Focusing on the plot, what do you notice has changed? Does that make sense?
+
+✅ **Answer Check**: Report the new RMSE value.
 :::
 
 ## Exercise 9
@@ -180,6 +202,8 @@ If we don't actually want to use all predictors, we can use the function `step_s
 Compute predictive metrics for the new model on our training data using `metrics()`. Then, plot the predicted values against the actual observed values.
 
 Have the metrics improved? Which of the three models we've fit seems best?
+
+✅ **Answer Check**: Report which model was best and its RMSE value.
 :::
 
 
@@ -191,6 +215,8 @@ Have the metrics improved? Which of the three models we've fit seems best?
 Now compute the metrics for each of the models when predicting the `test` data. How do the metrics compare? Which of the three models seems best?
 
 If the metrics are different, why is that?
+
+✅ **Answer Check**: Report which model was best for the test data and its RMSE value. Explain any differences from the previous answer.
 :::
 
 
@@ -219,6 +245,8 @@ Create a new dataset `test2020` based off of `test` where variables are construc
 Now generate the model's predictions and compute the metrics against the real election results in 2020. How well would such a model do?
 
 Does this differ from the test-set performance we saw within a year and why or why not? Think about the assumptions we are making in generating predictions this way.
+
+✅ **Answer Check**: Report the RMSE value for the new model. Briefly address the difference between the assumptions of the two models.
 :::
 
 

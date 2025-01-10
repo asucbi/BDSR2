@@ -147,6 +147,11 @@ Consider what you should make of the accuracy score you observe in light of the 
 Calculate the expected accuracy of a "classifier" that operates by guessing based on the overall probability of recidivism. How does such a "null" model compare to our model in terms of accuracy?
 :::
 
+::: callout-tip
+## "Null" models
+We'll sometimes refer to a "null" model as a point of comparison. Roughly, kind of like the standard null hypothesis, a null model is one in which "nothing is going on." Usually, it's a model that doesn't depend on any predictors, that just predicts the same thing for every instance. If we can't beat the null model, then we really aren't doing so hot!
+:::
+
 
 ## Exercise 7
 

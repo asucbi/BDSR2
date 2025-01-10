@@ -128,8 +128,8 @@ Let's examine this model in a few ways.
 ::: {.callout-note icon="false"}
 ## Exercise 5
 
-1. First, `tidy()` the model and examine the coefficient for `Supervision_Risk_Score_First`. How would you interpret the coefficient? Compare the odds of recidivating for a parolee with a score of 2 to a score of 9.
-2. Calculate the probability of recidivating for parolees with a score of 2 versus 9:  
+1. First, `tidy()` the model and examine the coefficient for `Supervision_Risk_Score_First`. How would you interpret the coefficient? Calculate the odds ratio of recidivating for a parolee with a score of 2 compared to a parolee with a score of 9.
+2. Then, calculate the probability of recidivating for parolees with a score of 2 versus 9:  
     - using `augment()` or `predict()`
     - manually using `plogis()`
     

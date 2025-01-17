@@ -71,6 +71,7 @@ Hopefully this is kind of fun, but let's also do some even more basic EDA. If we
 ## Exercise 2
 
 Compare the rows representing two different states to diagnose what is going on. Use some kind of join or other comparison to highlight the issue and briefly explain. When you have finished, you can confirm you've got it by expanding the explanation below.
+
 :::
 
 ::: {.callout-warning icon="false" collapse="true"}
@@ -86,6 +87,8 @@ To fix this, we can use a series of joins, including a new type of join you have
 ## Exercise 3
 
 Fix the problem as described in the explanation above. You can overwrite the `hds` dataset when you've got the solution.
+
+**Answer Check**: What responses were never given by respondents from Arizona for item 50, "What word(s) do you use to address a group of two or more people?". You should be able to filter the new dataset to easily find this answer.
 :::
 
 
@@ -113,6 +116,8 @@ $$x'_i = \frac{x_i}{\sum_i x_i}$$
 There is no 100% principled way to do this. If we had more training and validation data, we might treat the degree of smoothing as a **hyperparameter** we could tune (more on that in later modules). For now, find the minimum observed `ans_prop` and replace the `NA` values with a value 1/10 as large. Then, renormalize the probabilities of the answers to ensure they sum to one for each question and state pair.
 
 You can again overwrite the `hds` dataset when you've got the solution.
+
+**Answer Check**: Report the minimum observed value for `ans_prop`.
 :::
 
 
@@ -123,6 +128,8 @@ Let's grab out one respondent from our validation survey data to experiment on a
 ::: {.callout-note icon="false"}
 ## Exercise 5
 Implement the basic model as shown in lecture to generate predicted probabilities for all 50 states for this one respondent's data. Print the first few lines of  the tibble of predictions.
+
+**Answer Check**: Report the probability for "California".
 :::
 
 ::: {.hidden}
@@ -181,6 +188,8 @@ Your function should take the following form `nb_predict(input_data)` and should
 ::: {.callout-note icon="false"}
 ## Exercise 8
 Compare your predictions to the actual observed values in our survey data. Compute an accuracy metric and compare to chance accuracy (briefly describe).
+
+**Answer check**: Report the accuracy, chance accuracy, and describe how you estimated chance accuracy.
 :::
 
 
@@ -198,6 +207,8 @@ Write a new function `nb_predict_topN(input_data, N)` that takes an additional a
 
 Use your new function to compute the top-5 accuracy of the model.
 
+**Answer Check**: Report the top-5 accuracy for the model.
+
 :::
 
 ## BONUS exercise
@@ -210,7 +221,9 @@ Let's keep things relatively simple while experimenting with this a bit by formi
 
 ::: {.callout-note icon="false"}
 ## Exercise 10 (bonus)
-Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Modify your code for `nb_predict_topN` as needed to include that probability as the prior when making predictions. Then, rerun the calculations from exercises 10 and 11 and compare what you find with the uniform vs informative prior.
+Google your way to a reputable-looking dataset for the population of U.S. states and from that compute the probability of living in each state. Modify your code for `nb_predict_topN` as needed to include that probability as the prior when making predictions. Then, rerun the calculations from exercises 8 with this model and compare what you find with the uniform vs informative prior.
+
+**Answer Check**: Report the top-5 accuracy for the informative prior model.
 :::
 
 

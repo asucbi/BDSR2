@@ -1,7 +1,7 @@
 # proc qualtrics
 
 library(tidyverse)
-hds <- read_csv("../../data/hds.csv") # create appropriate HDS data first
+hds <- read_csv("data/hds.csv") # create appropriate HDS data first
 
 hds <- hds %>% 
   distinct(item_num, item, ans_ind, ans_text) %>% 
@@ -17,16 +17,17 @@ out <- hds %>%
   mutate_at(vars(-item), ~ifelse(is.na(.x), "", .x))
 
 
-survey_fake <- read_csv("../../data/dialect-survey.csv")
+survey_fake <- read_csv("data/dialect-survey.csv")
 
 
 read_qualtrics <- function(fname){
   colnames <- colnames(read_csv(fname))
-  survey_q <- read_csv("ASU+dialect+survey+-+BDSR2_January+11,+2024_15.28.csv", skip = 3, col_names = colnames)
+  survey_q <- read_csv(fname, skip = 3, col_names = colnames)
   
   return(survey_q)
 }
 
+survey_q <- read_qualtrics("proc/hds/ASU+dialect+survey+-+BDSR2_January+21,+2025_10.42.csv")
 
 s <- survey_q %>% 
   select(name, state_of_birth, states_lived, contains("_dialect")) %>% 
@@ -40,10 +41,35 @@ s <- survey_q %>%
   mutate(item_num = as.numeric(gsub("_dialect", "", item_num))) %>%
   left_join(out %>% select(item) %>% mutate(item_num = 1:n()), by = c("item_num")) %>% 
   select(-item_num) %>% 
-  left_join(hds %>% distinct(item_num, ans_ind, item, ans_text), by = c("item", "ans_ind") )
+  left_join(hds %>% distinct( ans_ind, item_num, item,ans_text), by = c("item", "ans_ind") )
   
 x <- survey_fake %>% 
   mutate(states_lived = state) %>% 
   bind_rows(s)
 
-write_csv(x, "../../data/dialect-survey-full.csv")
+x <- x %>% 
+  mutate(name = case_when(
+    name == "Matt" ~ "mb",
+    name == "Ayah Abu Zour" ~ "Ayz",
+    name == "Rose Eerdmans" ~ "RE",
+    name == "Alex Pedraza" ~ "Apx",
+    name == "Gabriell Young" ~ "gg",
+    name == "Emma Saiter" ~ "Se",
+    name == "Allie Cross" ~ "AC",
+    name == "Natalie Rossman" ~ "NRo",
+    name == "Taylor Lebensfeld" ~ "TTL",
+    name == "Kristen" ~ "gj",
+    name == "Yasaman" ~ "yy",
+    TRUE ~ name
+  ))
+
+# items <- x %>% 
+#   distinct(item, item_num)
+# 
+# z <- x %>% left_join(items, by = "item")
+z <- x %>% 
+  mutate(
+    item_num = if_else(is.na(item_num), 50, item_num)
+    )
+
+write_csv(z, "data/dialect-survey-full-s25.csv")

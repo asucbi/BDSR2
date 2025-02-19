@@ -1,0 +1,462 @@
+---
+title: "Homework U03: Science literacy across Europe"
+author: "Derek Powell"
+bibliography: ../references.bib
+editor: source
+theme:
+  - cosmo
+  - hwstyle.scss
+---
+
+::: {.callout-caution icon="false"}
+## Learning Objectives
+
+Our learning objectives for this homework are:
+
+- Learn to interpret and visualize the workings of "black box" machine learning models using:
+  - Permutation Feature Importance
+  - PDP and ICE plots
+- Compare interpretations of decision trees and random forest models
+- Become acquainted with methods for applying machine learning methods to small datasets
+
+:::
+
+![](../imgs/science-microscope.png)
+
+In an increasingly complex world, scientific literacy is more important than ever. The ability to think critically, analyze evidence, and apply scientific reasoning affects not only individual success but also the progress of entire societies. But what factors shape students' scientific abilities and their interest in science? How do economic resources and educational investment affect science literacy?
+
+To explore these questions, we’ll analyze data from the Programme for International Student Assessment (**PISA**)---a large-scale international survey that evaluates the scientific, mathematical, and reading abilities of 15-year-olds across the globe. This dataset combines PISA 2006 Science scores with key national development indicators such as income, education, and health indices. By examining patterns in scientific performance and interest across countries, we can gain insights into the broader factors that shape scientific literacy worldwide. 
+
+We'll examine relationships between science literacy and GNI per capita (Purchasing Power Parity, 2005 dollars), Educational Index, Health Index, and Human Development Index from UN data. Credit for compiling the dataset goes to [Michael Clark](https://github.com/m-clark/).
+
+
+```{r dalex_funcs}
+#| include: false
+make_explainer_obj <- function(fitted_workflow){
+  fitted_model <-
+    fitted_workflow %>% 
+    extract_fit_parsnip() # <- parsnip model_fit object
+
+  feature_data <- 
+    fitted_workflow %>% 
+    extract_mold() %>% 
+    pluck("predictors") 
+  
+  outcome_data <- 
+    fitted_workflow %>% 
+    extract_mold() %>% 
+    pluck("outcomes") %>% 
+    pluck(1)    # <- is is a 1D df, make it a vector
+  
+  vip_features <- 
+    explain_tidymodels(
+      fitted_model, 
+      data = feature_data, 
+      y = as.numeric(as.character(outcome_data))
+    )
+  
+  return(vip_features)
+}
+
+
+ggplot_imp <- function(...) {
+  obj <- list(...)
+  metric_name <- attr(obj[[1]], "loss_name")
+  metric_lab <- paste(metric_name, 
+                      "after permutations\n(higher indicates more important)")
+  
+  full_vip <- bind_rows(obj) %>%
+    filter(variable != "_baseline_")
+  
+  perm_vals <- full_vip %>% 
+    filter(variable == "_full_model_") %>% 
+    group_by(label) %>% 
+    summarise(dropout_loss = mean(dropout_loss))
+  
+  p <- full_vip %>%
+    filter(variable != "_full_model_") %>% 
+    mutate(variable = fct_reorder(variable, dropout_loss)) %>%
+    group_by(variable) %>% 
+    mutate(
+      M = mean(dropout_loss),
+      min_loss = perm_vals %>% pull(dropout_loss)
+      ) %>% 
+    ggplot(aes(dropout_loss, variable)) 
+  if(length(obj) > 1) {
+    p <- p + 
+      facet_wrap(vars(label)) +
+      geom_segment(aes(xend = min_loss, x = M, yend = variable ), linewidth = 8, color = "dodgerblue2") +
+      geom_boxplot(aes(color = label, fill = label), alpha = 1, coef = 500, width = .33)
+  } else {
+    p <- p + 
+      geom_segment(aes(xend = min_loss, x = M, yend = variable ), linewidth = 8, color = "dodgerblue2") +
+      geom_boxplot(fill = "dodgerblue4", color = "dodgerblue4", alpha = 1, coef = 500, width = .33) +
+      scale_x_continuous(limits = c(perm_vals %>% pull(dropout_loss), NA))
+    
+  }
+  p +
+    theme(legend.position = "none") +
+    labs(x = metric_lab, 
+         y = NULL,  fill = NULL,  color = NULL)
+}
+
+ggplot_pdp <- function(obj, x) {
+
+  p <- 
+    as_tibble(obj$agr_profiles) %>%
+    mutate(`_label_` = stringr::str_remove(`_label_`, "^[^_]*_")) %>% 
+    ggplot(aes(`_x_`, `_yhat_`)) +
+    geom_line(color = "midnightblue", linewidth = 1.2, alpha = 0.8)
+  
+  p
+}
+
+ggplot_ice <- function(obj, x, center = TRUE) {
+  agg_d <- as_tibble(obj$agr_profiles) %>%
+      mutate(`_label_` = stringr::str_remove(`_label_`, "^[^_]*_"))
+  
+  first_y <- agg_d %>% summarize(first_y = first(`_yhat_`)) %>% pull(first_y)
+  lines_data <- as_tibble(obj$cp_profiles) %>% 
+                group_by(`_ids_`) %>%
+                mutate(firsts = first(`_yhat_`))
+  if (center) {
+    agg_d <- mutate(agg_d, `_yhat_` = `_yhat_` - first_y)
+    lines_data <- lines_data %>% 
+      mutate(`_yhat_` = `_yhat_` - firsts)
+  }
+                
+  p <-
+    agg_d %>%
+      ggplot(aes(`_x_`, `_yhat_`)) +
+      geom_line(data = lines_data,
+                aes(x = {{ x }}, group = `_ids_`),
+                linewidth = 0.5, alpha = 0.1, color = "gray50")
+
+  num_colors <- n_distinct(obj$agr_profiles$`_label_`)
+
+  if (num_colors > 1) {
+    p <- p + geom_line(aes(color = `_label_`), linewidth = 1.2, alpha = 0.8)
+  } else {
+    p <- p + geom_line(color = "midnightblue", linewidth = 1.2, alpha = 0.8)
+  }
+  
+  return(p)
+}
+
+pdp_2way <- function(fitted_workflow, x1, x2, grid_steps = 64, N = 100, custom_range = NULL){
+  var1 <- enquo(x1)
+  x1_var_name <- quo_name(var1)
+  
+  var2 <- enquo(x2)
+  x2_var_name <- quo_name(var2)
+  
+  d <- fitted_workflow %>% 
+      extract_mold() %>% 
+      pluck("predictors")
+  
+  if (is.null(custom_range)){
+    grid <- crossing(
+    !! x1_var_name := seq(min(pull(d, !!var1)), max(pull(d, !!var1)), length.out = grid_steps),
+    !! x2_var_name := seq(min(pull(d, !!var2)), max(pull(d, !!var2)), length.out = grid_steps)
+    )
+  } else {
+    grid <- crossing(
+      !! x1_var_name := seq(custom_range[1,1], custom_range[2,1],  length.out = grid_steps),
+      !! x2_var_name := seq(custom_range[1,2], custom_range[2,2], length.out = grid_steps)
+    )
+  }
+  
+
+  pred_df <-  d %>%
+    sample_n(N) %>%
+    mutate(.id = 1:n()) %>%
+    select(-c(!!var1, !!var2)) %>%
+    cross_join(grid)
+
+  p <- extract_fit_parsnip(fitted_workflow) %>%
+    augment(pred_df) %>%
+    group_by(!!var1, !!var2) %>%
+    summarize(m = mean(.pred)) %>%
+    ggplot(aes(x = !!var1, y = !!var2, fill = m)) +
+    geom_raster(interpolate = TRUE) +
+    # geom_tile(linewidth=0.0) +
+    scale_fill_viridis_c() +
+    theme_minimal() +
+    theme(panel.grid = element_blank())
+  
+  return(p)
+  
+}
+```
+
+Below is some code to load and pre-process the data.
+
+```{r}
+#| message: false
+
+library(tidyverse)
+library(tidymodels)
+
+pisa <-  read_csv('https://raw.githubusercontent.com/m-clark/generalized-additive-models/master/data/pisasci2006.csv') %>% 
+  filter(!is.na(Overall), !is.na(Income), !is.na(Edu))
+```
+
+## Exercise 1
+::: {.callout-note icon="false"}
+## Exercise 1
+
+1. Create a recipe to predict `Overall` science interest from income, education, and health variables from the `pisa` dataset.
+2. Create model specifications for linear regression, decision tree, and random forest models. For the decision tree model, set the `min_n` argument to 5, to improve fitting for our small amount of data.
+3. Combine these into workflows (or a workflow set, if you prefer) for each of the three types of models.
+:::
+
+
+## Exercise 2
+
+You'll notice that the `pisa` dataset is not very large. We're going to break one of our major rules in this homework: we won't split our data into separate training and testing sets before fitting models. We will still use cross-validation to get out-of-sample performance estimates. This won't be so problematic here since we won't do any tuning of our models. But because we don't have a true test dataset, this means we won't be able to get a good estimate of our future model performance. I'll return to this issue and discuss how we can approach these situations in the final section of the homework.
+
+But for now, we will treat the full `pisa` dataset as our training data.
+
+::: {.callout-note icon="false"}
+## Exercise 2
+
+Perform 10-fold cross validation to evaluate the out-of-sample performance for each of the model types on the `pisa` data. Compare the models according to RMSE. Which does best?
+:::
+
+::: callout-important
+Make sure you set a seed value before creating your folds and before fitting random forest models in order to ensure your results are reproducible. Use `set.seed(1234)` to match the answer key results.
+:::
+
+
+
+## Exercise 3
+
+Let's dig into our random forest model. For the next few exercises, we'll fit a single random forest model to the full `pisa` data. We'll start by examining the importance of each feature.
+
+::: {.callout-note icon="false"}
+## Exercise 3
+
+Fit a random forest model workflow to the full `pisa` data, and call it `fitted_workflow`.
+
+Then, Follow the steps shown in lectures to prepare a `DALEX` `explainer` object and use the `ggplot_imp()` function (provided for you in `helpers.R`) to plot the feature importances. Interpret these importance scores two ways:
+
+1. Holistically: Which are important/less important?
+2. Specifically: What do the actual importance values mean? Interpret the specific value and its calculation for the `Income` predictor. (Hint: The value indicates that ________ to the Income predictor [increase/descreases] the model's _______ by ______.)
+
+Briefly describe both your interpretations.
+:::
+
+
+## Exercise 4
+
+Now let's explore our model through visualizations. We'll visualize the predicted values of `Overall` science enthusiasm by each of our three predictors.
+
+::: {.callout-note icon="false"}
+## Exercise 4
+Make a centered conditional ICE plot for `Income`, `Edu`, and `Health` predictors (three plots, one for each predictor).
+:::
+
+## Exercise 5
+
+::: {.callout-note icon="false"}
+## Exercise 5
+Examine ICE plot for `Income`. Does this look like a linear or non-linear relationship? Briefly explain why or why not.
+:::
+
+
+## Exercise 6
+
+One of the virtues of linear models is their interpretability. Let's compare the insights we get from our feature importance and ICE plots to the kind of interpretations we get from a linear model.
+
+::: {.callout-note icon="false"}
+## Exercise 6
+Fit a linear model with `lm()` to estimate standardized coefficients (you can use the whole `pisa` dataset). Compare these coefficients to the feature importance values and what you see in the ICE plots.
+
+1. Display the `summary()` of your linear model
+2. Briefly describe where the linear model coefficients and random forest importance values seem to agree/disagree
+3. Compare the linear model coefficients and ICE plots. Breifly describe how they relate to one another.
+4. For any disagreements between the importance values and coefficients, briefly speculate as to why they may differ.
+:::
+
+
+## Exercise 7
+
+We can also visualize more complex two-way interactions among variables, using two-way PDP plots. This can give insight into interactions among variables that can sometimes be naturally uncovered by flexible, non-linear models like Random Forests.
+
+::: {.callout-note icon="false"}
+## Exercise 7
+Create a two-way PDP plot visualizing the effects of `Income` and `Edu` on the model's predictions using the `pdp_2way()` function. Set the `N` argument to the number of rows in the `pisa` dataset.
+
+Briefly describe how you interpret the results shown in the plot you have created.
+:::
+
+
+## Exercise 8
+A virtue of decision trees over random forests are the potential for direct interpretation of a decision-trees splitting rules. Let's compare a decision tree to the two-way PDP plot your just created.
+
+::: {.callout-note icon="false"}
+## Exercise 8
+First, fit a decision tree workflow to the full `pisa` dataset. Then, we will need to extract just the fitted decision tree model. Using the default engine, this will be an `rpart` object, which we can plot using the `rpart.plot()` function from the `rpart.plot` library.
+
+It's a bit clunky, so here's a function you can use to do this extraction and plot the tree:
+
+```r
+plot_decision_tree <- function(x){
+  x %>% 
+    pull_workflow_fit() %>% 
+    .$fit %>% 
+    rpart.plot::rpart.plot()
+}
+```
+
+Plot the tree and compare what you see here to the various interpretive plots we have created. Briefly answer three questions:
+
+1. How do these splitting rules align with the feature importances we calculated?
+2. How do these splitting rules align with the trends shown in the ICE plots?
+3. How do these splitting rules compare with the two-way PDP plot?
+:::
+
+
+# Nested Cross-Validation for small datasets
+
+Typically, we split our data into training and testing splits, using the training data to tune hyperparameters, conduct feature engineering, and select models. In this step, we predict their out-of-sample predictive performance using cross-validation or similar procedures. Then, we "validate", or assess a final chosen model's out-of-sample predictive performance on the held-out testing set. But if cross-validation already estimates out-of-sample performance, why this final step?
+
+The issue is in those steps of tuning, feature engineering, and model selection: as we make decisions about each of these steps based on the cross-validation performance, we risk overfitting our final chosen model to the data on which it is cross-validated. This can produce biased or "optimistic" estimates of its future performance. Re-estimating its performance on the held-out testing data provides an unbiased estimate.
+
+But what about settings like the situation we find ourselves in currently, where we don't have enough data to establish a dedicated held-out testing set? Here, we can employ **nested cross-validation** to achieve unbiased estimates of model performance. The approach is described in the figure below. We start by generating a set of k-fold "outer" cross-validation splits. Then, within the "training" portion of each of these, we create another set of k-fold cross-validation splits. We fit our models on the "training" portions of these inner k-fold splits, and tune our hyperparameters using the cross-validation performance estimated on the "validation" splits. Then, we estimate the final out-of-sample performance of this fitting procedure on the "validation" splits of the outer cross-validation folds.
+
+```{mermaid}
+graph LR
+  d[(Data)] --> split([Split]) --> trainSplit[(Training 1)]
+  split[Resample 1] --> testSplit[(Testing 1)]
+  trainSplit --> resamp([Resampling])
+  resamp --> m1 & m3 & m4
+
+  subgraph if1[Inner Folds 1]
+  m1[Model 1] & m3[...] & m4[Model j]
+  end
+
+  m1 & m3 & m4 --> sel{{Model selection}}
+  sel --> final[Best Model 1]
+  trainSplit --> final
+  final --> val{{Validation 1}}
+  testSplit ------> val
+  
+  d[(Data)] --> splitz([...]) ----> modelz ----> valz{{...}}
+  
+  subgraph if[Inner Folds ...]
+  modelz[...]
+  end  
+  
+  d[(Data)] --> split1([Resample k]) --> trainSplit1[(Training k)]
+  split1 --> testSplit1[(Testing k)]
+  trainSplit1 --> resamp1([Resampling])
+  resamp1 --> m11  & m31 & m41
+  
+  subgraph if2[Inner Folds k]
+  m11[Model 1] & m31[...] & m41[Model j]
+  end
+
+  m11 & m31 & m41 --> sel1{{Model selection}}
+  sel1 --> final1[Best Model k]
+  trainSplit1 --> final1
+  final1 --> val1{{Validation k}}
+  testSplit1 ------> val1
+  
+  subgraph outer-folds[Outer Folds]
+  split & splitz & split1 
+  end
+  
+```
+
+In the `tidymodels` framework, this can be accomplished with the `nested_folds()` function. Unfortunately, working with this arrangement is less convenient, as functions like `fit_resamples()` and `tune_grid()` have to be applied to each of the outer folds, and the resulting out-of-sampel validation performance must be calculated manually. The code below gives an example of how this can be accomplished for your reference.
+
+```{r}
+#| include: false
+
+set.seed(1234)
+```
+
+
+```{r}
+#| message: false
+#| warning: false
+
+# set up nested cross-validation
+nested_folds <- nested_cv(
+  pisa,
+  outside = vfold_cv(v = 10),
+  inside = vfold_cv(v = 10)
+)
+
+# model tuning specification
+rf_mod_tune <- rand_forest(mode = "regression", trees = 500, mtry = tune(), min_n = tune())
+rec <- recipe(Overall ~ Income + Edu + Health, pisa)
+
+# set up tuning parameter grid
+tune_grid <- expand_grid(
+  mtry = c(1, 2),
+  min_n = c(5, 3, 1)
+)
+
+# do the tuning
+nested_fits <- nested_folds %>%
+  mutate(
+    fit = map(inner_resamples, ~tune_grid(rf_mod_tune, rec, resamples = .x), grid = tune_grid, save_workflow = TRUE)
+  )
+
+# estimate the performance of the selected best model for each of outer folds validation data
+nested_result <- nested_fits %>%
+  mutate(
+    best_fit = map(fit, ~select_best(.x, metric = "rmse")),
+    finalized_model = map(best_fit, ~finalize_model(rf_mod_tune, .x)),
+    finalized_wflow = map(finalized_model, ~workflow(rec, .x)),
+    res = map2(finalized_wflow, splits, ~last_fit(.x, .y)),
+    metrics = modify(res, collect_metrics)
+  )
+
+# extract and summarize the out-of-sample performance
+outer_scores <- nested_result %>%
+  mutate(
+    rmse = map_dbl(metrics, ~.x %>% filter(.metric=="rmse") %>% pull(.estimate)),
+    rsq = map_dbl(metrics, ~.x %>% filter(.metric=="rsq") %>% pull(.estimate)),
+  )
+
+outer_scores %>%
+  select(rmse, rsq) %>%
+  gather(metric, estimate) %>%
+  group_by(metric) %>%
+  summarize(
+    est = mean(estimate),
+    std_err = sd(estimate, )/sqrt(n()-1)
+  )
+```
+
+A major drawback to this approach is that it multiplies the number of models that must be fit, since they are fit across both inner and outer folds. For example, 5-fold inner cross-validations within 10-fold outer cross-validation, means each model is fit 50 times (and this is then multiplied by each hyperparameter tuning configuration, etc.). This can create a high computational cost.
+
+## Exercise 9
+
+::: {.callout-note icon="false"}
+## Exercise 9
+How many models are being fit to perform the hyperparameter tuning and performance validation in the code above? Look over the code to calculate and report the exact number. (Hint: The math is easy, but you'll have to read-through and understand the code somewhat)
+:::
+
+
+## Exercise 10
+
+::: {.callout-note icon="false"}
+## Exercise 10
+How does the RMSE estimated with nested cross validation compare to the naive estimate you created in your own code above? (Exercise 2)? Briefly describe what you observe.
+:::
+
+
+# Wrapping up
+
+When you are finished, knit your Quarto document to a PDF file.
+
+::: {.callout-important icon="false"}
+**MAKE SURE YOU LOOK OVER THIS FILE CAREFULLY BEFORE SUBMITTING**
+:::
+
+When you are sure it looks good, submit it on Canvas in the appropriate assignment page.
+

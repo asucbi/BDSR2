@@ -319,7 +319,7 @@ Plot the tree and compare what you see here to the various interpretive plots we
 
 # Nested Cross-Validation for small datasets
 
-Typically, we split our data into training and testing splits, using the training data to tune hyperparameters, conduct feature engineering, and select models. In this step, we predict their out-of-sample predictive performance using cross-validation or similar procedures. Then, we "validate", or assess a final chosen model's out-of-sample predictive performance on the held-out testing set. But if cross-validation already estimates out-of-sample performance, why this final step?
+Recall, we broke one of our number one rules in this homework. Typically, we split our data into training and testing splits, using the training data to tune hyperparameters, conduct feature engineering, and select models. In this step, we predict their out-of-sample predictive performance using cross-validation or similar procedures. Then, we "validate", or assess a final chosen model's out-of-sample predictive performance on the held-out testing set. But if cross-validation already estimates out-of-sample performance, why this final step?
 
 The issue is in those steps of tuning, feature engineering, and model selection: as we make decisions about each of these steps based on the cross-validation performance, we risk overfitting our final chosen model to the data on which it is cross-validated. This can produce biased or "optimistic" estimates of its future performance. Re-estimating its performance on the held-out testing data provides an unbiased estimate.
 
@@ -369,7 +369,7 @@ graph LR
   
 ```
 
-In the `tidymodels` framework, this can be accomplished with the `nested_folds()` function. Unfortunately, working with this arrangement is less convenient, as functions like `fit_resamples()` and `tune_grid()` have to be applied to each of the outer folds, and the resulting out-of-sampel validation performance must be calculated manually. The code below gives an example of how this can be accomplished for your reference.
+In the `tidymodels` framework, this can be accomplished with the `nested_folds()` function. Unfortunately, working with this arrangement is less convenient, as functions like `fit_resamples()` and `tune_grid()` have to be applied to each of the outer folds, and the resulting out-of-sample validation performance must be calculated manually. The code below gives an example of how this can be accomplished for your reference.
 
 ```{r}
 #| include: false
@@ -432,9 +432,10 @@ outer_scores %>%
   )
 ```
 
-A major drawback to this approach is that it multiplies the number of models that must be fit, since they are fit across both inner and outer folds. For example, 5-fold inner cross-validations within 10-fold outer cross-validation, means each model is fit 50 times (and this is then multiplied by each hyperparameter tuning configuration, etc.). This can create a high computational cost.
 
 ## Exercise 9
+
+A major drawback to nested cross-validation is that this approach multiplies the number of models that must be fit, since they are fit across both inner and outer folds. For example, 5-fold inner cross-validations within 10-fold outer cross-validation, means each model is fit 50 times (and this is then multiplied by each hyperparameter tuning configuration, etc.). This can create a high computational cost.
 
 ::: {.callout-note icon="false"}
 ## Exercise 9

@@ -19,7 +19,7 @@ Our learning objectives for this lab are:
 
 ![](../imgs/mallcustomers.jpg)
 
-One common industry application for clustering is market segmentation--trying to group potential customers into subsets based on demographics, needs, priorities, common interests, etc. For this lab, we'll be looking at a dataset containing information on 200 mall customers, including their gender, age, annual income, and spending score (how much they spend at the mall). Our goal will be to attempt to discover useful groupings in the dataset--groupings that, for example, could be used to design targeted ads, or recommend products based on what other similar individuals have liked.
+One common industry application for clustering is market segmentation: trying to group potential customers into subsets based on demographics, needs, priorities, common interests, etc. For this lab, we'll be looking at a dataset containing information on 200 mall customers, including their gender, age, annual income, and spending score (how much they spend at the mall). Our goal will be to attempt to discover useful groupings in the dataset--groupings that, for example, could be used to design targeted ads, or recommend products based on what other similar individuals have liked.
 
 ## Library and data loading
 
@@ -39,7 +39,7 @@ As always, our first step is to explore our data with some visualizations.
 ::: {.callout-note icon="false"}
 ## Exercise 1.A
 
-Begin by building histograms for `Age`, `AnnualIncome` and `SpendingScore`, and a plot showing the breakdown of `Gender` (it could also be a histogram, but bonus points for a pie chart)
+Begin by building histograms for `Age`, `AnnualIncome` and `SpendingScore`, and a plot showing the breakdown of `Gender` (bonus points for plotting `Gender` as a pie chart rather than histogram)
 :::
 
 ```{r}
@@ -66,7 +66,7 @@ In each scatterplot, color the points by `Gender`.
 
 ```
 
-Do you notice any obvious clusters in the data? The first thing expect a clustering algorithm to do is to capture the patterns that we can visually detect. Of course, it may also be helpful for finding clusters in the data that we *can't* easily see--ones that cut across multiple dimensions--but we probably don't have high confidence in those if it doesn't find the ones that our obvious to the eye.
+Do you notice any obvious clusters in the data? The least we expect a clustering algorithm to do is to capture the patterns that we can visually detect. Of course, it may also be helpful for finding clusters in the data that we *can't* easily see--ones that cut across multiple dimensions--but we probably don't have high confidence in those if the algorithm can't even find the ones that *are* obvious to the eye.
 
 Often, clustering is an exploratory process. There is no single "correct" way to assign data points into clusters, but instead we're looking for a *reasonable* way to chunk the data *for some purpose*. However, we can still use some rules of thumb to make reasonable decisions about which clustering algorithm to use, and to tune our model parameters.
 

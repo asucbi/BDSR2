@@ -1,11 +1,11 @@
 ---
 title: |
-  | Language Models:
-  | From RNNs to LLMs
+  | Language Networks:
+  | `From RNNs to LLMs`
 subtitle: | 
   | Behavioral Data Science in R II
   | Unit 5
-  | Module 12
+  | Module 13
 format: 
   revealjs:
     css: style.css
@@ -28,23 +28,11 @@ format:
 - Adds feedback loops 
   - Previous state(s) become part of the next input ("short term memory")
 - Allows for processing sequential/temporal data, where order matters
-- Can handle sequences of varying lengths, and create outputs of varying lengths
-
-:::
-
-![](../imgs/rnn-vs-fnn.png)
-
-## Recurrent Neural Networks
-
-:::{style="font-size:65%;"}
-- Adds feedback loops 
-  - Previous state(s) become part of the next input ("short term memory")
-- Allows for processing sequential/temporal data, where order matters
 - Can handle sequences of varying lengths
 
 :::
 
-![](../imgs/rnn-vs-fnn2.png)
+![](../imgs/rnn-vs-fnn.png)
 
 ## ANN Benchmarks
 
@@ -52,7 +40,7 @@ format:
 
 ## Common applications of RNNs
 
-:::{.incremental style="font-size:80%;"}
+:::{style="font-size:80%;"}
 - Text classification (e.g. sentiment analysis)
 - Text generation (e.g. image-captioning)
 - Translation
@@ -63,7 +51,7 @@ format:
 
 :::
 
-## [Backpropagation through time by unrolling]{style="font-size:75%;"}
+## ["Backpropagation through time" (BPTT) by unrolling]{style="font-size:75%;"}
 
 :::{.fragment}
 - Often trained via next-word prediction
@@ -112,8 +100,15 @@ format:
 ## Encoder-decoder models
 
 :::{style="font-size:70%;" .incremental}
-- RNNs can handle sequences of varying length, but the input will always have the same length as the output
+- RNNs can handle sequences of varying length, but the ratio of input length to output length is constant
 - For some applications, such as translation and question-answering, we might want to allow the output to be a different length from the input
+:::
+
+## Encoder-decoder models
+
+:::{style="font-size:70%;"}
+- RNNs can handle sequences of varying length, but the ratio of input length to output length is constant
+- For some applications, such as translation and question-answering, we might want to allow the output to vary in length
 :::
 
 ![](../imgs/encoderdecoder.png)
@@ -130,16 +125,16 @@ format:
 
 ![](../imgs/annAttention.png)
 
-## [Multi-Head Attention & Transformers (est. 2017)]{style="font-size:80%;"}
+## [Transformers: Multi-head & Cross Attention]{style="font-size:80%;"}
 
 :::{.columns}
 ::::{.column width=50%}
-:::{style="font-size:70%;" .incremental}
+:::{style="font-size:65%;" .incremental}
 - Stacks multiple attention layers, such that each attention head can learn to focus on dependencies over different lengths 
   - e.g. within-sentence dependencies vs within-conversation dependencies
 - Has self-attention, but also "cross-attention"
   - Decoder side also attends to the encoder, in addition to itself
-- Rather than processing inputs one at a time, Transformer models process an entire sequence in parallel
+- Rather than processing inputs one at a time, Transformer models process an entire sequence in parallel by applying a *positional encoding*
   - Helps with the problem of RNNs being slow to train
 
 :::
@@ -153,7 +148,7 @@ format:
 ## Encoder- and Decoder-only models
 
 :::{.columns}
-::::{.column width=40%}
+::::{.column width=30%}
 :::{style="font-size:50%;" .incremental}
 - Encoder-only models such as **BERT** are trained through masked-token prediction
   - Only requires learning the relationships among encoded words
@@ -165,7 +160,7 @@ format:
 :::
 ::::
 
-::::{.column width=60%}
+::::{.column width=70%}
 ![](../imgs/bertvsgpt.png)
 ::::
 :::
@@ -174,9 +169,9 @@ format:
 
 ![](../imgs/LLMsMoore.png)
 
-## Is human language computationally intractable? {.small}
+## [Is human language computationally intractable?]{style="font-size:70%;"}
 
 
-![Van Rooij, et al. (2024). Reclaiming AI as a theoretical tool for cognitive science. Computational Brain & Behavior, 7(4), 616-636.](../imgs/intractability.jpg)
+![[Van Rooij, et al. (2024). Reclaiming AI as a theoretical tool for cognitive science. Computational Brain & Behavior, 7(4), 616-636.]{style="font-size:70%;"}](../imgs/intractability.png)
 
 

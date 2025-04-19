@@ -10,7 +10,7 @@
 <link href="m13-01_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
   <meta name="generator" content="quarto-1.5.57">
 
-  <title>quarto-inputf603fb81d1b10a50</title>
+  <title>quarto-input4f44325f0196f983</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -326,11 +326,11 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title"><div class="line-block">Language Models:<br>
-From RNNs to LLMs</div></h1>
+  <h1 class="title"><div class="line-block">Language Networks:<br>
+<code>From RNNs to LLMs</code></div></h1>
   <p class="subtitle"></p><div class="line-block">Behavioral Data Science in R II<br>
 Unit 5<br>
-Module 12</div><p></p>
+Module 13</div><p></p>
 
 <div class="quarto-title-authors">
 </div>
@@ -358,25 +358,11 @@ Module 12</div><p></p>
 <li class="fragment">Previous state(s) become part of the next input (“short term memory”)</li>
 </ul></li>
 <li class="fragment">Allows for processing sequential/temporal data, where order matters</li>
-<li class="fragment">Can handle sequences of varying lengths, and create outputs of varying lengths</li>
+<li class="fragment">Can handle sequences of varying lengths</li>
 </ul>
 </div>
 
 <img data-src="../imgs/rnn-vs-fnn.png" class="r-stretch"></section>
-<section id="recurrent-neural-networks-1" class="slide level2">
-<h2>Recurrent Neural Networks</h2>
-<div style="font-size:65%;">
-<ul>
-<li>Adds feedback loops
-<ul>
-<li>Previous state(s) become part of the next input (“short term memory”)</li>
-</ul></li>
-<li>Allows for processing sequential/temporal data, where order matters</li>
-<li>Can handle sequences of varying lengths</li>
-</ul>
-</div>
-
-<img data-src="../imgs/rnn-vs-fnn2.png" class="r-stretch"></section>
 <section id="ann-benchmarks" class="slide level2">
 <h2>ANN Benchmarks</h2>
 
@@ -385,18 +371,18 @@ Module 12</div><p></p>
 <h2>Common applications of RNNs</h2>
 <div style="font-size:80%;">
 <ul>
-<li class="fragment">Text classification (e.g.&nbsp;sentiment analysis)</li>
-<li class="fragment">Text generation (e.g.&nbsp;image-captioning)</li>
-<li class="fragment">Translation</li>
-<li class="fragment">Speech recognition</li>
-<li class="fragment">Time-series prediction</li>
-<li class="fragment">Autocomplete</li>
-<li class="fragment">Stimulus construction in psycholinguistics</li>
+<li>Text classification (e.g.&nbsp;sentiment analysis)</li>
+<li>Text generation (e.g.&nbsp;image-captioning)</li>
+<li>Translation</li>
+<li>Speech recognition</li>
+<li>Time-series prediction</li>
+<li>Autocomplete</li>
+<li>Stimulus construction in psycholinguistics</li>
 </ul>
 </div>
 </section>
-<section id="backpropagation-through-time-by-unrolling" class="slide level2">
-<h2><span style="font-size:75%;">Backpropagation through time by unrolling</span></h2>
+<section id="backpropagation-through-time-bptt-by-unrolling" class="slide level2">
+<h2><span style="font-size:75%;">“Backpropagation through time” (BPTT) by unrolling</span></h2>
 <div class="fragment">
 <ul>
 <li>Often trained via next-word prediction</li>
@@ -449,8 +435,17 @@ Module 12</div><p></p>
 <h2>Encoder-decoder models</h2>
 <div style="font-size:70%;">
 <ul>
-<li class="fragment">RNNs can handle sequences of varying length, but the input will always have the same length as the output</li>
+<li class="fragment">RNNs can handle sequences of varying length, but the ratio of input length to output length is constant</li>
 <li class="fragment">For some applications, such as translation and question-answering, we might want to allow the output to be a different length from the input</li>
+</ul>
+</div>
+</section>
+<section id="encoder-decoder-models-1" class="slide level2">
+<h2>Encoder-decoder models</h2>
+<div style="font-size:70%;">
+<ul>
+<li>RNNs can handle sequences of varying length, but the ratio of input length to output length is constant</li>
+<li>For some applications, such as translation and question-answering, we might want to allow the output to vary in length</li>
 </ul>
 </div>
 
@@ -468,11 +463,11 @@ Module 12</div><p></p>
 </div>
 
 <img data-src="../imgs/annAttention.png" class="r-stretch"></section>
-<section id="multi-head-attention-transformers-est.-2017" class="slide level2">
-<h2><span style="font-size:80%;">Multi-Head Attention &amp; Transformers (est. 2017)</span></h2>
+<section id="transformers-multi-head-cross-attention" class="slide level2">
+<h2><span style="font-size:80%;">Transformers: Multi-head &amp; Cross Attention</span></h2>
 <div class="columns">
 <div class="column" style="width:50%;">
-<div style="font-size:70%;">
+<div style="font-size:65%;">
 <ul>
 <li class="fragment">Stacks multiple attention layers, such that each attention head can learn to focus on dependencies over different lengths
 <ul>
@@ -482,7 +477,7 @@ Module 12</div><p></p>
 <ul>
 <li class="fragment">Decoder side also attends to the encoder, in addition to itself</li>
 </ul></li>
-<li class="fragment">Rather than processing inputs one at a time, Transformer models process an entire sequence in parallel
+<li class="fragment">Rather than processing inputs one at a time, Transformer models process an entire sequence in parallel by applying a <em>positional encoding</em>
 <ul>
 <li class="fragment">Helps with the problem of RNNs being slow to train</li>
 </ul></li>
@@ -495,7 +490,7 @@ Module 12</div><p></p>
 <section id="encoder--and-decoder-only-models" class="slide level2">
 <h2>Encoder- and Decoder-only models</h2>
 <div class="columns">
-<div class="column" style="width:40%;">
+<div class="column" style="width:30%;">
 <div style="font-size:50%;">
 <ul>
 <li class="fragment">Encoder-only models such as <strong>BERT</strong> are trained through masked-token prediction
@@ -510,7 +505,7 @@ Module 12</div><p></p>
 </ul></li>
 </ul>
 </div>
-</div><div class="column" style="width:60%;">
+</div><div class="column" style="width:70%;">
 <p><img data-src="../imgs/bertvsgpt.png"></p>
 </div></div>
 </section>
@@ -518,10 +513,10 @@ Module 12</div><p></p>
 <h2>Diminishing returns of LLMs</h2>
 
 <img data-src="../imgs/LLMsMoore.png" class="r-stretch"></section>
-<section id="is-human-language-computationally-intractable" class="slide level2 small">
-<h2>Is human language computationally intractable?</h2>
+<section id="is-human-language-computationally-intractable" class="slide level2">
+<h2><span style="font-size:70%;">Is human language computationally intractable?</span></h2>
 
-<img data-src="../imgs/intractability.jpg" class="r-stretch quarto-figure-center"><p class="caption">Van Rooij, et al.&nbsp;(2024). Reclaiming AI as a theoretical tool for cognitive science. Computational Brain &amp; Behavior, 7(4), 616-636.</p><div class="quarto-auto-generated-content">
+<img data-src="../imgs/intractability.png" class="r-stretch quarto-figure-center"><p class="caption"><span style="font-size:70%;">Van Rooij, et al.&nbsp;(2024). Reclaiming AI as a theoretical tool for cognitive science. Computational Brain &amp; Behavior, 7(4), 616-636.</span></p><div class="quarto-auto-generated-content">
 <div class="footer footer-default">
 
 </div>

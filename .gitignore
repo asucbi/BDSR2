@@ -68,3 +68,5 @@ proc/**/data
 
 # cached files
 */*_files/*
+
+**/*.quarto_ipynb

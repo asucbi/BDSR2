@@ -51,8 +51,9 @@ Our first step will be to set up our data so we can build our models. For each d
 
 First, do some further data munging of the sort we learned last semester.
 
-1.  Filter `df` to include only the rows for Democrat and Republican candidates
-2.  Pivot the data to a wide format, so that for each Congressional district we have variables representing the proportion of democratic votes in 2014, 2016, 2018, and 2020, and whether or not there was a democrat incumbent going into the 2018 election. If there is more than one D or R candidate, use the proportion value for the candidate with the most votes.
+1.  Filter `df` to include only the rows for Democrat candidates
+2.  Add a column `inc` that indicates whether there was a Democratic incumbent at the time of each election. For the 2014 election in every State/District, `inc` will be `NA`, because there is no election data before 2014. But for the 2016 election in each State/District, `inc` will indicate whether a Democrat won that State/District in 2014.
+3.  Pivot the data to a wide format, so that for each Congressional district we have variables representing the proportion of democratic votes in 2014, 2016, 2018, and 2020, and whether or not there was a democrat incumbent going into 2016, 2018, and 2020. If there is more than one D candidate, use the proportion value for the candidate with the most votes.
 3.  Replace `NA` values for vote proportion and incumbency with zero---if there's not value it's because no one ran and therefore they got zero votes.
 
 ✅ **Answer Check**: Report the number of rows in your resulting dataset (`nrow(df)`).

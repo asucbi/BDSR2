@@ -53,15 +53,19 @@ First, do some further data munging of the sort we learned last semester.
 
 1.  Filter `df` to include only the rows for Democrat candidates
 2.  Add a column `inc` that indicates whether there was a Democratic incumbent at the time of each election. 
+
 ::: {.callout-tip collapse="true"}
-Hint:
+## Hint:
 For the 2014 election in every State/District, `inc` will be `NA`, because there is no election data before 2014. But for the 2016 election in each State/District, `inc` will indicate whether a Democrat won that State/District in 2014. 
 :::
+
 3.  Pivot the data to a wide format, so that for each Congressional district we have variables representing the proportion of democratic votes in 2014, 2016, 2018, and 2020, and whether or not there was a democrat incumbent going into 2016, 2018, and 2020. If there is more than one D candidate, use the proportion value for the candidate with the most votes. 
+
 ::: {.callout-tip collapse="true"}
-Hint: 
+## Hint: 
 Since you should end up with one row per Congressional district, your pivot statement should be aware of the columns needed to uniquely identify each Congressional district.
 ::: 
+
 3.  Replace `NA` values for vote proportion and incumbency with zero---if there's not value it's because no one ran and therefore they got zero votes.
 
 ✅ **Answer Check**: Report the number of rows in your resulting dataset (`nrow(df)`).

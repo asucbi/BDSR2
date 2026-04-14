@@ -38,7 +38,7 @@ library(ggplot2)
 
 ```{r, eval=F}
 train <- image_dataset_from_directory( 
-  "./train", 
+  "./fer-2013/train", 
   labels = "inferred", 
   label_mode = "int", 
   color_mode = "grayscale", 
@@ -50,7 +50,7 @@ train <- image_dataset_from_directory(
 ) 
 
 val <- image_dataset_from_directory( 
-  "./train", 
+  "./fer-2013/train", 
   labels = "inferred", 
   label_mode = "int", 
   color_mode = "grayscale", 
@@ -62,7 +62,7 @@ val <- image_dataset_from_directory(
 ) 
 
 test <- image_dataset_from_directory( 
-  "./test", 
+  "./fer-2013/test", 
   labels = "inferred", 
   label_mode = "int", 
   color_mode = "grayscale", 
@@ -70,6 +70,7 @@ test <- image_dataset_from_directory(
   batch_size = 128
 ) 
 ```
+
 ## Plot one image from each class
 
 ```{r, eval=F}

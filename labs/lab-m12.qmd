@@ -142,7 +142,7 @@ model <- keras_model_sequential() %>%
 ```{r, eval=F}
 model %>% compile(
   optimizer = 'adam',
-  loss = loss_sparse_categorical_crossentropy, 
+  loss = loss_sparse_categorical_crossentropy(from_logits = TRUE), 
   metrics = 'accuracy'
 )
 
